@@ -1,18 +1,25 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const rxjs_1 = require("rxjs");
 const tag_endpoint_1 = require("../endpoints/tag-endpoint");
+const operators_1 = require("rxjs/operators");
 class JiraTagUseCase {
-    execute(identifier) {
-        console.log("very enterprise");
-        identifier.greet();
-        return rxjs_1.of(new JiraTagUseCaseOutput());
+    constructor(dependencies) {
+        this.commitExtractor = dependencies.commitExtractor;
+        this.jiraTickerParser = dependencies.jiraTicketParser;
+        this.jiraTicketTagger = dependencies.jiraTicketTagger;
+    }
+    execute(input) {
+        return this.commitExtractor
+            .commits(input.identifier)
+            .pipe(operators_1.map(x => this.jiraTickerParser.parse(x)))
+            .pipe(operators_1.map(x => this.jiraTicketTagger.tag(x, input.tag)))
+            .pipe(operators_1.mapTo(new JiraTagUseCaseOutput()));
     }
 }
 exports.JiraTagUseCase = JiraTagUseCase;
 class JiraMappers {
     map(useCaseOutput) {
-        return new tag_endpoint_1.TagEndpointResponse(useCaseOutput.onlyIHaveThis);
+        return new tag_endpoint_1.TagEndpointResponse();
     }
     mapToUseCase() {
         return new JiraTagUseCaseInput();
@@ -20,13 +27,7 @@ class JiraMappers {
 }
 exports.JiraMappers = JiraMappers;
 class JiraTagUseCaseInput {
-    greet() {
-        console.log("bem loko isso");
-    }
 }
 class JiraTagUseCaseOutput {
-    constructor() {
-        this.onlyIHaveThis = "seriao????";
-    }
 }
 //# sourceMappingURL=tag-use-case.js.map

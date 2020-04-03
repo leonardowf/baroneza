@@ -34,8 +34,4 @@ export class TagEndpoint {
 }
 
 export class TagEndpointResponse {
-    name: string
-    constructor(name: string) {
-        this.name = name
-    }
 }

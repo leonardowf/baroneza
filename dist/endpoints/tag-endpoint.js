@@ -14,9 +14,6 @@ class TagEndpoint {
 }
 exports.TagEndpoint = TagEndpoint;
 class TagEndpointResponse {
-    constructor(name) {
-        this.name = name;
-    }
 }
 exports.TagEndpointResponse = TagEndpointResponse;
 //# sourceMappingURL=tag-endpoint.js.map
