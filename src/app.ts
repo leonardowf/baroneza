@@ -1,10 +1,17 @@
 import express from 'express';
+import { range, interval } from "rxjs";
+import { map, filter, take, toArray } from "rxjs/operators";
+import { TagEndpoint, TagEndpointDependencies } from './endpoints/tag-endpoint';
+import { Dependencies } from './endpoints/dependencies';
 
 const app = express();
 const port = 3000;
+const dependencies = new Dependencies()
 
 app.get('/', (req, res) => {
-  res.send('The sedulous hyena ate the antelope!');
+  new TagEndpoint(dependencies)
+  .execute()
+  .subscribe(x => res.send(x));
 });
 
 app.listen(port, err => {

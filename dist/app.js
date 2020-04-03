@@ -4,10 +4,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const tag_endpoint_1 = require("./endpoints/tag-endpoint");
+const dependencies_1 = require("./endpoints/dependencies");
 const app = express_1.default();
 const port = 3000;
+const dependencies = new dependencies_1.Dependencies();
 app.get('/', (req, res) => {
-    res.send('The sedulous hyena ate the antelope!');
+    new tag_endpoint_1.TagEndpoint(dependencies)
+        .execute()
+        .subscribe(x => res.send(x));
 });
 app.listen(port, err => {
     if (err) {
