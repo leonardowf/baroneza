@@ -3,7 +3,7 @@ import { Octokit } from "@octokit/rest"
 import { map } from "rxjs/operators";
 
 export interface CommitExtractor {
-    commits(identifier: string): Observable<string[]>
+    commits(pullNumber: number): Observable<string[]>
 }
 
 export class GithubPullRequestExtractor implements CommitExtractor {
@@ -17,11 +17,11 @@ export class GithubPullRequestExtractor implements CommitExtractor {
         this.repo = repo
     }
 
-    commits(identifier: string): Observable<string[]> {
+    commits(pullNumber: number): Observable<string[]> {
         const stream = from(this.octokit.pulls.listCommits({
             owner: this.owner,
             repo: this.repo,
-            pull_number: 1848
+            pull_number: pullNumber
         }))
             .pipe(map(x => x.data))
             .pipe(map(x => x.map(y => y.commit.message)))
@@ -30,17 +30,8 @@ export class GithubPullRequestExtractor implements CommitExtractor {
     }
 }
 
-
 export interface JiraTicketParser {
     parse(values: string[]): string[]
-}
-
-export interface JiraTicketTagger {
-    tag(ticketIds: string[], tag: String): Observable<JiraTicket>
-}
-
-export interface JiraTicket  {
-
 }
 
 export class ConcreteJiraTickerParser implements JiraTicketParser {
@@ -56,14 +47,4 @@ export class ConcreteJiraTickerParser implements JiraTicketParser {
         return Array.from(new Set(extractedTicketIds))
     }
     
-}
-
-export class ConcreteJiraTickerTagger implements JiraTicketTagger {
-    tag(ticketIds: string[], tag: string): Observable<JiraTicket> {
-        return of(new ConcreteJiraTicket())
-    }
-}
-
-export class ConcreteJiraTicket implements JiraTicket {
-
 }

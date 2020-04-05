@@ -1,17 +1,16 @@
 import express from 'express';
-import { range, interval } from "rxjs";
-import { map, filter, take, toArray } from "rxjs/operators";
-import { TagEndpoint, TagEndpointDependencies } from './endpoints/tag-endpoint';
-import { Dependencies } from './endpoints/dependencies';
-import { Keychain } from './keys';
+import { TagEndpoint } from './endpoints/tag-endpoint';
+import { Dependencies } from './dependencies';
+import bodyParser from 'body-parser';
 
 const app = express();
+app.use(bodyParser.json());
+
 const port = 3000;
 const dependencies = new Dependencies()
 
-app.get('/', (req, res) => {
-  new TagEndpoint(dependencies)
-  .execute()
+app.post('/tagPullRequest', (req, res) => {
+  new TagEndpoint(dependencies).execute(req.body)
   .subscribe(
     x => res.send(x),
     error => {

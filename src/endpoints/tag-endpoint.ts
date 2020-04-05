@@ -9,7 +9,7 @@ export interface TagEndpointDependencies {
 }
 
 export interface TagEndpointInputMapper {
-    mapToUseCase(): TagUseCaseInput
+    mapToUseCase(input: TagEndpointInput): TagUseCaseInput
 }
 
 export interface TagEndpointOutputMapper {
@@ -27,10 +27,15 @@ export class TagEndpoint {
         this.outputMapper = dependencies.outputMapper
     }
 
-    execute(): Observable<TagEndpointResponse> {
-        const input = this.inputMapper.mapToUseCase()
-        return this.tagUseCase.execute(input).pipe(map(x => this.outputMapper.map(x)))
+    execute(input: TagEndpointInput): Observable<TagEndpointResponse> {
+        const useCaseInput = this.inputMapper.mapToUseCase(input)
+        return this.tagUseCase.execute(useCaseInput).pipe(map(x => this.outputMapper.map(x)))
     }
+}
+
+export interface TagEndpointInput {
+    number: number
+    tag: string
 }
 
 export class TagEndpointResponse {

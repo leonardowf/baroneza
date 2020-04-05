@@ -1,8 +1,10 @@
 import dotenv from "dotenv";
+import { isProd } from "./process-env";
 
 export class Keychain {
     githubAuthToken: string
     jiraAuthToken: string
+    jiraUserName: string
     slackAuthToken: string
 
     constructor(processEnv: NodeJS.ProcessEnv) {
@@ -13,18 +15,6 @@ export class Keychain {
         this.githubAuthToken = processEnv.GITHUB_AUTH_TOKEN
         this.jiraAuthToken = processEnv.JIRA_AUTH_TOKEN
         this.slackAuthToken = processEnv.SLACK_AUTH_TOKEN
+        this.jiraUserName = processEnv.JIRA_USER_NAME
     }
 }
-
-declare global {
-    namespace NodeJS {
-        export interface ProcessEnv {
-            NODE_ENV: "development" | "production" | "test"
-            GITHUB_AUTH_TOKEN: string
-            JIRA_AUTH_TOKEN: string
-            SLACK_AUTH_TOKEN: string
-        }
-    }
-}
-
-const isProd = () => process.env.NODE_ENV === "production"
