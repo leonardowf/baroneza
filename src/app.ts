@@ -14,7 +14,10 @@ app.get('/', (req, res) => {
   .execute()
   .subscribe(
     x => res.send(x),
-    error => res.send(error)
+    error => {
+      console.log(error)
+      res.send(error)
+    }
   );
 });
 

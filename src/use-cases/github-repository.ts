@@ -2,7 +2,6 @@ import { Observable, of, from } from "rxjs";
 import { Octokit } from "@octokit/rest"
 import { map } from "rxjs/operators";
 
-
 export interface CommitExtractor {
     commits(identifier: string): Observable<string[]>
 }
@@ -46,8 +45,15 @@ export interface JiraTicket  {
 
 export class ConcreteJiraTickerParser implements JiraTicketParser {
     parse(values: string[]): string[] {
-        console.log(values)
-        return ["[PSF-1234]"]
+        const regex: RegExp = /\[(PSF-\d+)\]/g
+
+        let extractedTicketIds = values.map(x => x.match(regex))
+            .map(x => x == null ? [] : x)
+            .filter(x => x.length > 0)
+            .map(x => x[0])
+            .map(x => x.replace("[", ""))
+            .map(x => x.replace("]", ""))
+        return Array.from(new Set(extractedTicketIds))
     }
     
 }
