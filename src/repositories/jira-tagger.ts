@@ -1,13 +1,15 @@
-import { Observable, of, from, merge, zip } from "rxjs";
+import { Observable, of, from, merge, zip, forkJoin } from "rxjs";
 import JiraAPI from "jira-client"
-import { materialize } from "rxjs/operators";
+import { materialize, catchError, map, toArray, concat } from "rxjs/operators";
 
-export interface JiraTicket  {
+export interface JiraTicketTaggetOutput  {
+    successes: string[]
+    failures: string[]
 
 }
 
 export interface JiraTicketTagger {
-    tag(ticketIds: string[], tag: String): Observable<JiraTicket>
+    tag(ticketIds: string[], tag: String): Observable<JiraTicketTaggetOutput>
 }
 
 export class ConcreteJiraTickerTagger implements JiraTicketTagger {
@@ -17,27 +19,42 @@ export class ConcreteJiraTickerTagger implements JiraTicketTagger {
         this.jiraAPI = jiraAPI
     }
 
-    tag(ticketIds: string[], tag: string): Observable<JiraTicket> {
-        const updatePromises = ticketIds.map(x => this.jiraAPI.updateIssue(x, {
-            "update": {
-                "fixVersions": [
-                    {
-                        "set": [{
-                            "name": tag
-                        }]
-                    }
-                ]
-            }
-        }))
+    tag(ticketIds: string[], tag: string): Observable<JiraTicketTaggetOutput> {
+        const streams = ticketIds.map(ticketId => {
+            const updateIssuePromise = this.jiraAPI.updateIssue(ticketId, {
+                "update": {
+                    "fixVersions": [
+                        {
+                            "set": [{
+                                "name": tag
+                            }]
+                        }
+                    ]
+                }
+            })
 
-        const updateOperations = updatePromises.map(x => from(x).pipe(materialize()))
-        zip(updateOperations).subscribe(x => console.log("terminou o zip"))
-        
+            return from(updateIssuePromise)
+                .pipe(map(x => { 
+                    return { success: true, ticketId: ticketId}
+                }))
+                .pipe(catchError(error => of({ success: false, ticketId: ticketId } )))
+        })
 
-        return of(new ConcreteJiraTicket())
+        return forkJoin(streams).pipe(map(x => {
+            let failures = x.filter(x => !x.success).map(x => x.ticketId)
+            let successes = x.filter(x => x.success).map(x => x.ticketId)
+            return { successes, failures }
+        })).pipe(map(y => new ConcreteJiraTicketTaggetOutput(y.successes, y.failures)))
+ 
     }
 }
 
-export class ConcreteJiraTicket implements JiraTicket {
+export class ConcreteJiraTicketTaggetOutput implements JiraTicketTaggetOutput {
+    successes: string[]
+    failures: string[]
 
+    constructor(successes: string[], failures: string[]) {
+        this.failures = failures
+        this.successes = successes
+    }
 }

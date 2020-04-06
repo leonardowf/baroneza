@@ -1,7 +1,7 @@
 import { Observable, of } from "rxjs";
 import { TagEndpointOutputMapper, TagEndpointInputMapper, TagEndpointResponse, TagEndpointInput } from "../endpoints/tag-endpoint";
 import { CommitExtractor, JiraTicketParser } from "../repositories/github-repository";
-import { map, mapTo } from "rxjs/operators";
+import { map, mapTo, flatMap } from "rxjs/operators";
 import { JiraTicketTagger } from "../repositories/jira-tagger";
 
 export interface TagUseCase {
@@ -12,7 +12,10 @@ export interface TagUseCaseInput {
     identifier: number
     tag: string
 }
-export interface TagUseCaseOutput { }
+export interface TagUseCaseOutput { 
+    successes: string[]
+    failures: string[]
+}
 
 export interface JiraTagUseCaseDependencies {
     commitExtractor: CommitExtractor
@@ -35,14 +38,15 @@ export class JiraTagUseCase implements TagUseCase {
         return this.commitExtractor
             .commits(input.identifier)
             .pipe(map(x => this.jiraTickerParser.parse(x)))
-            .pipe(map(x => this.jiraTicketTagger.tag(x, input.tag)))
-            .pipe(mapTo(new JiraTagUseCaseOutput()))
+            .pipe(flatMap(x => this.jiraTicketTagger.tag(x, input.tag)))
+            .pipe(map(x => new JiraTagUseCaseOutput(x.successes, x.failures)))
     }
 }
 
 export class JiraMappers implements TagEndpointOutputMapper, TagEndpointInputMapper {
     map(useCaseOutput: JiraTagUseCaseOutput): TagEndpointResponse {
-        return new TagEndpointResponse() 
+
+        return new TagEndpointResponse(useCaseOutput.successes, useCaseOutput.failures)
     }
 
     mapToUseCase(tagEndpointInput: TagEndpointInput): TagUseCaseInput {
@@ -62,4 +66,11 @@ class JiraTagUseCaseInput implements TagUseCaseInput {
 }
 
 class JiraTagUseCaseOutput implements TagUseCaseOutput {
+    successes: string[]
+    failures: string[]
+
+    constructor(successes: string[], failures: string[]) {
+        this.successes = successes
+        this.failures = failures
+    }
 }

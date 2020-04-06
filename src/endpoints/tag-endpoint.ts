@@ -39,4 +39,11 @@ export interface TagEndpointInput {
 }
 
 export class TagEndpointResponse {
+    successes: string[]
+    failures: string[]
+
+    constructor(successes: string[], failures: string[]) {
+        this.successes = successes
+        this.failures = failures
+    }
 }
