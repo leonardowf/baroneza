@@ -7,20 +7,19 @@ const app = express();
 app.use(bodyParser.json());
 
 const port = 3000;
-const dependencies = new Dependencies()
+const dependencies = new Dependencies();
 
 app.post('/tagPullRequest', (req, res) => {
-  new TagEndpoint(dependencies).execute(req.body)
-  .subscribe(
-    x => res.send(x),
-    error => {
-      console.log(error)
-      res.send(error)
+  new TagEndpoint(dependencies).execute(req.body).subscribe(
+    (x) => res.send(x),
+    (error) => {
+      console.log(error);
+      res.send(error);
     }
   );
 });
 
-app.listen(port, err => {
+app.listen(port, (err) => {
   if (err) {
     return console.error(err);
   }
