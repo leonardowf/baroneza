@@ -5,7 +5,8 @@ import { Observable } from 'rxjs';
 export interface CreateReleaseEndpointInput {
   branchName: string;
   referenceBranch: string;
-  name: string;
+  title: string;
+  targetBranch: string;
 }
 
 export class CreateReleaseEndpointResponse {}
@@ -27,7 +28,9 @@ export class CreateReleaseEndpoint {
     return this.createReleaseUseCase
       .execute({
         branchName: input.branchName,
-        referenceBranch: input.referenceBranch
+        referenceBranch: input.referenceBranch,
+        title: input.title,
+        targetBranch: input.targetBranch
       })
       .pipe(mapTo(new CreateReleaseEndpointResponse()));
   }

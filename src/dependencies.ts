@@ -18,6 +18,7 @@ import { CreateReleaseUseCase } from './use-cases/create-release-use-case';
 import { GithubCreateBranchUseCase } from './use-cases/create-branch-use-case';
 import { GithubSHAFinder } from './repositories/sha-finder';
 import { GithubBranchCreator } from './repositories/branch-creator';
+import { GithubPullRequestCreator } from './repositories/pull-request-creator';
 
 export class Dependencies
   implements
@@ -65,5 +66,7 @@ export class Dependencies
     this.shaFinder,
     this.branchCreator
   );
-  createReleaseUseCase = new CreateReleaseUseCase(this.createBranchUseCase);
+
+  pullRequestCreator = new GithubPullRequestCreator(this.octokit(), this.config.githubOwner, this.config.githubRepo)
+  createReleaseUseCase = new CreateReleaseUseCase(this.createBranchUseCase, this.pullRequestCreator);
 }
