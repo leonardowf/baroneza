@@ -13,9 +13,17 @@ import { Octokit } from '@octokit/rest';
 import JiraAPI from 'jira-client';
 import { ConcreteJiraTickerTagger } from './repositories/jira-tagger';
 import { Config } from './configs';
+import { CreateReleaseEndpointDependencies } from './endpoints/create-release-endpoint';
+import { CreateReleaseUseCase } from './use-cases/create-release-use-case';
+import { GithubCreateBranchUseCase } from './use-cases/create-branch-use-case';
+import { GithubSHAFinder } from './repositories/sha-finder';
+import { GithubBranchCreator } from './repositories/branch-creator';
 
 export class Dependencies
-  implements TagEndpointDependencies, JiraTagUseCaseDependencies {
+  implements
+    TagEndpointDependencies,
+    JiraTagUseCaseDependencies,
+    CreateReleaseEndpointDependencies {
   keychain = new Keychain(process.env);
   config = new Config(process.env);
 
@@ -42,4 +50,20 @@ export class Dependencies
   inputMapper = new JiraMappers();
   outputMapper = new JiraMappers();
   tagUseCase = new JiraTagUseCase(this);
+
+  shaFinder = new GithubSHAFinder(
+    this.octokit(),
+    this.config.githubOwner,
+    this.config.githubRepo
+  );
+  branchCreator = new GithubBranchCreator(
+    this.octokit(),
+    this.config.githubRepo,
+    this.config.githubOwner
+  );
+  createBranchUseCase = new GithubCreateBranchUseCase(
+    this.shaFinder,
+    this.branchCreator
+  );
+  createReleaseUseCase = new CreateReleaseUseCase(this.createBranchUseCase);
 }
