@@ -16,22 +16,7 @@ export interface TagUseCase {
   execute(input: TagUseCaseInput): Observable<TagUseCaseOutput>;
 }
 
-export interface TagUseCaseInput {
-  identifier: number;
-  tag: string;
-}
-export interface TagUseCaseOutput {
-  successes: string[];
-  failures: string[];
-}
-
-export interface JiraTagUseCaseDependencies {
-  commitExtractor: CommitExtractor;
-  jiraTicketParser: JiraTicketParser;
-  jiraTicketTagger: JiraTicketTagger;
-}
-
-class JiraTagUseCaseInput implements TagUseCaseInput {
+export class TagUseCaseInput {
   identifier: number;
   tag: string;
 
@@ -40,8 +25,7 @@ class JiraTagUseCaseInput implements TagUseCaseInput {
     this.tag = tag;
   }
 }
-
-class JiraTagUseCaseOutput implements TagUseCaseOutput {
+export class TagUseCaseOutput {
   successes: string[];
   failures: string[];
 
@@ -49,6 +33,12 @@ class JiraTagUseCaseOutput implements TagUseCaseOutput {
     this.successes = successes;
     this.failures = failures;
   }
+}
+
+export interface JiraTagUseCaseDependencies {
+  commitExtractor: CommitExtractor;
+  jiraTicketParser: JiraTicketParser;
+  jiraTicketTagger: JiraTicketTagger;
 }
 
 export class JiraTagUseCase implements TagUseCase {
@@ -62,18 +52,18 @@ export class JiraTagUseCase implements TagUseCase {
     this.jiraTicketTagger = dependencies.jiraTicketTagger;
   }
 
-  execute(input: JiraTagUseCaseInput): Observable<JiraTagUseCaseOutput> {
+  execute(input: TagUseCaseInput): Observable<TagUseCaseOutput> {
     return this.commitExtractor
       .commits(input.identifier)
       .pipe(map((x) => this.jiraTickerParser.parse(x)))
       .pipe(flatMap((x) => this.jiraTicketTagger.tag(x, input.tag)))
-      .pipe(map((x) => new JiraTagUseCaseOutput(x.successes, x.failures)));
+      .pipe(map((x) => new TagUseCaseOutput(x.successes, x.failures)));
   }
 }
 
 export class JiraMappers
   implements TagEndpointOutputMapper, TagEndpointInputMapper {
-  map(useCaseOutput: JiraTagUseCaseOutput): TagEndpointResponse {
+  map(useCaseOutput: TagUseCaseOutput): TagEndpointResponse {
     return new TagEndpointResponse(
       useCaseOutput.successes,
       useCaseOutput.failures
@@ -81,9 +71,6 @@ export class JiraMappers
   }
 
   mapToUseCase(tagEndpointInput: TagEndpointInput): TagUseCaseInput {
-    return new JiraTagUseCaseInput(
-      tagEndpointInput.number,
-      tagEndpointInput.tag
-    );
+    return new TagUseCaseInput(tagEndpointInput.number, tagEndpointInput.tag);
   }
 }

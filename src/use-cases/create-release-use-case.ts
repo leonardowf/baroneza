@@ -5,6 +5,7 @@ import {
 } from './create-branch-use-case';
 import { mapTo, flatMap } from 'rxjs/operators';
 import { PullRequestCreator } from '../repositories/pull-request-creator';
+import { TagUseCase, TagUseCaseInput } from './tag-use-case';
 
 export class CreateReleaseUseCaseInput {
   branchName: string;
@@ -17,11 +18,17 @@ export class CreateReleaseUseCaseOutput {}
 
 export class CreateReleaseUseCase {
   private createBranchUseCase: CreateBranchUseCase;
-  private pullRequestCreator: PullRequestCreator
+  private pullRequestCreator: PullRequestCreator;
+  private tagUseCase: TagUseCase;
 
-  constructor(createBranchUseCase: CreateBranchUseCase, pullRequestCreator: PullRequestCreator) {
+  constructor(
+    createBranchUseCase: CreateBranchUseCase,
+    pullRequestCreator: PullRequestCreator,
+    tagUseCase: TagUseCase
+  ) {
     this.createBranchUseCase = createBranchUseCase;
-    this.pullRequestCreator = pullRequestCreator
+    this.pullRequestCreator = pullRequestCreator;
+    this.tagUseCase = tagUseCase;
   }
 
   execute(
@@ -30,7 +37,23 @@ export class CreateReleaseUseCase {
     return this.createBranchUseCase
       .execute(
         new CreateBranchUseCaseInput(input.branchName, input.referenceBranch)
-      ).pipe(flatMap((x) => this.pullRequestCreator.create(input.title, input.branchName, input.targetBranch)))
+      )
+      .pipe(
+        flatMap(() =>
+          this.pullRequestCreator.create(
+            input.title,
+            input.branchName,
+            input.targetBranch
+          )
+        )
+      )
+      .pipe(
+        flatMap((x) =>
+          this.tagUseCase.execute(
+            new TagUseCaseInput(x.identifier, input.branchName)
+          )
+        )
+      )
       .pipe(mapTo(new CreateReleaseUseCaseOutput()));
   }
 }

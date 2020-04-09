@@ -67,6 +67,14 @@ export class Dependencies
     this.branchCreator
   );
 
-  pullRequestCreator = new GithubPullRequestCreator(this.octokit(), this.config.githubOwner, this.config.githubRepo)
-  createReleaseUseCase = new CreateReleaseUseCase(this.createBranchUseCase, this.pullRequestCreator);
+  pullRequestCreator = new GithubPullRequestCreator(
+    this.octokit(),
+    this.config.githubOwner,
+    this.config.githubRepo
+  );
+  createReleaseUseCase = new CreateReleaseUseCase(
+    this.createBranchUseCase,
+    this.pullRequestCreator,
+    this.tagUseCase
+  );
 }
