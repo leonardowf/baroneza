@@ -12,6 +12,18 @@ export class CreateReleaseUseCaseInput {
   referenceBranch: string;
   targetBranch: string;
   title: string;
+
+  constructor(
+    branchName: string,
+    referenceBranch: string,
+    targetBranch: string,
+    title: string
+  ) {
+    this.branchName = branchName;
+    this.referenceBranch = referenceBranch;
+    this.targetBranch = targetBranch;
+    this.title = title;
+  }
 }
 
 export class CreateReleaseUseCaseOutput {}

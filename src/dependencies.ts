@@ -19,12 +19,19 @@ import { GithubCreateBranchUseCase } from './use-cases/create-branch-use-case';
 import { GithubSHAFinder } from './repositories/sha-finder';
 import { GithubBranchCreator } from './repositories/branch-creator';
 import { GithubPullRequestCreator } from './repositories/pull-request-creator';
+import { StartTrainDependencies } from './endpoints/start-train-endpoint';
+import { StartTrainUseCase } from './use-cases/start-train-use-case';
+import { SlackMessageSender } from './repositories/message-sender';
+import { WebClient } from '@slack/web-api';
+import { SlackReactionsReader } from './repositories/reactions-reader';
+import { GithubNextReleaseGuesser } from './repositories/next-release-guesser';
 
 export class Dependencies
   implements
     TagEndpointDependencies,
     JiraTagUseCaseDependencies,
-    CreateReleaseEndpointDependencies {
+    CreateReleaseEndpointDependencies,
+    StartTrainDependencies {
   keychain = new Keychain(process.env);
   config = new Config(process.env);
 
@@ -76,5 +83,19 @@ export class Dependencies
     this.createBranchUseCase,
     this.pullRequestCreator,
     this.tagUseCase
+  );
+
+  slackWebClient = new WebClient(this.keychain.slackAuthToken);
+
+  messageSender = new SlackMessageSender(this.slackWebClient);
+  reactionsReader = new SlackReactionsReader(this.slackWebClient);
+  nextReleaseGuesser = new GithubNextReleaseGuesser();
+
+  startTrainUseCase = new StartTrainUseCase(
+    this.messageSender,
+    this.reactionsReader,
+    this.nextReleaseGuesser,
+    this.createReleaseUseCase,
+    'automation'
   );
 }
