@@ -11,6 +11,7 @@ export class Config {
   newBranchPrefix: string;
   channelToConfirm: string;
   pullRequestTitlePrefix: string;
+  secondsToConfirmationTimeout: number;
 
   constructor(processEnv: NodeJS.ProcessEnv) {
     this.jiraHost = configJSON.jira_host
@@ -22,5 +23,6 @@ export class Config {
     this.newBranchPrefix = configJSON.new_branch_prefix
     this.channelToConfirm = configJSON.channel_to_confirm
     this.pullRequestTitlePrefix = configJSON.pull_request_title_prefix
+    this.secondsToConfirmationTimeout = configJSON.seconds_to_confirmation_timeout
   }
 }

@@ -7,24 +7,24 @@ import {
 import {
   GithubPullRequestExtractor,
   ConcreteJiraTickerParser
-} from './repositories/github-repository';
+} from './workers/commit-extractor';
 import { Keychain } from './keys';
 import { Octokit } from '@octokit/rest';
 import JiraAPI from 'jira-client';
-import { ConcreteJiraTickerTagger } from './repositories/jira-tagger';
+import { ConcreteJiraTickerTagger } from './workers/jira-tagger';
 import { Config } from './configs';
 import { CreateReleaseEndpointDependencies } from './endpoints/create-release-endpoint';
 import { CreateReleaseUseCase } from './use-cases/create-release-use-case';
 import { GithubCreateBranchUseCase } from './use-cases/create-branch-use-case';
-import { GithubSHAFinder } from './repositories/sha-finder';
-import { GithubBranchCreator } from './repositories/branch-creator';
-import { GithubPullRequestCreator } from './repositories/pull-request-creator';
+import { GithubSHAFinder } from './workers/sha-finder';
+import { GithubBranchCreator } from './workers/branch-creator';
+import { GithubPullRequestCreator } from './workers/pull-request-creator';
 import { StartTrainDependencies } from './endpoints/start-train-endpoint';
 import { StartTrainUseCase } from './use-cases/start-train-use-case';
-import { SlackMessageSender } from './repositories/message-sender';
+import { SlackMessageSender } from './workers/message-sender';
 import { WebClient } from '@slack/web-api';
-import { SlackReactionsReader } from './repositories/reactions-reader';
-import { GithubNextReleaseGuesser } from './repositories/next-release-guesser';
+import { SlackReactionsReader } from './workers/reactions-reader';
+import { GithubNextReleaseGuesser } from './workers/next-release-guesser';
 
 export class Dependencies
   implements
@@ -97,8 +97,10 @@ export class Dependencies
     this.nextReleaseGuesser,
     this.createReleaseUseCase,
     this.config.channelToConfirm,
+    this.config.newBranchPrefix,
     this.config.releaseBaseBranch,
     this.config.releaseTargetBranch,
-    this.config.pullRequestTitlePrefix
+    this.config.pullRequestTitlePrefix,
+    this.config.secondsToConfirmationTimeout
   );
 }

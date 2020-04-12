@@ -8,9 +8,9 @@ import {
 import {
   CommitExtractor,
   JiraTicketParser
-} from '../repositories/github-repository';
+} from '../workers/commit-extractor';
 import { map, flatMap } from 'rxjs/operators';
-import { JiraTicketTagger } from '../repositories/jira-tagger';
+import { JiraTicketTagger } from '../workers/jira-tagger';
 
 export interface TagUseCase {
   execute(input: TagUseCaseInput): Observable<TagUseCaseOutput>;
@@ -55,9 +55,9 @@ export class JiraTagUseCase implements TagUseCase {
   execute(input: TagUseCaseInput): Observable<TagUseCaseOutput> {
     return this.commitExtractor
       .commits(input.identifier)
-      .pipe(map((x) => this.jiraTickerParser.parse(x)))
-      .pipe(flatMap((x) => this.jiraTicketTagger.tag(x, input.tag)))
-      .pipe(map((x) => new TagUseCaseOutput(x.successes, x.failures)));
+      .pipe(map((commits) => this.jiraTickerParser.parse(commits)))
+      .pipe(flatMap((ticketIds) => this.jiraTicketTagger.tag(ticketIds, input.tag)))
+      .pipe(map((output) => new TagUseCaseOutput(output.successes, output.failures)));
   }
 }
 

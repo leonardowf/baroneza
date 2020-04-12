@@ -2,12 +2,12 @@ import { Observable, of } from 'rxjs';
 import {
   MessageSender,
   MessageSenderInput
-} from '../repositories/message-sender';
+} from '../workers/message-sender';
 import {
   ReactionsReader,
   ReactionsReaderInput
-} from '../repositories/reactions-reader';
-import { NextReleaseGuesser } from '../repositories/next-release-guesser';
+} from '../workers/reactions-reader';
+import { NextReleaseGuesser } from '../workers/next-release-guesser';
 import { flatMap, map, delay } from 'rxjs/operators';
 import {
   CreateReleaseUseCase,
@@ -24,9 +24,11 @@ export class StartTrainUseCase {
   private reactionsReader: ReactionsReader;
   private createReleaseUseCase: CreateReleaseUseCase;
   private channelToConfirm: string;
+  private branchPrefix: string;
   private baseBranch: string;
   private targetBranch: string;
   private pullRequestTitlePrefix: string;
+  private secondsToConfirmationTimeout: number
 
   constructor(
     messageSender: MessageSender,
@@ -34,18 +36,22 @@ export class StartTrainUseCase {
     nextReleaseGuesser: NextReleaseGuesser,
     createReleaseUseCase: CreateReleaseUseCase,
     channelToConfirm: string,
+    branchPrefix: string,
     baseBranch: string,
     targetBranch: string,
     pullRequestTitlePrefix: string,
+    secondsToConfirmationTimeout: number
   ) {
     this.messageSender = messageSender;
     this.reactionsReader = reactionsReader;
     this.nextReleaseGuesser = nextReleaseGuesser;
     this.channelToConfirm = channelToConfirm;
     this.createReleaseUseCase = createReleaseUseCase;
+    this.branchPrefix = branchPrefix;
     this.baseBranch = baseBranch
     this.targetBranch = targetBranch
     this.pullRequestTitlePrefix = pullRequestTitlePrefix
+    this.secondsToConfirmationTimeout = secondsToConfirmationTimeout
   }
 
   execute(input: StartTrainUseCaseInput): Observable<StartTrainUseCaseOutput> {
@@ -59,7 +65,7 @@ export class StartTrainUseCase {
 
         return this.messageSender
           .send(new MessageSenderInput(this.channelToConfirm, copy))
-          .pipe(delay(10 * 1000))
+          .pipe(delay(this.secondsToConfirmationTimeout * 1000))
           .pipe(
             flatMap((x) =>
               this.reactionsReader.read(
@@ -83,10 +89,11 @@ export class StartTrainUseCase {
               if (confirmed) {
                 return this.createReleaseUseCase.execute(
                   new CreateReleaseUseCaseInput(
-                    version,
+                    `${ this.branchPrefix }${ version }`,
                     this.baseBranch,
                     this.targetBranch,
-                    `${ this.pullRequestTitlePrefix } ${ version }`
+                    `${ this.pullRequestTitlePrefix } ${ version }`,
+                    version
                   )
                 );
               } else {

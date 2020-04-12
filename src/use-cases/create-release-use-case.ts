@@ -4,7 +4,7 @@ import {
   CreateBranchUseCaseInput
 } from './create-branch-use-case';
 import { mapTo, flatMap } from 'rxjs/operators';
-import { PullRequestCreator } from '../repositories/pull-request-creator';
+import { PullRequestCreator } from '../workers/pull-request-creator';
 import { TagUseCase, TagUseCaseInput } from './tag-use-case';
 
 export class CreateReleaseUseCaseInput {
@@ -12,17 +12,20 @@ export class CreateReleaseUseCaseInput {
   referenceBranch: string;
   targetBranch: string;
   title: string;
+  projectTag: string;
 
   constructor(
     branchName: string,
     referenceBranch: string,
     targetBranch: string,
-    title: string
+    title: string,
+    projectTag: string
   ) {
     this.branchName = branchName;
     this.referenceBranch = referenceBranch;
     this.targetBranch = targetBranch;
     this.title = title;
+    this.projectTag = projectTag
   }
 }
 
@@ -62,7 +65,7 @@ export class CreateReleaseUseCase {
       .pipe(
         flatMap((x) =>
           this.tagUseCase.execute(
-            new TagUseCaseInput(x.identifier, input.branchName)
+            new TagUseCaseInput(x.identifier, input.projectTag)
           )
         )
       )

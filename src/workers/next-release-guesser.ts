@@ -6,6 +6,6 @@ export interface NextReleaseGuesser {
 
 export class GithubNextReleaseGuesser implements NextReleaseGuesser {
   guess(): Observable<string> {
-    return of('1.0');
+    return of('1.1');
   }
 }

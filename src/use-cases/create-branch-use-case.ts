@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
-import { SHAFinder } from '../repositories/sha-finder';
+import { SHAFinder } from '../workers/sha-finder';
 import { flatMap, mapTo } from 'rxjs/operators';
-import { BranchCreator } from '../repositories/branch-creator';
+import { BranchCreator } from '../workers/branch-creator';
 
 export class CreateBranchUseCaseInput {
   branchName: string;
