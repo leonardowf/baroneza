@@ -1,0 +1,11 @@
+{
+    "jira_host": "baroneza.atlassian.net",
+    "github_repo": "baroneza",
+    "github_owner": "leonardowf",
+    "confirmation_emoji": ":100:",
+    "release_target_branch": "release-candidate",
+    "release_base_branch": "develop",
+    "new_branch_prefix": "rc",
+    "pull_request_title_prefix": "Release Candidate ",
+    "channel_to_confirm": "automation"
+}

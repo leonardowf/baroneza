@@ -24,19 +24,28 @@ export class StartTrainUseCase {
   private reactionsReader: ReactionsReader;
   private createReleaseUseCase: CreateReleaseUseCase;
   private channelToConfirm: string;
+  private baseBranch: string;
+  private targetBranch: string;
+  private pullRequestTitlePrefix: string;
 
   constructor(
     messageSender: MessageSender,
     reactionsReader: ReactionsReader,
     nextReleaseGuesser: NextReleaseGuesser,
     createReleaseUseCase: CreateReleaseUseCase,
-    channelToConfirm: string
+    channelToConfirm: string,
+    baseBranch: string,
+    targetBranch: string,
+    pullRequestTitlePrefix: string,
   ) {
     this.messageSender = messageSender;
     this.reactionsReader = reactionsReader;
     this.nextReleaseGuesser = nextReleaseGuesser;
     this.channelToConfirm = channelToConfirm;
     this.createReleaseUseCase = createReleaseUseCase;
+    this.baseBranch = baseBranch
+    this.targetBranch = targetBranch
+    this.pullRequestTitlePrefix = pullRequestTitlePrefix
   }
 
   execute(input: StartTrainUseCaseInput): Observable<StartTrainUseCaseOutput> {
@@ -75,9 +84,9 @@ export class StartTrainUseCase {
                 return this.createReleaseUseCase.execute(
                   new CreateReleaseUseCaseInput(
                     version,
-                    'lwf/testing-pr',
-                    'master',
-                    'ooi'
+                    this.baseBranch,
+                    this.targetBranch,
+                    `${ this.pullRequestTitlePrefix } ${ version }`
                   )
                 );
               } else {

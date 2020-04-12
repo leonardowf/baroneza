@@ -96,6 +96,9 @@ export class Dependencies
     this.reactionsReader,
     this.nextReleaseGuesser,
     this.createReleaseUseCase,
-    'automation'
+    this.config.channelToConfirm,
+    this.config.releaseBaseBranch,
+    this.config.releaseTargetBranch,
+    this.config.pullRequestTitlePrefix
   );
 }

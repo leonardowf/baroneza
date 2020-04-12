@@ -1,18 +1,26 @@
-import dotenv from 'dotenv';
-import { isProd } from './process-env';
+import fs from "fs"
+var configJSON = require("./config.json")
 
 export class Config {
+  jiraHost: string;
   githubRepo: string;
   githubOwner: string;
-  jiraHost: string;
+  confirmationEmoji: string;
+  releaseTargetBranch: string;
+  releaseBaseBranch: string;
+  newBranchPrefix: string;
+  channelToConfirm: string;
+  pullRequestTitlePrefix: string;
 
   constructor(processEnv: NodeJS.ProcessEnv) {
-    if (!isProd()) {
-      dotenv.config();
-    }
-
-    this.jiraHost = processEnv.JIRA_HOST;
-    this.githubOwner = processEnv.GITHUB_OWNER;
-    this.githubRepo = processEnv.GITHUB_REPO;
+    this.jiraHost = configJSON.jira_host
+    this.githubRepo = configJSON.github_repo
+    this.githubOwner = configJSON.github_owner
+    this.confirmationEmoji = configJSON.confirmation_emoji
+    this.releaseTargetBranch = configJSON.release_target_branch
+    this.releaseBaseBranch = configJSON.release_base_branch
+    this.newBranchPrefix = configJSON.new_branch_prefix
+    this.channelToConfirm = configJSON.channel_to_confirm
+    this.pullRequestTitlePrefix = configJSON.pull_request_title_prefix
   }
 }
