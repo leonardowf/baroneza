@@ -8,5 +8,5 @@
     "new_branch_prefix": "rc",
     "pull_request_title_prefix": "Release Candidate ",
     "channel_to_confirm": "automation",
-    "seconds_to_confirmation_timeout": 45
+    "seconds_to_confirmation_timeout": 20
 }

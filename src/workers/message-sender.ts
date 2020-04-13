@@ -41,8 +41,7 @@ export class SlackMessageSender implements MessageSender {
       })
     ).pipe(
       map((x) => {
-        console.log(x);
-        return new MessageSenderOutput(<string>x.ts, <string>x.channel);
+        return new MessageSenderOutput(x.ts as string, x.channel as string);
       })
     );
   }

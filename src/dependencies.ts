@@ -33,7 +33,7 @@ export class Dependencies
     CreateReleaseEndpointDependencies,
     StartTrainDependencies {
   keychain = new Keychain(process.env);
-  config = new Config(process.env);
+  config = new Config();
 
   octokit = (): Octokit =>
     new Octokit({
@@ -89,7 +89,11 @@ export class Dependencies
 
   messageSender = new SlackMessageSender(this.slackWebClient);
   reactionsReader = new SlackReactionsReader(this.slackWebClient);
-  nextReleaseGuesser = new GithubNextReleaseGuesser();
+  nextReleaseGuesser = new GithubNextReleaseGuesser(
+    this.octokit(),
+    this.config.githubRepo,
+    this.config.githubOwner
+  );
 
   startTrainUseCase = new StartTrainUseCase(
     this.messageSender,

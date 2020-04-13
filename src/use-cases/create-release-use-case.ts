@@ -25,7 +25,7 @@ export class CreateReleaseUseCaseInput {
     this.referenceBranch = referenceBranch;
     this.targetBranch = targetBranch;
     this.title = title;
-    this.projectTag = projectTag
+    this.projectTag = projectTag;
   }
 }
 

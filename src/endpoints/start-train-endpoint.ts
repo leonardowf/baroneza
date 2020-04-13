@@ -1,4 +1,4 @@
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import {
   StartTrainUseCase,
   StartTrainUseCaseInput
@@ -20,9 +20,9 @@ export class StartTrainEndpoint {
     this.startTrainUseCase = dependencies.startTrainUseCase;
   }
 
-  execute(input: StartTrainInput): Observable<StartTrainOutput> {
+  execute(): Observable<StartTrainOutput> {
     return this.startTrainUseCase
       .execute(new StartTrainUseCaseInput())
-      .pipe(map((x) => new StartTrainOutput()));
+      .pipe(map(() => new StartTrainOutput()));
   }
 }

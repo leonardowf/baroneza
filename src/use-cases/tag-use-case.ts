@@ -5,10 +5,7 @@ import {
   TagEndpointResponse,
   TagEndpointInput
 } from '../endpoints/tag-endpoint';
-import {
-  CommitExtractor,
-  JiraTicketParser
-} from '../workers/commit-extractor';
+import { CommitExtractor, JiraTicketParser } from '../workers/commit-extractor';
 import { map, flatMap } from 'rxjs/operators';
 import { JiraTicketTagger } from '../workers/jira-tagger';
 
@@ -56,8 +53,12 @@ export class JiraTagUseCase implements TagUseCase {
     return this.commitExtractor
       .commits(input.identifier)
       .pipe(map((commits) => this.jiraTickerParser.parse(commits)))
-      .pipe(flatMap((ticketIds) => this.jiraTicketTagger.tag(ticketIds, input.tag)))
-      .pipe(map((output) => new TagUseCaseOutput(output.successes, output.failures)));
+      .pipe(
+        flatMap((ticketIds) => this.jiraTicketTagger.tag(ticketIds, input.tag))
+      )
+      .pipe(
+        map((output) => new TagUseCaseOutput(output.successes, output.failures))
+      );
   }
 }
 

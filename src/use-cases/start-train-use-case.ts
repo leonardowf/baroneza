@@ -1,8 +1,5 @@
 import { Observable, of } from 'rxjs';
-import {
-  MessageSender,
-  MessageSenderInput
-} from '../workers/message-sender';
+import { MessageSender, MessageSenderInput } from '../workers/message-sender';
 import {
   ReactionsReader,
   ReactionsReaderInput
@@ -28,7 +25,7 @@ export class StartTrainUseCase {
   private baseBranch: string;
   private targetBranch: string;
   private pullRequestTitlePrefix: string;
-  private secondsToConfirmationTimeout: number
+  private secondsToConfirmationTimeout: number;
 
   constructor(
     messageSender: MessageSender,
@@ -48,15 +45,15 @@ export class StartTrainUseCase {
     this.channelToConfirm = channelToConfirm;
     this.createReleaseUseCase = createReleaseUseCase;
     this.branchPrefix = branchPrefix;
-    this.baseBranch = baseBranch
-    this.targetBranch = targetBranch
-    this.pullRequestTitlePrefix = pullRequestTitlePrefix
-    this.secondsToConfirmationTimeout = secondsToConfirmationTimeout
+    this.baseBranch = baseBranch;
+    this.targetBranch = targetBranch;
+    this.pullRequestTitlePrefix = pullRequestTitlePrefix;
+    this.secondsToConfirmationTimeout = secondsToConfirmationTimeout;
   }
 
-  execute(input: StartTrainUseCaseInput): Observable<StartTrainUseCaseOutput> {
+  execute(): Observable<StartTrainUseCaseOutput> {
     const confirmationReaction = ':100:';
-    const confirmationCopyMaker = (version: string) =>
+    const confirmationCopyMaker = (version: string): string =>
       `Would you like to start the release train for version ${version}? ${confirmationReaction} to continue!`;
 
     return this.nextReleaseGuesser.guess().pipe(
@@ -89,10 +86,10 @@ export class StartTrainUseCase {
               if (confirmed) {
                 return this.createReleaseUseCase.execute(
                   new CreateReleaseUseCaseInput(
-                    `${ this.branchPrefix }${ version }`,
+                    `${this.branchPrefix}${version}`,
                     this.baseBranch,
                     this.targetBranch,
-                    `${ this.pullRequestTitlePrefix } ${ version }`,
+                    `${this.pullRequestTitlePrefix} ${version}`,
                     version
                   )
                 );

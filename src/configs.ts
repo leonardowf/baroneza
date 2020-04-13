@@ -1,5 +1,4 @@
-import fs from "fs"
-var configJSON = require("./config.json")
+import configJSON from './config.json';
 
 export class Config {
   jiraHost: string;
@@ -13,16 +12,17 @@ export class Config {
   pullRequestTitlePrefix: string;
   secondsToConfirmationTimeout: number;
 
-  constructor(processEnv: NodeJS.ProcessEnv) {
-    this.jiraHost = configJSON.jira_host
-    this.githubRepo = configJSON.github_repo
-    this.githubOwner = configJSON.github_owner
-    this.confirmationEmoji = configJSON.confirmation_emoji
-    this.releaseTargetBranch = configJSON.release_target_branch
-    this.releaseBaseBranch = configJSON.release_base_branch
-    this.newBranchPrefix = configJSON.new_branch_prefix
-    this.channelToConfirm = configJSON.channel_to_confirm
-    this.pullRequestTitlePrefix = configJSON.pull_request_title_prefix
-    this.secondsToConfirmationTimeout = configJSON.seconds_to_confirmation_timeout
+  constructor() {
+    this.jiraHost = configJSON.jira_host;
+    this.githubRepo = configJSON.github_repo;
+    this.githubOwner = configJSON.github_owner;
+    this.confirmationEmoji = configJSON.confirmation_emoji;
+    this.releaseTargetBranch = configJSON.release_target_branch;
+    this.releaseBaseBranch = configJSON.release_base_branch;
+    this.newBranchPrefix = configJSON.new_branch_prefix;
+    this.channelToConfirm = configJSON.channel_to_confirm;
+    this.pullRequestTitlePrefix = configJSON.pull_request_title_prefix;
+    this.secondsToConfirmationTimeout =
+      configJSON.seconds_to_confirmation_timeout;
   }
 }
