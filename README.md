@@ -29,6 +29,7 @@ JIRA_USER_NAME=
 GITHUB_AUTH_TOKEN=
 SLACK_AUTH_TOKEN=
 ```
+On slack, the app must be able to read reactions and write messages.
 You can configure many options in the `config.json` file.
 
 
