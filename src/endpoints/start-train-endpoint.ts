@@ -22,7 +22,7 @@ export class StartTrainEndpoint {
 
   execute(): Observable<StartTrainOutput> {
     return this.startTrainUseCase
-      .execute(new StartTrainUseCaseInput())
+      .execute()
       .pipe(map(() => new StartTrainOutput()));
   }
 }
