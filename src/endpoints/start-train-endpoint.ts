@@ -1,8 +1,5 @@
 import { Observable } from 'rxjs';
-import {
-  StartTrainUseCase,
-  StartTrainUseCaseInput
-} from '../use-cases/start-train-use-case';
+import { StartTrainUseCase } from '../use-cases/start-train-use-case';
 import { map } from 'rxjs/operators';
 
 export interface StartTrainDependencies {
