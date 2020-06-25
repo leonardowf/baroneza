@@ -3,8 +3,8 @@ import JiraAPI from 'jira-client';
 import { catchError, map } from 'rxjs/operators';
 
 export interface JiraTicketTaggetOutput {
-  successes: string[];
-  failures: string[];
+  readonly successes: string[];
+  readonly failures: string[];
 }
 
 export interface JiraTicketTagger {

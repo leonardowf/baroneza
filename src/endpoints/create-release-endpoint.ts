@@ -3,11 +3,11 @@ import { mapTo } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 export interface CreateReleaseEndpointInput {
-  branchName: string;
-  referenceBranch: string;
-  title: string;
-  targetBranch: string;
-  projectTag: string;
+  readonly branchName: string;
+  readonly referenceBranch: string;
+  readonly title: string;
+  readonly targetBranch: string;
+  readonly projectTag: string;
 }
 
 export class CreateReleaseEndpointResponse {}

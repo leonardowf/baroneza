@@ -33,9 +33,9 @@ export class TagUseCaseOutput {
 }
 
 export interface JiraTagUseCaseDependencies {
-  commitExtractor: CommitExtractor;
-  jiraTicketParser: JiraTicketParser;
-  jiraTicketTagger: JiraTicketTagger;
+  readonly commitExtractor: CommitExtractor;
+  readonly jiraTicketParser: JiraTicketParser;
+  readonly jiraTicketTagger: JiraTicketTagger;
 }
 
 export class JiraTagUseCase implements TagUseCase {

@@ -3,7 +3,7 @@ import { StartTrainUseCase } from '../use-cases/start-train-use-case';
 import { map } from 'rxjs/operators';
 
 export interface StartTrainDependencies {
-  startTrainUseCase: StartTrainUseCase;
+  readonly startTrainUseCase: StartTrainUseCase;
 }
 
 export class StartTrainInput {}

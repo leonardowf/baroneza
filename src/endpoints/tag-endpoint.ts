@@ -7,9 +7,9 @@ import {
 } from '../use-cases/tag-use-case';
 
 export interface TagEndpointDependencies {
-  tagUseCase: TagUseCase;
-  inputMapper: TagEndpointInputMapper;
-  outputMapper: TagEndpointOutputMapper;
+  readonly tagUseCase: TagUseCase;
+  readonly inputMapper: TagEndpointInputMapper;
+  readonly outputMapper: TagEndpointOutputMapper;
 }
 
 export interface TagEndpointInputMapper {
@@ -40,8 +40,8 @@ export class TagEndpoint {
 }
 
 export interface TagEndpointInput {
-  number: number;
-  tag: string;
+  readonly number: number;
+  readonly tag: string;
 }
 
 export class TagEndpointResponse {

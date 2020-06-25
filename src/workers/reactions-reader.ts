@@ -21,8 +21,8 @@ export class ReactionsReaderOutput {
 }
 
 export interface Reaction {
-  count: number;
-  name: string;
+  readonly count: number;
+  readonly name: string;
 }
 
 export interface ReactionsReader {
