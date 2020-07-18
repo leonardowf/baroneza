@@ -12,3 +12,6 @@ jobs:
     steps:
     - name: Run coverage
       uses: leonardowf/jest-reporter-action@master
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        test-command: "npm run coverage"
