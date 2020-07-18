@@ -1,4 +1,3 @@
-import { TestScheduler } from 'rxjs/testing';
 import { Observable, from } from 'rxjs';
 
 describe("simple suite", () => {

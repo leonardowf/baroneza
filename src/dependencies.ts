@@ -5,8 +5,7 @@ import {
   JiraTagUseCaseDependencies
 } from './use-cases/tag-use-case';
 import {
-  GithubPullRequestExtractor,
-  ConcreteJiraTickerParser
+  GithubPullRequestExtractor
 } from './workers/commit-extractor';
 import { Keychain } from './keys';
 import { Octokit } from '@octokit/rest';
@@ -25,6 +24,7 @@ import { SlackMessageSender } from './workers/message-sender';
 import { WebClient } from '@slack/web-api';
 import { SlackReactionsReader } from './workers/reactions-reader';
 import { GithubNextReleaseGuesser } from './workers/next-release-guesser';
+import { ConcreteJiraTickerParser } from './workers/jira-ticket-parser';
 
 export class Dependencies
   implements
