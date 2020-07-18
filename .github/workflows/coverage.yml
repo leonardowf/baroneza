@@ -1,0 +1,14 @@
+name: Coverage
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    - name: Run coverage
+      uses: ziishaned/jest-reporter-action@0.1.1
