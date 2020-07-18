@@ -22,6 +22,7 @@
 
 ## 🔨 Getting started
 You will need `npm` and then you can do `npm run start:watch`.
+To run tests you can use `jest`.
 You will also need a `.env` file with the following environment variables:
 ```
 JIRA_AUTH_TOKEN=
