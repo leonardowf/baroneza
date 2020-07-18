@@ -6,6 +6,7 @@ describe("simple suite", () => {
         from("simple stream").subscribe({
             next: (x) => {
                 // Just a simple template to test streams
+                
             },
             complete: done
         })
