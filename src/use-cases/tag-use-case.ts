@@ -5,9 +5,10 @@ import {
   TagEndpointResponse,
   TagEndpointInput
 } from '../endpoints/tag-endpoint';
-import { CommitExtractor, JiraTicketParser } from '../workers/commit-extractor';
+import { CommitExtractor } from '../workers/commit-extractor';
 import { map, flatMap } from 'rxjs/operators';
 import { JiraTicketTagger } from '../workers/jira-tagger';
+import { JiraTicketParser } from '../workers/jira-ticket-parser';
 
 export interface TagUseCase {
   execute(input: TagUseCaseInput): Observable<TagUseCaseOutput>;

@@ -1,4 +1,3 @@
-import { TestScheduler } from 'rxjs/testing';
 import { Observable, from } from 'rxjs';
 
 describe("simple suite", () => {
@@ -6,7 +5,6 @@ describe("simple suite", () => {
         from("simple stream").subscribe({
             next: (x) => {
                 // Just a simple template to test streams
-                
             },
             complete: done
         })
