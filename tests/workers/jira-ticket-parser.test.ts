@@ -13,6 +13,4 @@ describe("The jira ticket parser", () => {
     it("does not work with number tags", () => {
         expect(sut.parse(["[PSF-abc] Bla Bla"])).toStrictEqual([])
     })
-
-
 })

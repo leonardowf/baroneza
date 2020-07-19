@@ -62,17 +62,3 @@ export class JiraTagUseCase implements TagUseCase {
       );
   }
 }
-
-export class JiraMappers
-  implements TagEndpointOutputMapper, TagEndpointInputMapper {
-  map(useCaseOutput: TagUseCaseOutput): TagEndpointResponse {
-    return new TagEndpointResponse(
-      useCaseOutput.successes,
-      useCaseOutput.failures
-    );
-  }
-
-  mapToUseCase(tagEndpointInput: TagEndpointInput): TagUseCaseInput {
-    return new TagUseCaseInput(tagEndpointInput.number, tagEndpointInput.tag);
-  }
-}
