@@ -1,7 +1,6 @@
 import { TagEndpointDependencies } from './endpoints/tag-endpoint';
 import {
   JiraTagUseCase,
-  JiraMappers,
   JiraTagUseCaseDependencies
 } from './use-cases/tag-use-case';
 import {
@@ -55,8 +54,6 @@ export class Dependencies
   );
   jiraTicketParser = new ConcreteJiraTickerParser();
   jiraTicketTagger = new ConcreteJiraTickerTagger(this.jiraAPI());
-  inputMapper = new JiraMappers();
-  outputMapper = new JiraMappers();
   tagUseCase = new JiraTagUseCase(this);
 
   shaFinder = new GithubSHAFinder(
