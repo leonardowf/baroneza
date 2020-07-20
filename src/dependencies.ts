@@ -3,9 +3,7 @@ import {
   JiraTagUseCase,
   JiraTagUseCaseDependencies
 } from './use-cases/tag-use-case';
-import {
-  GithubPullRequestExtractor
-} from './workers/commit-extractor';
+import { GithubPullRequestExtractor } from './workers/commit-extractor';
 import { Keychain } from './keys';
 import { Octokit } from '@octokit/rest';
 import JiraAPI from 'jira-client';
@@ -24,6 +22,7 @@ import { WebClient } from '@slack/web-api';
 import { SlackReactionsReader } from './workers/reactions-reader';
 import { GithubNextReleaseGuesser } from './workers/next-release-guesser';
 import { ConcreteJiraTickerParser } from './workers/jira-ticket-parser';
+import { ConcreteGithubService } from './services/github-service';
 
 export class Dependencies
   implements
@@ -82,12 +81,14 @@ export class Dependencies
     this.tagUseCase
   );
 
+  githubService = new ConcreteGithubService(this.octokit());
+
   slackWebClient = new WebClient(this.keychain.slackAuthToken);
 
   messageSender = new SlackMessageSender(this.slackWebClient);
   reactionsReader = new SlackReactionsReader(this.slackWebClient);
   nextReleaseGuesser = new GithubNextReleaseGuesser(
-    this.octokit(),
+    this.githubService,
     this.config.githubRepo,
     this.config.githubOwner
   );

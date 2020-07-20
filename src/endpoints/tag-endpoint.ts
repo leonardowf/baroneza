@@ -26,7 +26,7 @@ export class TagEndpoint {
   }
 
   execute(input: TagEndpointInput): Observable<TagEndpointResponse> {
-    const useCaseInput = new TagUseCaseInput(input.number, input.tag)
+    const useCaseInput = new TagUseCaseInput(input.number, input.tag);
     return this.tagUseCase
       .execute(useCaseInput)
       .pipe(map((x) => new TagEndpointResponse(x.successes, x.failures)));
