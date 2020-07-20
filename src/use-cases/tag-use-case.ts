@@ -1,10 +1,4 @@
 import { Observable } from 'rxjs';
-import {
-  TagEndpointOutputMapper,
-  TagEndpointInputMapper,
-  TagEndpointResponse,
-  TagEndpointInput
-} from '../endpoints/tag-endpoint';
 import { CommitExtractor } from '../workers/commit-extractor';
 import { map, flatMap } from 'rxjs/operators';
 import { JiraTicketTagger } from '../workers/jira-tagger';

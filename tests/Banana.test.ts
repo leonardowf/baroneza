@@ -1,12 +1,12 @@
-import { Observable, from } from 'rxjs';
+import { from } from 'rxjs';
 
-describe("simple suite", () => {
-    it("simple scenario", done => {
-        from("simple stream").subscribe({
-            next: (x) => {
-                // Just a simple template to test streams
-            },
-            complete: done
-        })
-    })
-})
+describe('simple suite', () => {
+  it('simple scenario', (done) => {
+    from('simple stream').subscribe({
+      next: () => {
+        // Just a simple template to test streams
+      },
+      complete: done
+    });
+  });
+});

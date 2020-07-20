@@ -1,5 +1,4 @@
-import { Observable, from } from 'rxjs';
-import { Octokit } from '@octokit/rest';
+import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import semver from 'semver';
 import { GithubService } from '../services/github-service';
