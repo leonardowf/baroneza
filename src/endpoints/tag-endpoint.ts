@@ -14,6 +14,16 @@ export interface TagEndpointInputMapper {
   mapToUseCase(input: TagEndpointInput): TagUseCaseInput;
 }
 
+export class TagEndpointResponse {
+  successes: string[];
+  failures: string[];
+
+  constructor(successes: string[], failures: string[]) {
+    this.successes = successes;
+    this.failures = failures;
+  }
+}
+
 export interface TagEndpointOutputMapper {
   map(useCaseOutput: TagUseCaseOutput): TagEndpointResponse;
 }
@@ -26,7 +36,7 @@ export class TagEndpoint {
   }
 
   execute(input: TagEndpointInput): Observable<TagEndpointResponse> {
-    const useCaseInput = new TagUseCaseInput(input.number, input.tag)
+    const useCaseInput = new TagUseCaseInput(input.number, input.tag);
     return this.tagUseCase
       .execute(useCaseInput)
       .pipe(map((x) => new TagEndpointResponse(x.successes, x.failures)));
@@ -36,14 +46,4 @@ export class TagEndpoint {
 export interface TagEndpointInput {
   readonly number: number;
   readonly tag: string;
-}
-
-export class TagEndpointResponse {
-  successes: string[];
-  failures: string[];
-
-  constructor(successes: string[], failures: string[]) {
-    this.successes = successes;
-    this.failures = failures;
-  }
 }
