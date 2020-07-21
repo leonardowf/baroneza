@@ -18,17 +18,38 @@ describe('the github next release guesser', () => {
     sut.guess().subscribe({
       next: () => {
         fail();
-        done();
       },
       error: () => {
         done();
-      }
+      }, complete: done
     });
   });
 
-  it('succeeds without semver in the title', (done) => {
+  it('succeeds with semver in the title', (done) => {
     const githubServiceMock = mock<GithubService>();
     const titles: string[] = ['bla 1.0.0'];
+
+    when(
+      githubServiceMock.pullRequestTitles(anything(), anything())
+    ).thenReturn(of(titles));
+
+    const githubService = instance(githubServiceMock);
+
+    const sut = new GithubNextReleaseGuesser(githubService, 'repo', 'owner');
+    sut.guess().subscribe({
+      next: (version) => {
+        expect(version).toEqual('1.0.1');
+      },
+      error: () => {
+        fail();
+      },
+      complete: done
+    });
+  });
+
+  it('succeeds with semver in beginning of the title', (done) => {
+    const githubServiceMock = mock<GithubService>();
+    const titles: string[] = ['1.0.0 bla'];
 
     when(
       githubServiceMock.pullRequestTitles(anything(), anything())
@@ -44,8 +65,7 @@ describe('the github next release guesser', () => {
       },
       error: () => {
         fail();
-        done();
-      }
+      }, complete: done
     });
   });
 });
