@@ -25,7 +25,6 @@ import { ConcreteJiraTickerParser } from './workers/jira-ticket-parser';
 import { ConcreteGithubService } from './services/github-service';
 import { ConcreteJiraService } from './services/jira-service';
 import { JiraCreateVersionUseCase } from './use-cases/create-version-use-case';
-import { config } from 'dotenv/types';
 
 export class Dependencies
   implements
