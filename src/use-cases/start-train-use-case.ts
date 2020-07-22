@@ -16,16 +16,17 @@ export class StartTrainUseCaseInput {}
 export class StartTrainUseCaseOutput {}
 
 export class StartTrainUseCase {
-  private nextReleaseGuesser: NextReleaseGuesser;
-  private messageSender: MessageSender;
-  private reactionsReader: ReactionsReader;
-  private createReleaseUseCase: CreateReleaseUseCase;
-  private channelToConfirm: string;
-  private branchPrefix: string;
-  private baseBranch: string;
-  private targetBranch: string;
-  private pullRequestTitlePrefix: string;
-  private secondsToConfirmationTimeout: number;
+  private readonly nextReleaseGuesser: NextReleaseGuesser;
+  private readonly messageSender: MessageSender;
+  private readonly reactionsReader: ReactionsReader;
+  private readonly createReleaseUseCase: CreateReleaseUseCase;
+  private readonly channelToConfirm: string;
+  private readonly branchPrefix: string;
+  private readonly baseBranch: string;
+  private readonly targetBranch: string;
+  private readonly pullRequestTitlePrefix: string;
+  private readonly secondsToConfirmationTimeout: number;
+  private readonly project: string;
 
   constructor(
     messageSender: MessageSender,
@@ -37,7 +38,8 @@ export class StartTrainUseCase {
     baseBranch: string,
     targetBranch: string,
     pullRequestTitlePrefix: string,
-    secondsToConfirmationTimeout: number
+    secondsToConfirmationTimeout: number,
+    project: string
   ) {
     this.messageSender = messageSender;
     this.reactionsReader = reactionsReader;
@@ -49,6 +51,7 @@ export class StartTrainUseCase {
     this.targetBranch = targetBranch;
     this.pullRequestTitlePrefix = pullRequestTitlePrefix;
     this.secondsToConfirmationTimeout = secondsToConfirmationTimeout;
+    this.project = project;
   }
 
   execute(): Observable<StartTrainUseCaseOutput> {
@@ -90,7 +93,8 @@ export class StartTrainUseCase {
                     this.baseBranch,
                     this.targetBranch,
                     `${this.pullRequestTitlePrefix} ${version}`,
-                    version
+                    version,
+                    this.project
                   )
                 );
               } else {

@@ -21,7 +21,8 @@ describe('the github next release guesser', () => {
       },
       error: () => {
         done();
-      }, complete: done
+      },
+      complete: done
     });
   });
 
@@ -65,7 +66,8 @@ describe('the github next release guesser', () => {
       },
       error: () => {
         fail();
-      }, complete: done
+      },
+      complete: done
     });
   });
 });

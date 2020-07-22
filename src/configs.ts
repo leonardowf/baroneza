@@ -11,6 +11,7 @@ export class Config {
     public newBranchPrefix = configJSON.new_branch_prefix,
     public channelToConfirm = configJSON.channel_to_confirm,
     public pullRequestTitlePrefix = configJSON.pull_request_title_prefix,
-    public secondsToConfirmationTimeout = configJSON.seconds_to_confirmation_timeout
+    public secondsToConfirmationTimeout = configJSON.seconds_to_confirmation_timeout,
+    public jiraProjectName = configJSON.jira_project_name
   ) {}
 }

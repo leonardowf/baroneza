@@ -12,20 +12,23 @@ export class CreateReleaseUseCaseInput {
   referenceBranch: string;
   targetBranch: string;
   title: string;
-  projectTag: string;
+  projectTag: string; // this is the tag, better naming please
+  project: string;
 
   constructor(
     branchName: string,
     referenceBranch: string,
     targetBranch: string,
     title: string,
-    projectTag: string
+    projectTag: string,
+    project: string
   ) {
     this.branchName = branchName;
     this.referenceBranch = referenceBranch;
     this.targetBranch = targetBranch;
     this.title = title;
     this.projectTag = projectTag;
+    this.project = project;
   }
 }
 
@@ -65,7 +68,7 @@ export class CreateReleaseUseCase {
       .pipe(
         flatMap((x) =>
           this.tagUseCase.execute(
-            new TagUseCaseInput(x.identifier, input.projectTag)
+            new TagUseCaseInput(x.identifier, input.projectTag, input.project)
           )
         )
       )

@@ -8,6 +8,7 @@ export interface CreateReleaseEndpointInput {
   readonly title: string;
   readonly targetBranch: string;
   readonly projectTag: string;
+  readonly project: string;
 }
 
 export class CreateReleaseEndpointResponse {}
@@ -32,7 +33,8 @@ export class CreateReleaseEndpoint {
         referenceBranch: input.referenceBranch,
         title: input.title,
         targetBranch: input.targetBranch,
-        projectTag: input.projectTag
+        projectTag: input.projectTag,
+        project: input.project
       })
       .pipe(mapTo(new CreateReleaseEndpointResponse()));
   }
