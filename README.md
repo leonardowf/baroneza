@@ -13,9 +13,9 @@
 - [x] Guesses the next release by reading PR history
 - [x] Create a pull request from a `base` to a `target`
 - [x] Parses Jira tags from commit history of a Pull Request and set the `fix-version` field
+- [x] Create automatically the version on Jira
 
 ## 🛣 Roadmap
-- [ ] Create automatically the version on Jira
 - [ ] Add tests
 - [ ] Send message to channel mentioning all Jira issues
 - [ ] Tag all pull requests with created release
