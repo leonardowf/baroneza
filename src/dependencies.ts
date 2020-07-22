@@ -23,6 +23,9 @@ import { SlackReactionsReader } from './workers/reactions-reader';
 import { GithubNextReleaseGuesser } from './workers/next-release-guesser';
 import { ConcreteJiraTickerParser } from './workers/jira-ticket-parser';
 import { ConcreteGithubService } from './services/github-service';
+import { ConcreteJiraService } from './services/jira-service';
+import { JiraCreateVersionUseCase } from './use-cases/create-version-use-case';
+import { config } from 'dotenv/types';
 
 export class Dependencies
   implements
@@ -46,6 +49,10 @@ export class Dependencies
       password: this.keychain.jiraAuthToken
     });
 
+  githubService = new ConcreteGithubService(this.octokit());
+  jiraService = new ConcreteJiraService(this.jiraAPI());
+  slackWebClient = new WebClient(this.keychain.slackAuthToken);
+
   commitExtractor = new GithubPullRequestExtractor(
     this.octokit(),
     this.config.githubOwner,
@@ -53,6 +60,7 @@ export class Dependencies
   );
   jiraTicketParser = new ConcreteJiraTickerParser();
   jiraTicketTagger = new ConcreteJiraTickerTagger(this.jiraAPI());
+  createVersionUseCase = new JiraCreateVersionUseCase(this.jiraService);
   tagUseCase = new JiraTagUseCase(this);
 
   shaFinder = new GithubSHAFinder(
@@ -81,10 +89,6 @@ export class Dependencies
     this.tagUseCase
   );
 
-  githubService = new ConcreteGithubService(this.octokit());
-
-  slackWebClient = new WebClient(this.keychain.slackAuthToken);
-
   messageSender = new SlackMessageSender(this.slackWebClient);
   reactionsReader = new SlackReactionsReader(this.slackWebClient);
   nextReleaseGuesser = new GithubNextReleaseGuesser(
@@ -103,6 +107,9 @@ export class Dependencies
     this.config.releaseBaseBranch,
     this.config.releaseTargetBranch,
     this.config.pullRequestTitlePrefix,
-    this.config.secondsToConfirmationTimeout
+    this.config.secondsToConfirmationTimeout,
+    this.config.jiraProjectName
   );
+
+  project = this.config.jiraProjectName;
 }

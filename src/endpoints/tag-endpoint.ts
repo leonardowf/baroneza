@@ -8,6 +8,7 @@ import {
 
 export interface TagEndpointDependencies {
   readonly tagUseCase: TagUseCase;
+  project: string;
 }
 
 export interface TagEndpointInputMapper {
@@ -29,14 +30,20 @@ export interface TagEndpointOutputMapper {
 }
 
 export class TagEndpoint {
-  tagUseCase: TagUseCase;
+  private readonly tagUseCase: TagUseCase;
+  private readonly project: string;
 
   constructor(dependencies: TagEndpointDependencies) {
     this.tagUseCase = dependencies.tagUseCase;
+    this.project = dependencies.project;
   }
 
   execute(input: TagEndpointInput): Observable<TagEndpointResponse> {
-    const useCaseInput = new TagUseCaseInput(input.number, input.tag);
+    const useCaseInput = new TagUseCaseInput(
+      input.number,
+      input.tag,
+      this.project
+    );
     return this.tagUseCase
       .execute(useCaseInput)
       .pipe(map((x) => new TagEndpointResponse(x.successes, x.failures)));
