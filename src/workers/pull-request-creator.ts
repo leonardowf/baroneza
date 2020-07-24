@@ -14,30 +14,30 @@ export interface PullRequestCreator {
   create(
     title: string,
     head: string,
-    base: string
+    base: string,
+    repository: string
   ): Observable<PullRequestCreatorOutput>;
 }
 
 export class GithubPullRequestCreator implements PullRequestCreator {
   private octokit: Octokit;
   private owner: string;
-  private repo: string;
 
-  constructor(octokit: Octokit, owner: string, repo: string) {
+  constructor(octokit: Octokit, owner: string) {
     this.octokit = octokit;
     this.owner = owner;
-    this.repo = repo;
   }
 
   create(
     title: string,
     head: string,
-    base: string
+    base: string,
+    repository: string
   ): Observable<PullRequestCreatorOutput> {
     return from(
       this.octokit.pulls.create({
         owner: this.owner,
-        repo: this.repo,
+        repo: repository,
         title,
         base,
         head

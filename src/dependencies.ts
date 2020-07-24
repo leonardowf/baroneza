@@ -54,8 +54,7 @@ export class Dependencies
 
   commitExtractor = new GithubPullRequestExtractor(
     this.octokit(),
-    this.config.githubOwner,
-    this.config.githubRepo
+    this.config.githubOwner
   );
   jiraTicketParser = new ConcreteJiraTickerParser();
   jiraTicketTagger = new ConcreteJiraTickerTagger(this.jiraAPI());
@@ -64,12 +63,10 @@ export class Dependencies
 
   shaFinder = new GithubSHAFinder(
     this.octokit(),
-    this.config.githubOwner,
-    this.config.githubRepo
+    this.config.githubOwner
   );
   branchCreator = new GithubBranchCreator(
     this.octokit(),
-    this.config.githubRepo,
     this.config.githubOwner
   );
   createBranchUseCase = new GithubCreateBranchUseCase(
@@ -79,8 +76,7 @@ export class Dependencies
 
   pullRequestCreator = new GithubPullRequestCreator(
     this.octokit(),
-    this.config.githubOwner,
-    this.config.githubRepo
+    this.config.githubOwner
   );
   createReleaseUseCase = new CreateReleaseUseCase(
     this.createBranchUseCase,
@@ -92,7 +88,6 @@ export class Dependencies
   reactionsReader = new SlackReactionsReader(this.slackWebClient);
   nextReleaseGuesser = new GithubNextReleaseGuesser(
     this.githubService,
-    this.config.githubRepo,
     this.config.githubOwner
   );
 
@@ -101,7 +96,6 @@ export class Dependencies
     this.reactionsReader,
     this.nextReleaseGuesser,
     this.createReleaseUseCase,
-    this.config.channelToConfirm,
     this.config.newBranchPrefix,
     this.config.releaseBaseBranch,
     this.config.releaseTargetBranch,

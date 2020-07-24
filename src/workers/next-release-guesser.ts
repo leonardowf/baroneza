@@ -4,21 +4,19 @@ import semver from 'semver';
 import { GithubService } from '../services/github-service';
 
 export interface NextReleaseGuesser {
-  guess(): Observable<string>;
+  guess(repository: string): Observable<string>;
 }
 
 export class GithubNextReleaseGuesser implements NextReleaseGuesser {
   private readonly githubService: GithubService;
   private readonly owner: string;
-  private readonly repo: string;
 
-  constructor(githubService: GithubService, repo: string, owner: string) {
+  constructor(githubService: GithubService, owner: string) {
     this.githubService = githubService;
     this.owner = owner;
-    this.repo = repo;
   }
 
-  guess(): Observable<string> {
+  guess(repository: string): Observable<string> {
     // https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
     const semverRegex = /w*(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?/;
     const semverFromString = (value: string): string | null => {
@@ -28,7 +26,7 @@ export class GithubNextReleaseGuesser implements NextReleaseGuesser {
     };
 
     return this.githubService
-      .pullRequestTitles(this.owner, this.repo)
+      .pullRequestTitles(this.owner, repository)
       .pipe(
         map((titles) =>
           titles

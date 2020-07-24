@@ -16,11 +16,13 @@ export class TagUseCaseInput {
   readonly identifier: number;
   readonly tag: string;
   readonly project: string;
+  readonly repository: string;
 
-  constructor(identifier: number, tag: string, project: string) {
+  constructor(identifier: number, tag: string, project: string, repository: string) {
     this.identifier = identifier;
     this.tag = tag;
     this.project = project;
+    this.repository = repository;
   }
 }
 export class TagUseCaseOutput {
@@ -55,7 +57,7 @@ export class JiraTagUseCase implements TagUseCase {
 
   execute(input: TagUseCaseInput): Observable<TagUseCaseOutput> {
     return this.commitExtractor
-      .commits(input.identifier)
+      .commits(input.identifier, input.repository)
       .pipe(map((commits) => this.jiraTickerParser.parse(commits)))
       .pipe(
         flatMap((ticketIds) => {
