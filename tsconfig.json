@@ -7,7 +7,8 @@
       "sourceMap": true,
       "outDir": "dist",
       "resolveJsonModule": true,
-      "strict": true
+      "strict": true,
+      "typeRoots": ["src/typings"]
     },
     "lib": ["es2015"]
   }
