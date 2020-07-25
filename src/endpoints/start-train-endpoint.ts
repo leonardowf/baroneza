@@ -1,14 +1,22 @@
 import { Observable } from 'rxjs';
-import { StartTrainUseCase } from '../use-cases/start-train-use-case';
+import {
+  StartTrainUseCase,
+  StartTrainUseCaseInput
+} from '../use-cases/start-train-use-case';
 import { map } from 'rxjs/operators';
 
 export interface StartTrainDependencies {
   readonly startTrainUseCase: StartTrainUseCase;
 }
 
-export class StartTrainInput {}
+export interface StartTrainEndpointInput {
+  repository: string;
+  baseBranch: string;
+  targetBranch: string;
+  channel: string;
+}
 
-export class StartTrainOutput {}
+export class StartTrainEndpointOutput {}
 
 export class StartTrainEndpoint {
   private startTrainUseCase: StartTrainUseCase;
@@ -17,9 +25,18 @@ export class StartTrainEndpoint {
     this.startTrainUseCase = dependencies.startTrainUseCase;
   }
 
-  execute(): Observable<StartTrainOutput> {
+  execute(
+    input: StartTrainEndpointInput
+  ): Observable<StartTrainEndpointOutput> {
     return this.startTrainUseCase
-      .execute()
-      .pipe(map(() => new StartTrainOutput()));
+      .execute(
+        new StartTrainUseCaseInput(
+          input.repository,
+          input.baseBranch,
+          input.targetBranch,
+          input.channel
+        )
+      )
+      .pipe(map(() => new StartTrainEndpointOutput()));
   }
 }

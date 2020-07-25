@@ -13,9 +13,9 @@ describe('the github next release guesser', () => {
     ).thenReturn(of(titles));
 
     const githubService = instance(githubServiceMock);
-    const sut = new GithubNextReleaseGuesser(githubService, 'repo', 'owner');
+    const sut = new GithubNextReleaseGuesser(githubService, 'owner');
 
-    sut.guess().subscribe({
+    sut.guess('repository').subscribe({
       next: () => {
         fail();
       },
@@ -36,8 +36,8 @@ describe('the github next release guesser', () => {
 
     const githubService = instance(githubServiceMock);
 
-    const sut = new GithubNextReleaseGuesser(githubService, 'repo', 'owner');
-    sut.guess().subscribe({
+    const sut = new GithubNextReleaseGuesser(githubService, 'owner');
+    sut.guess('repository').subscribe({
       next: (version) => {
         expect(version).toEqual('1.0.1');
       },
@@ -58,8 +58,8 @@ describe('the github next release guesser', () => {
 
     const githubService = instance(githubServiceMock);
 
-    const sut = new GithubNextReleaseGuesser(githubService, 'repo', 'owner');
-    sut.guess().subscribe({
+    const sut = new GithubNextReleaseGuesser(githubService, 'owner');
+    sut.guess('repository').subscribe({
       next: (version) => {
         expect(version).toEqual('1.0.1');
         done();

@@ -14,6 +14,7 @@ export class CreateReleaseUseCaseInput {
   title: string;
   projectTag: string; // this is the tag, better naming please
   project: string;
+  repository: string;
 
   constructor(
     branchName: string,
@@ -21,7 +22,8 @@ export class CreateReleaseUseCaseInput {
     targetBranch: string,
     title: string,
     projectTag: string,
-    project: string
+    project: string,
+    repository: string
   ) {
     this.branchName = branchName;
     this.referenceBranch = referenceBranch;
@@ -29,6 +31,7 @@ export class CreateReleaseUseCaseInput {
     this.title = title;
     this.projectTag = projectTag;
     this.project = project;
+    this.repository = repository;
   }
 }
 
@@ -54,21 +57,31 @@ export class CreateReleaseUseCase {
   ): Observable<CreateReleaseUseCaseOutput> {
     return this.createBranchUseCase
       .execute(
-        new CreateBranchUseCaseInput(input.branchName, input.referenceBranch)
+        new CreateBranchUseCaseInput(
+          input.branchName,
+          input.referenceBranch,
+          input.repository
+        )
       )
       .pipe(
         flatMap(() =>
           this.pullRequestCreator.create(
             input.title,
             input.branchName,
-            input.targetBranch
+            input.targetBranch,
+            input.repository
           )
         )
       )
       .pipe(
         flatMap((x) =>
           this.tagUseCase.execute(
-            new TagUseCaseInput(x.identifier, input.projectTag, input.project)
+            new TagUseCaseInput(
+              x.identifier,
+              input.projectTag,
+              input.project,
+              input.repository
+            )
           )
         )
       )

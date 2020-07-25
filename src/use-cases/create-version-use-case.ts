@@ -1,6 +1,6 @@
-import { Observable, from, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { JiraService } from '../services/jira-service';
-import { flatMap } from 'rxjs/operators';
+import { flatMap, mapTo } from 'rxjs/operators';
 
 export interface CreateVersionUseCase {
   execute(
@@ -36,7 +36,8 @@ export class JiraCreateVersionUseCase implements CreateVersionUseCase {
         flatMap((projectId) =>
           this.jiraService.createVersion(input.version, projectId)
         )
-      );
+      )
+      .pipe(mapTo(new CreateVersionUseCaseOutput()));
 
     return this.jiraService.hasVersion(input.version, input.project).pipe(
       flatMap((x) => {

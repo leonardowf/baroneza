@@ -32,7 +32,7 @@ app.post('/createRelease', (req, res) => {
 });
 
 app.post('/startTrain', (req, res) => {
-  new StartTrainEndpoint(dependencies).execute().subscribe(
+  new StartTrainEndpoint(dependencies).execute(req.body).subscribe(
     (x) => res.send(x),
     (error) => {
       console.log(error);

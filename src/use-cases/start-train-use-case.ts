@@ -11,7 +11,24 @@ import {
   CreateReleaseUseCaseInput
 } from './create-release-use-case';
 
-export class StartTrainUseCaseInput {}
+export class StartTrainUseCaseInput {
+  readonly repository: string;
+  readonly baseBranch: string;
+  readonly targetBranch: string;
+  readonly channel: string;
+
+  constructor(
+    repository: string,
+    baseBranch: string,
+    targetBranch: string,
+    channel: string
+  ) {
+    this.repository = repository;
+    this.baseBranch = baseBranch;
+    this.targetBranch = targetBranch;
+    this.channel = channel;
+  }
+}
 
 export class StartTrainUseCaseOutput {}
 
@@ -20,7 +37,6 @@ export class StartTrainUseCase {
   private readonly messageSender: MessageSender;
   private readonly reactionsReader: ReactionsReader;
   private readonly createReleaseUseCase: CreateReleaseUseCase;
-  private readonly channelToConfirm: string;
   private readonly branchPrefix: string;
   private readonly baseBranch: string;
   private readonly targetBranch: string;
@@ -33,7 +49,6 @@ export class StartTrainUseCase {
     reactionsReader: ReactionsReader,
     nextReleaseGuesser: NextReleaseGuesser,
     createReleaseUseCase: CreateReleaseUseCase,
-    channelToConfirm: string,
     branchPrefix: string,
     baseBranch: string,
     targetBranch: string,
@@ -44,7 +59,6 @@ export class StartTrainUseCase {
     this.messageSender = messageSender;
     this.reactionsReader = reactionsReader;
     this.nextReleaseGuesser = nextReleaseGuesser;
-    this.channelToConfirm = channelToConfirm;
     this.createReleaseUseCase = createReleaseUseCase;
     this.branchPrefix = branchPrefix;
     this.baseBranch = baseBranch;
@@ -54,17 +68,17 @@ export class StartTrainUseCase {
     this.project = project;
   }
 
-  execute(): Observable<StartTrainUseCaseOutput> {
+  execute(input: StartTrainUseCaseInput): Observable<StartTrainUseCaseOutput> {
     const confirmationReaction = ':100:';
     const confirmationCopyMaker = (version: string): string =>
       `Would you like to start the release train for version ${version}? ${confirmationReaction} to continue!`;
 
-    return this.nextReleaseGuesser.guess().pipe(
+    return this.nextReleaseGuesser.guess(input.repository).pipe(
       flatMap((version) => {
         const copy = confirmationCopyMaker(version);
 
         return this.messageSender
-          .send(new MessageSenderInput(this.channelToConfirm, copy))
+          .send(new MessageSenderInput(input.channel, copy))
           .pipe(delay(this.secondsToConfirmationTimeout * 1000))
           .pipe(
             flatMap((x) =>
@@ -94,7 +108,8 @@ export class StartTrainUseCase {
                     this.targetBranch,
                     `${this.pullRequestTitlePrefix} ${version}`,
                     version,
-                    this.project
+                    this.project,
+                    input.repository
                   )
                 );
               } else {
