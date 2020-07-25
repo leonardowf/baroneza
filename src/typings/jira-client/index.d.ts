@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 declare module 'jira-client' {
   import { CoreOptions, RequestResponse } from 'request';
   import { ReadStream } from 'fs';
@@ -444,3 +446,5 @@ declare module 'jira-client' {
   }
   export = JiraApi;
 }
+
+/* eslint-disable @typescript-eslint/no-explicit-any */

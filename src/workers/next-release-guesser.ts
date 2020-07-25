@@ -20,9 +20,13 @@ export class GithubNextReleaseGuesser implements NextReleaseGuesser {
     // https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
     const semverRegex = /w*(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?/;
     const semverFromString = (value: string): string | null => {
-      return value.match(semverRegex) || [].length > 0
-        ? value.match(semverRegex)![0]
-        : null;
+      const matches: RegExpMatchArray | null = value.match(semverRegex);
+
+      if (matches !== null) {
+        return matches[0];
+      } else {
+        return null;
+      }
     };
 
     return this.githubService
@@ -46,10 +50,10 @@ export class GithubNextReleaseGuesser implements NextReleaseGuesser {
       .pipe(
         map((latestSemver) => {
           const increasedSemver = semver.inc(latestSemver, 'patch');
-          if (increasedSemver == null) {
+          if (increasedSemver === null) {
             throw new Error('Unable to increase semver');
           }
-          return increasedSemver!;
+          return increasedSemver;
         })
       );
   }

@@ -3,7 +3,7 @@ import JiraAPI from 'jira-client';
 import { map, mapTo } from 'rxjs/operators';
 
 export interface JiraService {
-  createVersion(name: string, projectId: number): Observable<any>;
+  createVersion(name: string, projectId: number): Observable<void>;
   projectId(project: string): Observable<number>;
   hasVersion(name: string, project: string): Observable<boolean>;
 }
@@ -15,13 +15,13 @@ export class ConcreteJiraService {
     this.jiraAPI = jiraAPI;
   }
 
-  createVersion(name: string, projectId: number): Observable<any> {
+  createVersion(name: string, projectId: number): Observable<void> {
     return from(
       this.jiraAPI.createVersion({
         projectId: projectId,
         name
       })
-    );
+    ).pipe(mapTo(void 0));
   }
 
   projectId(project: string): Observable<number> {
@@ -36,7 +36,7 @@ export class ConcreteJiraService {
   hasVersion(name: string, project: string): Observable<boolean> {
     return from(this.jiraAPI.getVersions(project)).pipe(
       map((x) => {
-        const versions = <Array<JiraVersion>>x;
+        const versions = x as Array<JiraVersion>;
         return versions.filter((version) => version.name === name).length > 0;
       })
     );
