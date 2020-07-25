@@ -37,7 +37,7 @@ export class JiraCreateVersionUseCase implements CreateVersionUseCase {
           this.jiraService.createVersion(input.version, projectId)
         )
       )
-      .pipe(mapTo(() => new CreateVersionUseCaseOutput()));
+      .pipe(mapTo(new CreateVersionUseCaseOutput()));
 
     return this.jiraService.hasVersion(input.version, input.project).pipe(
       flatMap((x) => {

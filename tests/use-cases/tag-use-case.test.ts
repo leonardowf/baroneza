@@ -24,7 +24,7 @@ describe('The tag use case', () => {
       CreateVersionUseCase
     >();
 
-    when(commitExtractorMock.commits(anything())).thenReturn(
+    when(commitExtractorMock.commits(anything(), 'repository')).thenReturn(
       of(['A commit message'])
     );
     when(jiraTickerParserMock.parse(anything())).thenReturn(['123']);
@@ -47,15 +47,18 @@ describe('The tag use case', () => {
       createVersionUseCase
     });
 
-    jiraTagUseCase.execute(new TagUseCaseInput(1, 'v1.0', 'PSF')).subscribe({
-      next: (x) => {
-        verify(commitExtractorMock.commits(anything())).once();
-        verify(jiraTickerParserMock.parse(anything())).once();
-        verify(jiraTicketTaggerMock.tag(anything(), anything())).once();
+    jiraTagUseCase
+      .execute(new TagUseCaseInput(1, 'v1.0', 'PSF', 'repository'))
+      .subscribe({
+        next: (x) => {
+          verify(commitExtractorMock.commits(anything(), 'repository')).once();
+          verify(jiraTickerParserMock.parse(anything())).once();
+          verify(jiraTicketTaggerMock.tag(anything(), anything())).once();
+          verify(createVersionUseCaseMock.execute(anything())).once();
 
-        expect(x.successes[0]).toEqual('123');
-        done();
-      }
-    });
+          expect(x.successes[0]).toEqual('123');
+          done();
+        }
+      });
   });
 });
