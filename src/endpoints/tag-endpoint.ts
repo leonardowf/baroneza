@@ -45,7 +45,7 @@ export class TagEndpoint {
       this.project,
       input.repository
     );
-    
+
     return this.tagUseCase
       .execute(useCaseInput)
       .pipe(map((x) => new TagEndpointResponse(x.successes, x.failures)));
@@ -55,5 +55,5 @@ export class TagEndpoint {
 export interface TagEndpointInput {
   readonly number: number;
   readonly tag: string;
-  readonly repository: string
+  readonly repository: string;
 }

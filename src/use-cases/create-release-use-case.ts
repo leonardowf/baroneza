@@ -57,7 +57,11 @@ export class CreateReleaseUseCase {
   ): Observable<CreateReleaseUseCaseOutput> {
     return this.createBranchUseCase
       .execute(
-        new CreateBranchUseCaseInput(input.branchName, input.referenceBranch, input.repository)
+        new CreateBranchUseCaseInput(
+          input.branchName,
+          input.referenceBranch,
+          input.repository
+        )
       )
       .pipe(
         flatMap(() =>
@@ -72,7 +76,12 @@ export class CreateReleaseUseCase {
       .pipe(
         flatMap((x) =>
           this.tagUseCase.execute(
-            new TagUseCaseInput(x.identifier, input.projectTag, input.project, input.repository)
+            new TagUseCaseInput(
+              x.identifier,
+              input.projectTag,
+              input.project,
+              input.repository
+            )
           )
         )
       )

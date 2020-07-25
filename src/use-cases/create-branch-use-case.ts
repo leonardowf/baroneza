@@ -37,7 +37,11 @@ export class GithubCreateBranchUseCase implements CreateBranchUseCase {
   ): Observable<CreateBranchUseCaseOutput> {
     return this.shaFinder
       .execute(input.referenceBranch, input.repository)
-      .pipe(flatMap((x) => this.branchCreator.create(x, input.branchName, input.repository)))
+      .pipe(
+        flatMap((x) =>
+          this.branchCreator.create(x, input.branchName, input.repository)
+        )
+      )
       .pipe(mapTo(new CreateBranchUseCaseOutput()));
   }
 }

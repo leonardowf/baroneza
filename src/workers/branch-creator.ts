@@ -15,7 +15,11 @@ export class GithubBranchCreator implements BranchCreator {
     this.owner = owner;
   }
 
-  create(sha: string, branchName: string, repository: string): Observable<void> {
+  create(
+    sha: string,
+    branchName: string,
+    repository: string
+  ): Observable<void> {
     return from(
       this.octokit.git.createRef({
         owner: this.owner,

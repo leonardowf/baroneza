@@ -17,12 +17,17 @@ export class StartTrainUseCaseInput {
   readonly targetBranch: string;
   readonly channel: string;
 
-	constructor(repository: string, baseBranch: string, targetBranch: string, channel: string) {
-		this.repository = repository;
-		this.baseBranch = baseBranch;
-		this.targetBranch = targetBranch;
-		this.channel = channel;
-	}
+  constructor(
+    repository: string,
+    baseBranch: string,
+    targetBranch: string,
+    channel: string
+  ) {
+    this.repository = repository;
+    this.baseBranch = baseBranch;
+    this.targetBranch = targetBranch;
+    this.channel = channel;
+  }
 }
 
 export class StartTrainUseCaseOutput {}

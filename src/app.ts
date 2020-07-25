@@ -41,10 +41,6 @@ app.post('/startTrain', (req, res) => {
   );
 });
 
-app.get('/hey', (req, res) => {
-  res.send({ hello: "there"})
-})
-
 app.listen(port, (err) => {
   if (err) {
     return console.error(err);

@@ -18,7 +18,12 @@ export class TagUseCaseInput {
   readonly project: string;
   readonly repository: string;
 
-  constructor(identifier: number, tag: string, project: string, repository: string) {
+  constructor(
+    identifier: number,
+    tag: string,
+    project: string,
+    repository: string
+  ) {
     this.identifier = identifier;
     this.tag = tag;
     this.project = project;
