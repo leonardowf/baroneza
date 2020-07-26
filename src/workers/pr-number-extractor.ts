@@ -1,30 +1,33 @@
-import { Observable, of } from "rxjs";
-import { CommitExtractor } from "./commit-extractor";
-import { map } from "rxjs/operators";
+import { Observable } from 'rxjs';
+import { CommitExtractor } from './commit-extractor';
+import { map } from 'rxjs/operators';
 
 export interface PullRequestNumberExtractor {
-    extract(pullRequest: number): Observable<number[]>
+  extract(pullNumber: number, repository: string): Observable<number[]>;
 }
 
-export class GithubPullRequestNumberExtractor {
-    private readonly commitExtractor: CommitExtractor
+export class GithubPullRequestNumberExtractor
+  implements PullRequestNumberExtractor {
+  private readonly commitExtractor: CommitExtractor;
 
-    constructor(commitExtractor: CommitExtractor) {
-        this.commitExtractor = commitExtractor
-    }
+  constructor(commitExtractor: CommitExtractor) {
+    this.commitExtractor = commitExtractor;
+  }
 
-    extract(pullNumber: number, repository: string): Observable<number[]> {
-        return this.commitExtractor.commits(pullNumber, repository).pipe(
-            map((commits) => {
-                return commits.map((commit) => {
-                    const match = commit.match(/(?:#)(\d+)/)
-                    if (match !== null) {
-                        const asNumber: number = +match[1]
-                        return asNumber
-                    }
-                    return null
-                }).filter((x): x is number => x !== null);
-            })
-        )
-    }
+  extract(pullNumber: number, repository: string): Observable<number[]> {
+    return this.commitExtractor.commits(pullNumber, repository).pipe(
+      map((commits) => {
+        return commits
+          .map((commit) => {
+            const match = commit.match(/(?:#)(\d+)/);
+            if (match !== null) {
+              const asNumber: number = +match[1];
+              return asNumber;
+            }
+            return null;
+          })
+          .filter((x): x is number => x !== null);
+      })
+    );
+  }
 }

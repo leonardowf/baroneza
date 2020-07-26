@@ -25,6 +25,11 @@ import { ConcreteJiraTickerParser } from './workers/jira-ticket-parser';
 import { ConcreteGithubService } from './services/github-service';
 import { ConcreteJiraService } from './services/jira-service';
 import { JiraCreateVersionUseCase } from './use-cases/create-version-use-case';
+import { GithubKeepChangelogCreateChangelogUseCase } from './use-cases/create-changelog-use-case';
+import { GithubPullRequestNumberExtractor } from './workers/pr-number-extractor';
+import { GithubPullRequestInfoUseCase } from './workers/pull-request-description-reader';
+import { ConcreteKeepChangelogParser } from './workers/keep-changelog-parser';
+import { ConcreteKeepChangelogBuilder } from './workers/keep-changelog-builder';
 
 export class Dependencies
   implements
@@ -75,10 +80,29 @@ export class Dependencies
     this.octokit(),
     this.config.githubOwner
   );
+
+  pullRequestNumberExtractor = new GithubPullRequestNumberExtractor(
+    this.commitExtractor
+  );
+  pullRequestInfoUseCase = new GithubPullRequestInfoUseCase(
+    this.githubService,
+    this.config.githubOwner
+  );
+  keepChangelogParser = new ConcreteKeepChangelogParser();
+  keepChangelogBuilder = new ConcreteKeepChangelogBuilder();
+
+  createChangeLogUseCase = new GithubKeepChangelogCreateChangelogUseCase(
+    this.pullRequestNumberExtractor,
+    this.pullRequestInfoUseCase,
+    this.keepChangelogParser,
+    this.keepChangelogBuilder
+  );
+
   createReleaseUseCase = new CreateReleaseUseCase(
     this.createBranchUseCase,
     this.pullRequestCreator,
-    this.tagUseCase
+    this.tagUseCase,
+    this.createChangeLogUseCase
   );
 
   messageSender = new SlackMessageSender(this.slackWebClient);
