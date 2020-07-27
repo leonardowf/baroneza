@@ -1,7 +1,4 @@
-import {
-  KeepChangelogParser,
-  ConcreteKeepChangelogParser
-} from '../../src/workers/keep-changelog-parser';
+import { ConcreteKeepChangelogParser } from '../../src/workers/keep-changelog-parser';
 
 describe('the keep changelog parser', () => {
   let sut: ConcreteKeepChangelogParser;
@@ -30,10 +27,13 @@ describe('the keep changelog parser', () => {
         ### Security
         ---
         `;
+
+    /* eslint-disable @typescript-eslint/no-non-null-assertion */
     expect(sut.parse(text)!.added[0]).toEqual('- Support to multi platform');
     expect(sut.parse(text)!.added[1]).toEqual(
       '- Support to Jira version creation'
     );
+
     expect(sut.parse(text)!.changed[0]).toEqual('- Feature flag name');
 
     expect(sut.parse(text)!.deprecated[0]).toBeUndefined();
@@ -89,3 +89,5 @@ describe('the keep changelog parser', () => {
     );
   });
 });
+
+/* eslint-disable @typescript-eslint/no-non-null-assertion */

@@ -9,7 +9,7 @@ import {
 } from '../workers/keep-changelog-builder';
 
 export interface CreateChangelogUseCase {
-  execute(input: CreateChangelogInput): Observable<string>;
+  execute(input: CreateChangelogInput): Observable<string | undefined>;
 }
 
 export class CreateChangelogInput {
@@ -45,7 +45,7 @@ export class GithubKeepChangelogCreateChangelogUseCase
     this.keepChangelogBuilder = keepChangelogBuilder;
   }
 
-  execute(input: CreateChangelogInput): Observable<string> {
+  execute(input: CreateChangelogInput): Observable<string | undefined> {
     return this.pullRequestNumberExtractor
       .extract(input.pullRequestNumber, input.repository)
       .pipe(

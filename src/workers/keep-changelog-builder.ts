@@ -7,7 +7,7 @@ export interface KeepChangelogBuilder {
     removed: KeepChangelogItem[],
     fixed: KeepChangelogItem[],
     security: KeepChangelogItem[]
-  ): string;
+  ): string | undefined;
 }
 
 export class KeepChangelogItem {
@@ -24,7 +24,11 @@ export class KeepChangelogItem {
   }
 
   toString(): string {
-    return `${this.text}, by ${this.author}, ${this.date}, (#${this.identifier})`;
+    let item = `${this.text}, by ${this.author} - (#${this.identifier})`;
+    if (!this.text.trim().includes('- ')) {
+      item = `- ${item}`;
+    }
+    return item;
   }
 }
 
@@ -37,8 +41,19 @@ export class ConcreteKeepChangelogBuilder implements KeepChangelogBuilder {
     removed: KeepChangelogItem[],
     fixed: KeepChangelogItem[],
     security: KeepChangelogItem[]
-  ): string {
+  ): string | undefined {
     let lines: string[] = [];
+
+    const numberOfEntries =
+      added.length +
+      changed.length +
+      deprecated.length +
+      removed.length +
+      fixed.length +
+      security.length;
+    if (numberOfEntries == 0) {
+      return undefined;
+    }
 
     lines.push(`## ${version}`);
 

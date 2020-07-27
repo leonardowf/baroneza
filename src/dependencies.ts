@@ -30,6 +30,8 @@ import { GithubPullRequestNumberExtractor } from './workers/pr-number-extractor'
 import { GithubPullRequestInfoUseCase } from './workers/pull-request-description-reader';
 import { ConcreteKeepChangelogParser } from './workers/keep-changelog-parser';
 import { ConcreteKeepChangelogBuilder } from './workers/keep-changelog-builder';
+import { GithubReleasePageCreator } from './workers/release-page-creator';
+import { GithubPullRequestDescriptionWriter } from './use-cases/pull-request-description-writer';
 
 export class Dependencies
   implements
@@ -98,11 +100,22 @@ export class Dependencies
     this.keepChangelogBuilder
   );
 
+  releasePageCreator = new GithubReleasePageCreator(
+    this.githubService,
+    this.config.githubOwner
+  );
+  pullRequestDescriptionWriter = new GithubPullRequestDescriptionWriter(
+    this.githubService,
+    this.config.githubOwner
+  );
+
   createReleaseUseCase = new CreateReleaseUseCase(
     this.createBranchUseCase,
     this.pullRequestCreator,
     this.tagUseCase,
-    this.createChangeLogUseCase
+    this.createChangeLogUseCase,
+    this.releasePageCreator,
+    this.pullRequestDescriptionWriter
   );
 
   messageSender = new SlackMessageSender(this.slackWebClient);

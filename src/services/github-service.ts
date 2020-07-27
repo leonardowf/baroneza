@@ -1,6 +1,6 @@
-import { Observable, from, of } from 'rxjs';
+import { Observable, from } from 'rxjs';
 import { Octokit } from '@octokit/rest';
-import { map } from 'rxjs/operators';
+import { map, mapTo } from 'rxjs/operators';
 
 export interface GithubService {
   pullRequestTitles(owner: string, repo: string): Observable<string[]>;
@@ -9,6 +9,20 @@ export interface GithubService {
     repo: string,
     number: number
   ): Observable<PullRequestLoginDescriptionDateOutput>;
+
+  createPreRelease(
+    tag: string,
+    name: string,
+    owner: string,
+    repo: string,
+    body?: string
+  ): Observable<void>;
+  updateDescription(
+    number: number,
+    owner: string,
+    repo: string,
+    body?: string
+  ): Observable<void>;
 }
 
 export class PullRequestLoginDescriptionDateOutput {
@@ -72,5 +86,43 @@ export class ConcreteGithubService implements GithubService {
           )
       )
     );
+  }
+
+  createPreRelease(
+    tag: string,
+    name: string,
+    owner: string,
+    repo: string,
+    body?: string
+  ): Observable<void> {
+    return from(
+      this.octokit.repos.createRelease({
+        repo: repo,
+        owner: owner,
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        tag_name: tag,
+        name: name,
+        draft: true,
+        body: body,
+        prerelease: true
+      })
+    ).pipe(mapTo(void 0));
+  }
+
+  updateDescription(
+    number: number,
+    owner: string,
+    repo: string,
+    body?: string
+  ): Observable<void> {
+    return from(
+      this.octokit.pulls.update({
+        owner,
+        repo,
+        body,
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        pull_number: number
+      })
+    ).pipe(mapTo(void 0));
   }
 }

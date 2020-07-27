@@ -3,7 +3,7 @@ import {
   GithubService,
   PullRequestLoginDescriptionDateOutput
 } from '../services/github-service';
-import { catchError, filter, map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 
 export interface PullRequestInfoUseCase {
   execute(
