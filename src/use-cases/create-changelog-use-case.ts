@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { PullRequestNumberExtractor } from '../workers/pr-number-extractor';
-import { PullRequestInfoUseCase } from '../workers/pull-request-description-reader';
+import { ReadPullRequestInfoUseCase } from './read-pull-request-info-use-case';
 import { flatMap, map } from 'rxjs/operators';
 import { KeepChangelogParser } from '../workers/keep-changelog-parser';
 import {
@@ -26,16 +26,16 @@ export class CreateChangelogInput {
 
 export class CreateChangelogOutput {}
 
-export class GithubKeepChangelogCreateChangelogUseCase
+export class GithubCreateChangelogUseCase
   implements CreateChangelogUseCase {
   private readonly pullRequestNumberExtractor: PullRequestNumberExtractor;
-  private readonly pullRequestInfoUseCase: PullRequestInfoUseCase;
+  private readonly pullRequestInfoUseCase: ReadPullRequestInfoUseCase;
   private readonly keepChangelogParser: KeepChangelogParser;
   private readonly keepChangelogBuilder: KeepChangelogBuilder;
 
   constructor(
     pullRequestNumberExtractor: PullRequestNumberExtractor,
-    pullRequestInfoUseCase: PullRequestInfoUseCase,
+    pullRequestInfoUseCase: ReadPullRequestInfoUseCase,
     keepChangelogParser: KeepChangelogParser,
     keepChangelogBuilder: KeepChangelogBuilder
   ) {

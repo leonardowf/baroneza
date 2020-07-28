@@ -5,14 +5,14 @@ import {
 } from '../services/github-service';
 import { catchError, map } from 'rxjs/operators';
 
-export interface PullRequestInfoUseCase {
+export interface ReadPullRequestInfoUseCase {
   execute(
     pullRequestNumbers: number[],
     repo: string
-  ): Observable<PullRequestInfoUseCaseOutput>;
+  ): Observable<ReadPullRequestInfoUseCaseOutput>;
 }
 
-export class PullRequestInfoUseCaseOutput {
+export class ReadPullRequestInfoUseCaseOutput {
   readonly pullRequests: PullRequestInfo[];
 
   constructor(pullRequests: PullRequestInfo[]) {
@@ -39,7 +39,7 @@ export class PullRequestInfo {
   }
 }
 
-export class GithubPullRequestInfoUseCase implements PullRequestInfoUseCase {
+export class GithubPullRequestInfoUseCase implements ReadPullRequestInfoUseCase {
   private readonly githubService: GithubService;
   private readonly owner: string;
 
@@ -51,7 +51,7 @@ export class GithubPullRequestInfoUseCase implements PullRequestInfoUseCase {
   execute(
     pullRequestNumbers: number[],
     repo: string
-  ): Observable<PullRequestInfoUseCaseOutput> {
+  ): Observable<ReadPullRequestInfoUseCaseOutput> {
     const infos = pullRequestNumbers.map((number) =>
       this.githubService
         .pullRequestLoginDescriptionDate(this.owner, repo, number)
@@ -80,7 +80,7 @@ export class GithubPullRequestInfoUseCase implements PullRequestInfoUseCase {
       .pipe(
         map(
           (pullRequestInfos) =>
-            new PullRequestInfoUseCaseOutput(pullRequestInfos)
+            new ReadPullRequestInfoUseCaseOutput(pullRequestInfos)
         )
       );
   }

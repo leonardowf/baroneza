@@ -1,5 +1,5 @@
 import {
-  GithubKeepChangelogCreateChangelogUseCase,
+  GithubCreateChangelogUseCase,
   CreateChangelogInput
 } from '../../src/use-cases/create-changelog-use-case';
 import { mock, instance, when, deepEqual } from 'ts-mockito';
@@ -13,16 +13,16 @@ import {
   KeepChangelogItem
 } from '../../src/workers/keep-changelog-builder';
 import {
-  PullRequestInfoUseCase,
-  PullRequestInfoUseCaseOutput,
+  ReadPullRequestInfoUseCase,
+  ReadPullRequestInfoUseCaseOutput,
   PullRequestInfo
-} from '../../src/workers/pull-request-description-reader';
+} from '../../src/use-cases/read-pull-request-info-use-case';
 import { of } from 'rxjs';
 
 describe('the create changelog use case', () => {
   it('executes as expected', (done) => {
     const pullRequestNumberExtractorMock = mock<PullRequestNumberExtractor>();
-    const pullRequestInfoUseCaseMock = mock<PullRequestInfoUseCase>();
+    const pullRequestInfoUseCaseMock = mock<ReadPullRequestInfoUseCase>();
     const keepChangelogParserMock = mock<KeepChangelogParser>();
     const keepChangelogBuilderMock = mock<KeepChangelogBuilder>();
 
@@ -33,7 +33,7 @@ describe('the create changelog use case', () => {
       pullRequestInfoUseCaseMock.execute(deepEqual([1, 2]), 'repository')
     ).thenReturn(
       of(
-        new PullRequestInfoUseCaseOutput([
+        new ReadPullRequestInfoUseCaseOutput([
           new PullRequestInfo('Leo', 'hello', '10/10/10', 123)
         ])
       )
@@ -58,7 +58,7 @@ describe('the create changelog use case', () => {
     const keepChangelogParser = instance(keepChangelogParserMock);
     const keepChangelogBuilder = instance(keepChangelogBuilderMock);
 
-    const sut = new GithubKeepChangelogCreateChangelogUseCase(
+    const sut = new GithubCreateChangelogUseCase(
       pullRequestNumberExtractor,
       pullRequestInfoUseCase,
       keepChangelogParser,

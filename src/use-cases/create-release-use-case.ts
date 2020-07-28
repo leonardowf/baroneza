@@ -11,7 +11,7 @@ import {
   CreateChangelogInput
 } from './create-changelog-use-case';
 import { ReleasePageCreator } from '../workers/release-page-creator';
-import { PullRequestDescriptionWriter } from './pull-request-description-writer';
+import { PullRequestDescriptionWriter } from '../workers/pull-request-description-writer';
 
 export class CreateReleaseUseCaseInput {
   branchName: string;
