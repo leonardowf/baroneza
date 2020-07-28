@@ -1,17 +1,16 @@
 import { Observable, from } from 'rxjs';
-import { Octokit } from '@octokit/rest';
-import { mapTo } from 'rxjs/operators';
+import { GithubService } from '../services/github-service';
 
 export interface BranchCreator {
   create(sha: string, branchName: string, repository: string): Observable<void>;
 }
 
 export class GithubBranchCreator implements BranchCreator {
-  private octokit: Octokit;
+  private githubService: GithubService;
   private owner: string;
 
-  constructor(octokit: Octokit, owner: string) {
-    this.octokit = octokit;
+  constructor(githubService: GithubService, owner: string) {
+    this.githubService = githubService;
     this.owner = owner;
   }
 
@@ -20,13 +19,11 @@ export class GithubBranchCreator implements BranchCreator {
     branchName: string,
     repository: string
   ): Observable<void> {
-    return from(
-      this.octokit.git.createRef({
-        owner: this.owner,
-        repo: repository,
-        ref: 'refs/heads/' + branchName,
-        sha
-      })
-    ).pipe(mapTo(void 0));
+    return this.githubService.createBranch(
+      this.owner,
+      sha,
+      branchName,
+      repository
+    );
   }
 }

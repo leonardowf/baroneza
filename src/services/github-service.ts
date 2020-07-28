@@ -17,11 +17,19 @@ export interface GithubService {
     repo: string,
     body?: string
   ): Observable<void>;
+
   updateDescription(
     number: number,
     owner: string,
     repo: string,
     body?: string
+  ): Observable<void>;
+
+  createBranch(
+    owner: string,
+    sha: string,
+    branchName: string,
+    repository: string
   ): Observable<void>;
 }
 
@@ -122,6 +130,22 @@ export class ConcreteGithubService implements GithubService {
         body,
         // eslint-disable-next-line @typescript-eslint/camelcase
         pull_number: number
+      })
+    ).pipe(mapTo(void 0));
+  }
+
+  createBranch(
+    owner: string,
+    sha: string,
+    branchName: string,
+    repository: string
+  ): Observable<void> {
+    return from(
+      this.octokit.git.createRef({
+        owner: owner,
+        repo: repository,
+        ref: 'refs/heads/' + branchName,
+        sha
       })
     ).pipe(mapTo(void 0));
   }

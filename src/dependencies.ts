@@ -70,7 +70,7 @@ export class Dependencies
 
   shaFinder = new GithubSHAFinder(this.octokit(), this.config.githubOwner);
   branchCreator = new GithubBranchCreator(
-    this.octokit(),
+    this.githubService,
     this.config.githubOwner
   );
   createBranchUseCase = new GithubCreateBranchUseCase(

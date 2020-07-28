@@ -26,8 +26,7 @@ export class CreateChangelogInput {
 
 export class CreateChangelogOutput {}
 
-export class GithubCreateChangelogUseCase
-  implements CreateChangelogUseCase {
+export class GithubCreateChangelogUseCase implements CreateChangelogUseCase {
   private readonly pullRequestNumberExtractor: PullRequestNumberExtractor;
   private readonly pullRequestInfoUseCase: ReadPullRequestInfoUseCase;
   private readonly keepChangelogParser: KeepChangelogParser;

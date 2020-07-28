@@ -39,7 +39,8 @@ export class PullRequestInfo {
   }
 }
 
-export class GithubPullRequestInfoUseCase implements ReadPullRequestInfoUseCase {
+export class GithubPullRequestInfoUseCase
+  implements ReadPullRequestInfoUseCase {
   private readonly githubService: GithubService;
   private readonly owner: string;
 
