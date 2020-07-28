@@ -25,6 +25,13 @@ import { ConcreteJiraTickerParser } from './workers/jira-ticket-parser';
 import { ConcreteGithubService } from './services/github-service';
 import { ConcreteJiraService } from './services/jira-service';
 import { JiraCreateVersionUseCase } from './use-cases/create-version-use-case';
+import { GithubCreateChangelogUseCase } from './use-cases/create-changelog-use-case';
+import { GithubPullRequestNumberExtractor } from './workers/pr-number-extractor';
+import { GithubPullRequestInfoUseCase } from './use-cases/read-pull-request-info-use-case';
+import { ConcreteKeepChangelogParser } from './workers/keep-changelog-parser';
+import { ConcreteKeepChangelogBuilder } from './workers/keep-changelog-builder';
+import { GithubReleasePageCreator } from './workers/release-page-creator';
+import { GithubPullRequestDescriptionWriter } from './workers/pull-request-description-writer';
 
 export class Dependencies
   implements
@@ -75,10 +82,40 @@ export class Dependencies
     this.octokit(),
     this.config.githubOwner
   );
+
+  pullRequestNumberExtractor = new GithubPullRequestNumberExtractor(
+    this.commitExtractor
+  );
+  pullRequestInfoUseCase = new GithubPullRequestInfoUseCase(
+    this.githubService,
+    this.config.githubOwner
+  );
+  keepChangelogParser = new ConcreteKeepChangelogParser();
+  keepChangelogBuilder = new ConcreteKeepChangelogBuilder();
+
+  createChangeLogUseCase = new GithubCreateChangelogUseCase(
+    this.pullRequestNumberExtractor,
+    this.pullRequestInfoUseCase,
+    this.keepChangelogParser,
+    this.keepChangelogBuilder
+  );
+
+  releasePageCreator = new GithubReleasePageCreator(
+    this.githubService,
+    this.config.githubOwner
+  );
+  pullRequestDescriptionWriter = new GithubPullRequestDescriptionWriter(
+    this.githubService,
+    this.config.githubOwner
+  );
+
   createReleaseUseCase = new CreateReleaseUseCase(
     this.createBranchUseCase,
     this.pullRequestCreator,
-    this.tagUseCase
+    this.tagUseCase,
+    this.createChangeLogUseCase,
+    this.releasePageCreator,
+    this.pullRequestDescriptionWriter
   );
 
   messageSender = new SlackMessageSender(this.slackWebClient);

@@ -27,7 +27,6 @@ export class ConcreteJiraService {
   projectId(project: string): Observable<number> {
     return from(this.jiraAPI.getProject(project)).pipe(
       map((x) => {
-        console.log(x);
         return x.id;
       })
     );
