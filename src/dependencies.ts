@@ -68,7 +68,7 @@ export class Dependencies
   createVersionUseCase = new JiraCreateVersionUseCase(this.jiraService);
   tagUseCase = new JiraTagUseCase(this);
 
-  shaFinder = new GithubSHAFinder(this.octokit(), this.config.githubOwner);
+  shaFinder = new GithubSHAFinder(this.githubService, this.config.githubOwner);
   branchCreator = new GithubBranchCreator(
     this.githubService,
     this.config.githubOwner
