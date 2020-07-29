@@ -39,17 +39,17 @@ describe('the create changelog use case', () => {
       )
     );
     when(keepChangelogParserMock.parse('hello')).thenReturn(
-      new KeepChangelogOutput(['added'], [], [], [], [], [])
+      new KeepChangelogOutput(['added'], ['b'], ['c'], ['d'], ['e'], ['f'])
     );
     when(
       keepChangelogBuilderMock.build(
         '1.0.0',
         deepEqual([new KeepChangelogItem('added', 'Leo', '10/10/10', '123')]),
-        deepEqual([]),
-        deepEqual([]),
-        deepEqual([]),
-        deepEqual([]),
-        deepEqual([])
+        deepEqual([new KeepChangelogItem('b', 'Leo', '10/10/10', '123')]),
+        deepEqual([new KeepChangelogItem('c', 'Leo', '10/10/10', '123')]),
+        deepEqual([new KeepChangelogItem('d', 'Leo', '10/10/10', '123')]),
+        deepEqual([new KeepChangelogItem('e', 'Leo', '10/10/10', '123')]),
+        deepEqual([new KeepChangelogItem('f', 'Leo', '10/10/10', '123')]),
       )
     ).thenReturn('success');
 
@@ -70,6 +70,61 @@ describe('the create changelog use case', () => {
       .subscribe({
         next: (result) => {
           expect(result).toEqual('success');
+        },
+        complete: done
+      });
+  });
+
+  it('when parsed as null', (done) => {
+    const pullRequestNumberExtractorMock = mock<PullRequestNumberExtractor>();
+    const pullRequestInfoUseCaseMock = mock<ReadPullRequestInfoUseCase>();
+    const keepChangelogParserMock = mock<KeepChangelogParser>();
+    const keepChangelogBuilderMock = mock<KeepChangelogBuilder>();
+
+    when(pullRequestNumberExtractorMock.extract(123, 'repository')).thenReturn(
+      of([1, 2])
+    );
+    when(
+      pullRequestInfoUseCaseMock.execute(deepEqual([1, 2]), 'repository')
+    ).thenReturn(
+      of(
+        new ReadPullRequestInfoUseCaseOutput([
+          new PullRequestInfo('Leo', 'hello', '10/10/10', 123)
+        ])
+      )
+    );
+    when(keepChangelogParserMock.parse('hello')).thenReturn(
+      null
+    );
+    when(
+      keepChangelogBuilderMock.build(
+        '1.0.0',
+        deepEqual([]),
+        deepEqual([]),
+        deepEqual([]),
+        deepEqual([]),
+        deepEqual([]),
+        deepEqual([])
+      )
+    ).thenReturn(undefined);
+
+    const pullRequestNumberExtractor = instance(pullRequestNumberExtractorMock);
+    const pullRequestInfoUseCase = instance(pullRequestInfoUseCaseMock);
+    const keepChangelogParser = instance(keepChangelogParserMock);
+    const keepChangelogBuilder = instance(keepChangelogBuilderMock);
+
+    const sut = new GithubCreateChangelogUseCase(
+      pullRequestNumberExtractor,
+      pullRequestInfoUseCase,
+      keepChangelogParser,
+      keepChangelogBuilder
+    );
+
+    sut
+      .execute(new CreateChangelogInput(123, 'repository', '1.0.0'))
+      .subscribe({
+        next: (result) => {
+          expect(result).toBeUndefined()
         },
         complete: done
       });

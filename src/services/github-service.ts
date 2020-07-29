@@ -31,6 +31,8 @@ export interface GithubService {
     branchName: string,
     repository: string
   ): Observable<void>;
+
+  getSHA(owner: string, repo: string, branchName: string): Observable<string>;
 }
 
 export class PullRequestLoginDescriptionDateOutput {
@@ -148,5 +150,15 @@ export class ConcreteGithubService implements GithubService {
         sha
       })
     ).pipe(mapTo(void 0));
+  }
+
+  getSHA(owner: string, repo: string, branchName: string): Observable<string> {
+    return from(
+      this.octokit.git.getRef({
+        owner: owner,
+        repo,
+        ref: 'heads/' + branchName
+      })
+    ).pipe(map((x) => x.data.object.sha));
   }
 }
