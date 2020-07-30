@@ -49,7 +49,7 @@ describe('the create changelog use case', () => {
         deepEqual([new KeepChangelogItem('c', 'Leo', '10/10/10', '123')]),
         deepEqual([new KeepChangelogItem('d', 'Leo', '10/10/10', '123')]),
         deepEqual([new KeepChangelogItem('e', 'Leo', '10/10/10', '123')]),
-        deepEqual([new KeepChangelogItem('f', 'Leo', '10/10/10', '123')]),
+        deepEqual([new KeepChangelogItem('f', 'Leo', '10/10/10', '123')])
       )
     ).thenReturn('success');
 
@@ -93,9 +93,7 @@ describe('the create changelog use case', () => {
         ])
       )
     );
-    when(keepChangelogParserMock.parse('hello')).thenReturn(
-      null
-    );
+    when(keepChangelogParserMock.parse('hello')).thenReturn(null);
     when(
       keepChangelogBuilderMock.build(
         '1.0.0',
@@ -124,7 +122,7 @@ describe('the create changelog use case', () => {
       .execute(new CreateChangelogInput(123, 'repository', '1.0.0'))
       .subscribe({
         next: (result) => {
-          expect(result).toBeUndefined()
+          expect(result).toBeUndefined();
         },
         complete: done
       });
