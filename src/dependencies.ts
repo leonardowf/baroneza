@@ -32,6 +32,7 @@ import { ConcreteKeepChangelogParser } from './workers/keep-changelog-parser';
 import { ConcreteKeepChangelogBuilder } from './workers/keep-changelog-builder';
 import { GithubReleasePageCreator } from './workers/release-page-creator';
 import { GithubPullRequestDescriptionWriter } from './workers/pull-request-description-writer';
+import { SlackAskConfirmationUseCase } from './use-cases/ask-confirmation-use-case';
 
 export class Dependencies
   implements
@@ -125,18 +126,19 @@ export class Dependencies
     this.config.githubOwner
   );
 
+  askConfirmationUseCase = new SlackAskConfirmationUseCase(this.messageSender, this.reactionsReader, this.config.confirmationEmoji, this.config.secondsToConfirmationTimeout)
+
   startTrainUseCase = new StartTrainUseCase(
-    this.messageSender,
-    this.reactionsReader,
     this.nextReleaseGuesser,
     this.createReleaseUseCase,
+    this.askConfirmationUseCase,
     this.config.newBranchPrefix,
     this.config.releaseBaseBranch,
     this.config.releaseTargetBranch,
     this.config.pullRequestTitlePrefix,
-    this.config.secondsToConfirmationTimeout,
-    this.config.jiraProjectName
-  );
+    this.config.jiraProjectName,
+    this.config.confirmationEmoji
+  )
 
   project = this.config.jiraProjectName;
 }

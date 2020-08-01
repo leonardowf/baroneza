@@ -1,15 +1,11 @@
 import { Observable, of } from 'rxjs';
-import { MessageSender, MessageSenderInput } from '../workers/message-sender';
-import {
-  ReactionsReader,
-  ReactionsReaderInput
-} from '../workers/reactions-reader';
 import { NextReleaseGuesser } from '../workers/next-release-guesser';
-import { flatMap, map, delay } from 'rxjs/operators';
+import { flatMap } from 'rxjs/operators';
 import {
   CreateReleaseUseCase,
   CreateReleaseUseCaseInput
 } from './create-release-use-case';
+import { AskConfirmationUseCase, AskConfirmationUseCaseInput } from './ask-confirmation-use-case';
 
 export class StartTrainUseCaseInput {
   readonly repository: string;
@@ -34,73 +30,49 @@ export class StartTrainUseCaseOutput {}
 
 export class StartTrainUseCase {
   private readonly nextReleaseGuesser: NextReleaseGuesser;
-  private readonly messageSender: MessageSender;
-  private readonly reactionsReader: ReactionsReader;
   private readonly createReleaseUseCase: CreateReleaseUseCase;
+  private readonly askConfirmationUseCase: AskConfirmationUseCase
   private readonly branchPrefix: string;
   private readonly baseBranch: string;
   private readonly targetBranch: string;
   private readonly pullRequestTitlePrefix: string;
-  private readonly secondsToConfirmationTimeout: number;
   private readonly project: string;
+  private readonly confirmationReaction: string;
 
   constructor(
-    messageSender: MessageSender,
-    reactionsReader: ReactionsReader,
     nextReleaseGuesser: NextReleaseGuesser,
     createReleaseUseCase: CreateReleaseUseCase,
+    askConfirmationUseCase: AskConfirmationUseCase,
     branchPrefix: string,
     baseBranch: string,
     targetBranch: string,
     pullRequestTitlePrefix: string,
-    secondsToConfirmationTimeout: number,
-    project: string
+    project: string,
+    confirmationReaction: string
   ) {
-    this.messageSender = messageSender;
-    this.reactionsReader = reactionsReader;
     this.nextReleaseGuesser = nextReleaseGuesser;
     this.createReleaseUseCase = createReleaseUseCase;
+    this.askConfirmationUseCase = askConfirmationUseCase;
+
     this.branchPrefix = branchPrefix;
     this.baseBranch = baseBranch;
     this.targetBranch = targetBranch;
     this.pullRequestTitlePrefix = pullRequestTitlePrefix;
-    this.secondsToConfirmationTimeout = secondsToConfirmationTimeout;
     this.project = project;
+    this.confirmationReaction = confirmationReaction;
   }
 
   execute(input: StartTrainUseCaseInput): Observable<StartTrainUseCaseOutput> {
-    const confirmationReaction = ':100:';
     const confirmationCopyMaker = (version: string): string =>
-      `Would you like to start the release train for version ${version}? ${confirmationReaction} to continue!`;
+      `Would you like to start the release train for version ${version}? ${this.confirmationReaction} to continue!`;
 
     return this.nextReleaseGuesser.guess(input.repository).pipe(
       flatMap((version) => {
         const copy = confirmationCopyMaker(version);
-
-        return this.messageSender
-          .send(new MessageSenderInput(input.channel, copy))
-          .pipe(delay(this.secondsToConfirmationTimeout * 1000))
+        return this.askConfirmationUseCase.execute(new AskConfirmationUseCaseInput(copy, input.channel))
           .pipe(
-            flatMap((x) =>
-              this.reactionsReader.read(
-                new ReactionsReaderInput(
-                  x.channelIdentifier,
-                  x.messageIdentifier
-                )
-              )
-            )
-          )
-          .pipe(
-            map((x) =>
-              x.reactions.filter(
-                (y) => y.name === confirmationReaction.split(':').join('')
-              )
-            )
-          )
-          .pipe(map((x) => x.length > 0))
-          .pipe(
-            flatMap((confirmed) => {
-              if (confirmed) {
+            flatMap((confirmationRequest) => {
+              if (confirmationRequest.confirmed) {
                 return this.createReleaseUseCase.execute(
                   new CreateReleaseUseCaseInput(
                     `${this.branchPrefix}${version}`,
