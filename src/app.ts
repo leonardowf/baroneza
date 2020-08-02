@@ -45,5 +45,14 @@ app.listen(port, (err) => {
   if (err) {
     return console.error(err);
   }
-  return console.log(`server is listening on ${port}`);
+  return console.log(
+    `
+          . . . . o o o o o
+                _____      o
+       ____====  ]OO|_n_n__][.
+      [________]_|__|________)<     choo choo on port ${port}
+       oo    oo  'oo OOOO-| oo\\_
+   +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
+    `
+  );
 });

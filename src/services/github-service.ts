@@ -17,12 +17,22 @@ export interface GithubService {
     repo: string,
     body?: string
   ): Observable<void>;
+
   updateDescription(
     number: number,
     owner: string,
     repo: string,
     body?: string
   ): Observable<void>;
+
+  createBranch(
+    owner: string,
+    sha: string,
+    branchName: string,
+    repository: string
+  ): Observable<void>;
+
+  getSHA(owner: string, repo: string, branchName: string): Observable<string>;
 }
 
 export class PullRequestLoginDescriptionDateOutput {
@@ -124,5 +134,31 @@ export class ConcreteGithubService implements GithubService {
         pull_number: number
       })
     ).pipe(mapTo(void 0));
+  }
+
+  createBranch(
+    owner: string,
+    sha: string,
+    branchName: string,
+    repository: string
+  ): Observable<void> {
+    return from(
+      this.octokit.git.createRef({
+        owner: owner,
+        repo: repository,
+        ref: 'refs/heads/' + branchName,
+        sha
+      })
+    ).pipe(mapTo(void 0));
+  }
+
+  getSHA(owner: string, repo: string, branchName: string): Observable<string> {
+    return from(
+      this.octokit.git.getRef({
+        owner: owner,
+        repo,
+        ref: 'heads/' + branchName
+      })
+    ).pipe(map((x) => x.data.object.sha));
   }
 }

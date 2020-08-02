@@ -32,6 +32,7 @@ import { ConcreteKeepChangelogParser } from './workers/keep-changelog-parser';
 import { ConcreteKeepChangelogBuilder } from './workers/keep-changelog-builder';
 import { GithubReleasePageCreator } from './workers/release-page-creator';
 import { GithubPullRequestDescriptionWriter } from './workers/pull-request-description-writer';
+import { SlackAskConfirmationUseCase } from './use-cases/ask-confirmation-use-case';
 
 export class Dependencies
   implements
@@ -68,9 +69,9 @@ export class Dependencies
   createVersionUseCase = new JiraCreateVersionUseCase(this.jiraService);
   tagUseCase = new JiraTagUseCase(this);
 
-  shaFinder = new GithubSHAFinder(this.octokit(), this.config.githubOwner);
+  shaFinder = new GithubSHAFinder(this.githubService, this.config.githubOwner);
   branchCreator = new GithubBranchCreator(
-    this.octokit(),
+    this.githubService,
     this.config.githubOwner
   );
   createBranchUseCase = new GithubCreateBranchUseCase(
@@ -125,17 +126,23 @@ export class Dependencies
     this.config.githubOwner
   );
 
-  startTrainUseCase = new StartTrainUseCase(
+  askConfirmationUseCase = new SlackAskConfirmationUseCase(
     this.messageSender,
     this.reactionsReader,
+    this.config.confirmationEmoji,
+    this.config.secondsToConfirmationTimeout
+  );
+
+  startTrainUseCase = new StartTrainUseCase(
     this.nextReleaseGuesser,
     this.createReleaseUseCase,
+    this.askConfirmationUseCase,
     this.config.newBranchPrefix,
     this.config.releaseBaseBranch,
     this.config.releaseTargetBranch,
     this.config.pullRequestTitlePrefix,
-    this.config.secondsToConfirmationTimeout,
-    this.config.jiraProjectName
+    this.config.jiraProjectName,
+    this.config.confirmationEmoji
   );
 
   project = this.config.jiraProjectName;
