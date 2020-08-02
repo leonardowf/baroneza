@@ -1,7 +1,7 @@
 import { GithubSHAFinder } from '../../src/workers/sha-finder';
 import { mock, when, instance } from 'ts-mockito';
 import { GithubService } from '../../src/services/github-service';
-import { of, Observable } from 'rxjs';
+import { of } from 'rxjs';
 
 describe('The SHA finder', () => {
   it('calls the github service', (done) => {

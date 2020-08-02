@@ -5,7 +5,10 @@ import {
   CreateReleaseUseCase,
   CreateReleaseUseCaseInput
 } from './create-release-use-case';
-import { AskConfirmationUseCase, AskConfirmationUseCaseInput } from './ask-confirmation-use-case';
+import {
+  AskConfirmationUseCase,
+  AskConfirmationUseCaseInput
+} from './ask-confirmation-use-case';
 
 export class StartTrainUseCaseInput {
   readonly repository: string;
@@ -31,7 +34,7 @@ export class StartTrainUseCaseOutput {}
 export class StartTrainUseCase {
   private readonly nextReleaseGuesser: NextReleaseGuesser;
   private readonly createReleaseUseCase: CreateReleaseUseCase;
-  private readonly askConfirmationUseCase: AskConfirmationUseCase
+  private readonly askConfirmationUseCase: AskConfirmationUseCase;
   private readonly branchPrefix: string;
   private readonly baseBranch: string;
   private readonly targetBranch: string;
@@ -69,7 +72,8 @@ export class StartTrainUseCase {
     return this.nextReleaseGuesser.guess(input.repository).pipe(
       flatMap((version) => {
         const copy = confirmationCopyMaker(version);
-        return this.askConfirmationUseCase.execute(new AskConfirmationUseCaseInput(copy, input.channel))
+        return this.askConfirmationUseCase
+          .execute(new AskConfirmationUseCaseInput(copy, input.channel))
           .pipe(
             flatMap((confirmationRequest) => {
               if (confirmationRequest.confirmed) {

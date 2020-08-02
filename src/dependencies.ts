@@ -126,7 +126,12 @@ export class Dependencies
     this.config.githubOwner
   );
 
-  askConfirmationUseCase = new SlackAskConfirmationUseCase(this.messageSender, this.reactionsReader, this.config.confirmationEmoji, this.config.secondsToConfirmationTimeout)
+  askConfirmationUseCase = new SlackAskConfirmationUseCase(
+    this.messageSender,
+    this.reactionsReader,
+    this.config.confirmationEmoji,
+    this.config.secondsToConfirmationTimeout
+  );
 
   startTrainUseCase = new StartTrainUseCase(
     this.nextReleaseGuesser,
@@ -138,7 +143,7 @@ export class Dependencies
     this.config.pullRequestTitlePrefix,
     this.config.jiraProjectName,
     this.config.confirmationEmoji
-  )
+  );
 
   project = this.config.jiraProjectName;
 }

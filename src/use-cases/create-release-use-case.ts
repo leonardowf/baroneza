@@ -101,7 +101,7 @@ export class CreateReleaseUseCase {
             )
             .pipe(
               flatMap(() => {
-            return this.createChangelogUseCase
+                return this.createChangelogUseCase
                   .execute(
                     new CreateChangelogInput(
                       x.identifier,

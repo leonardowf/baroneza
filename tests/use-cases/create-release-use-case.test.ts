@@ -7,9 +7,19 @@ import {
   CreateBranchUseCaseInput,
   CreateBranchUseCaseOutput
 } from '../../src/use-cases/create-branch-use-case';
-import { PullRequestCreator, PullRequestCreatorOutput } from '../../src/workers/pull-request-creator';
-import { TagUseCase, TagUseCaseInput, TagUseCaseOutput } from '../../src/use-cases/tag-use-case';
-import { CreateChangelogUseCase, CreateChangelogInput } from '../../src/use-cases/create-changelog-use-case';
+import {
+  PullRequestCreator,
+  PullRequestCreatorOutput
+} from '../../src/workers/pull-request-creator';
+import {
+  TagUseCase,
+  TagUseCaseInput,
+  TagUseCaseOutput
+} from '../../src/use-cases/tag-use-case';
+import {
+  CreateChangelogUseCase,
+  CreateChangelogInput
+} from '../../src/use-cases/create-changelog-use-case';
 import { ReleasePageCreator } from '../../src/workers/release-page-creator';
 import { PullRequestDescriptionWriter } from '../../src/workers/pull-request-description-writer';
 
@@ -39,11 +49,37 @@ describe('the create release use case', () => {
       )
     ).thenReturn(of(new CreateBranchUseCaseOutput()));
 
-    when(pullRequestCreatorMock.create("title", "branchName", "targetBranch", "repository")).thenReturn(of(new PullRequestCreatorOutput(123)))
-    when(tagUseCaseMock.execute(deepEqual(new TagUseCaseInput(123, "projectTag", "project", "repository")))).thenReturn(of(new TagUseCaseOutput([], [])))
-    when(createChangelogUseCaseMock.execute(deepEqual(new CreateChangelogInput(123, "repository", "projectTag")))).thenReturn(of("changelog"))
-    when(pullRequestDescriptionWriterMock.write(123, "repository", "changelog")).thenReturn(of(void 0))
-    when(releasePageCreatorMock.create("projectTag", "projectTag", "repository", "changelog")).thenReturn(of(void 0))
+    when(
+      pullRequestCreatorMock.create(
+        'title',
+        'branchName',
+        'targetBranch',
+        'repository'
+      )
+    ).thenReturn(of(new PullRequestCreatorOutput(123)));
+    when(
+      tagUseCaseMock.execute(
+        deepEqual(
+          new TagUseCaseInput(123, 'projectTag', 'project', 'repository')
+        )
+      )
+    ).thenReturn(of(new TagUseCaseOutput([], [])));
+    when(
+      createChangelogUseCaseMock.execute(
+        deepEqual(new CreateChangelogInput(123, 'repository', 'projectTag'))
+      )
+    ).thenReturn(of('changelog'));
+    when(
+      pullRequestDescriptionWriterMock.write(123, 'repository', 'changelog')
+    ).thenReturn(of(void 0));
+    when(
+      releasePageCreatorMock.create(
+        'projectTag',
+        'projectTag',
+        'repository',
+        'changelog'
+      )
+    ).thenReturn(of(void 0));
 
     const createBranchUseCase = instance(createBranchUseCaseMock);
     const pullRequestCreator = instance(pullRequestCreatorMock);
@@ -63,21 +99,23 @@ describe('the create release use case', () => {
       pullRequestDescriptionWriter
     );
 
-    sut.execute(
-      new CreateReleaseUseCaseInput(
-        'branchName',
-        'referenceBranch',
-        'targetBranch',
-        'title',
-        'projectTag',
-        'project',
-        'repository'
+    sut
+      .execute(
+        new CreateReleaseUseCaseInput(
+          'branchName',
+          'referenceBranch',
+          'targetBranch',
+          'title',
+          'projectTag',
+          'project',
+          'repository'
+        )
       )
-    ).subscribe({
-        error: (error) => {
-            done.fail()
+      .subscribe({
+        error: () => {
+          done.fail();
         },
         complete: done
-    });
+      });
   });
 });

@@ -1,4 +1,4 @@
-import { Observable, from } from 'rxjs';
+import { Observable } from 'rxjs';
 import { GithubService } from '../services/github-service';
 
 export interface BranchCreator {
