@@ -11,6 +11,7 @@ module.exports = {
         '!src/configs.ts',
         '!src/keys.ts',
         '!src/process-env.ts',
-        '!src/dependencies.ts'
+        '!src/dependencies.ts',
+        '!src/app.ts'
     ]
 };

@@ -12,7 +12,7 @@ export interface CreateReleaseEndpointInput {
   readonly repository: string;
 }
 
-export class CreateReleaseEndpointResponse {}
+export class CreateReleaseEndpointOutput {}
 
 export interface CreateReleaseEndpointDependencies {
   createReleaseUseCase: CreateReleaseUseCase;
@@ -27,7 +27,7 @@ export class CreateReleaseEndpoint {
 
   execute(
     input: CreateReleaseEndpointInput
-  ): Observable<CreateReleaseEndpointResponse> {
+  ): Observable<CreateReleaseEndpointOutput> {
     return this.createReleaseUseCase
       .execute({
         branchName: input.branchName,
@@ -38,6 +38,6 @@ export class CreateReleaseEndpoint {
         project: input.project,
         repository: input.repository
       })
-      .pipe(mapTo(new CreateReleaseEndpointResponse()));
+      .pipe(mapTo(new CreateReleaseEndpointOutput()));
   }
 }
