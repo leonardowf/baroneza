@@ -1,0 +1,63 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "Baroneza",
+        "description": "A release train to automate boring tasks",
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        }
+    },
+    "servers": [
+        {
+            "url": "http://localhost:3000",
+            "description": "Your basic localhost"
+        }
+    ],
+    "components": {},
+    "paths": {
+        "/tagPullRequest": {
+            "post": {
+                "description": "This endpoint reads an open pull request, parses the commit messages for Jira tickets and then add-version on then.",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "identifier": {
+                                        "type": "integer",
+                                        "description": "The number of the Pull Request",
+                                        "example": 1
+                                    },
+                                    "tag": {
+                                        "type": "string",
+                                        "description": "The tag on Jira that you want to add to the tickets",
+                                        "example": "1.0.0"
+                                    },
+                                    "project": {
+                                        "type": "string",
+                                        "description": "The name of the project on JIRA to create the new version",
+                                        "example": "PSF"
+                                    },
+                                    "repository": {
+                                        "type": "string",
+                                        "description": "The Github repository",
+                                        "example": "baroneza-test"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        }
+    }
+}

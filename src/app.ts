@@ -4,6 +4,8 @@ import { Dependencies } from './dependencies';
 import bodyParser from 'body-parser';
 import { CreateReleaseEndpoint } from './endpoints/create-release-endpoint';
 import { StartTrainEndpoint } from './endpoints/start-train-endpoint';
+import swagger from 'swagger-ui-express'
+import * as swaggerDocument from '../swagger.json'
 
 const app = express();
 app.use(bodyParser.json());
@@ -40,6 +42,8 @@ app.post('/startTrain', (req, res) => {
     }
   );
 });
+
+app.use('/swagger', swagger.serve, swagger.setup(swaggerDocument))
 
 app.listen(port, (err) => {
   if (err) {
