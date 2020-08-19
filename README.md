@@ -36,3 +36,26 @@ SOON
 
 ## 📖 Documentation
 You can check the supported endpoints in the swagger page: `localhost:3000/swagger`
+
+## 🏗 Architecture
+The idea is to keep it simple with no hard abstractions, but also maintaining flexibility to increase LOC covered.
+The main components are: Endpoints, UseCases, Workers and Services.
+
+### Endpoints
+Endpoints are the entry of every request. They exist to keep documented all the supported APIs. They should map 1:1 to a UseCase.
+
+### UseCases
+UseCases perform the logic of the application. They can have other UseCases as dependencies and also many Workers.
+
+### Workers
+Workers do only one thing. They can have Services as dependencies.
+
+### Services
+Services make the bridge of baroneza and external APIs.
+
+### Should I create a Worker or a UseCase?
+There is no silver bullet and don't waste too much brainpower on this. The rule of thumb used is:
+- If the problem that you are trying to solve requires an AND, then go with a UseCase.
+- If you can think of your problem as one single atomic responsibility, go with a Worker.
+Example: To create a release, we need to create a branch and create the pr and parse the commits and ... The amount of different things that need to be done fit an UseCase. Now, parsing and creating a branch, sounds like an atomic operation that doesn't care about the previous steps, they fit as a Worker.
+
