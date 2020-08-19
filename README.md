@@ -42,13 +42,13 @@ The idea is to keep it simple with no hard abstractions, but also maintaining fl
 The main components are: Endpoints, UseCases, Workers and Services.
 
 ### Endpoints
-Endpoints are the entry of every request. They exist to keep documented all the supported APIs. They should map 1:1 to a use-case.
+Endpoints are the entry of every request. They exist to keep documented all the supported APIs. They should map 1:1 to a UseCase.
 
 ### UseCases
-Use cases perform the logic of the application. They can have other UseCases as dependency and also workers.
+UseCases perform the logic of the application. They can have other UseCases as dependencies and also many Workers.
 
 ### Workers
-Workers do only one thing. They can have services as dependencies.
+Workers do only one thing. They can have Services as dependencies.
 
 ### Services
 Services make the bridge of baroneza and external APIs.
