@@ -57,5 +57,5 @@ Services make the bridge of baroneza and external APIs.
 There is no silver bullet and don't waste too much brainpower on this. The rule of thumb used is:
 - If the problem that you are trying to solve requires an AND, then go with a UseCase.
 - If you can think of your problem as one single atomic responsibility, go with a Worker.
-Example: To create a release, we need to create a branch and create the pr and parse the commits and ... The amount of different things that need to be done fit an use case. Now, parsing and creating a branch, sound like an atomic operation that don't care about previous steps, they fit as a worker.
+Example: To create a release, we need to create a branch and create the pr and parse the commits and ... The amount of different things that need to be done fit an UseCase. Now, parsing and creating a branch, sounds like an atomic operation that doesn't care about the previous steps, they fit as a Worker.
 
