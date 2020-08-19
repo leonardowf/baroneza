@@ -1,0 +1,143 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "Baroneza",
+        "description": "A release train to automate boring tasks",
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        }
+    },
+    "servers": [
+        {
+            "url": "http://localhost:3000",
+            "description": "Your basic localhost"
+        }
+    ],
+    "components": {},
+    "paths": {
+        "/startTrain": {
+            "post": {
+                "description": "This endpoint guesses the next release of the repository, creates a PR, reads the commits, parses the commit messages, tags the tickets and creates a changelog",
+                "requestBody":{
+                    "content": {
+                        "application/json": {
+                            "schema":{
+                                "type": "object",
+                                "properties": {
+                                    "repository": {
+                                        "type": "string",
+                                        "example": "baroneza-test"
+                                    },
+                                    "baseBranch": {
+                                        "type": "string",
+                                        "example": "develop"
+                                    },
+                                    "targetBranch": {
+                                        "type": "string",
+                                        "example": "master"
+                                    },
+                                    "channel": {
+                                        "type": "string",
+                                        "example": "ios-devs"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/tagPullRequest": {
+            "post": {
+                "description": "This endpoint reads an open pull request, parses the commit messages for Jira tickets and then add-version on then.",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "number": {
+                                        "type": "integer",
+                                        "description": "The number of the Pull Request",
+                                        "example": 1
+                                    },
+                                    "tag": {
+                                        "type": "string",
+                                        "description": "The tag on Jira that you want to add to the tickets",
+                                        "example": "1.0.0"
+                                    },
+                                    "repository": {
+                                        "type": "string",
+                                        "description": "The Github repository",
+                                        "example": "baroneza-test"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        },
+        "/createRelease": {
+            "post": {
+                "description": "This endpoint creates a branch, parses commits, creates a changelog",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "branchName": {
+                                        "type": "string",
+                                        "example": "rc-1.0.0"
+                                    },
+                                    "referenceBranch": {
+                                        "type": "string",
+                                        "example": "develop"
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Awesome Release Candidate"
+                                    },
+                                    "targetBranch": {
+                                        "type": "string",
+                                        "example": "release-candidate"
+                                    },
+                                    "projectTag": {
+                                        "type": "string",
+                                        "example": "1.0.0"
+                                    },
+                                    "project": {
+                                        "type": "string",
+                                        "example": "PSF"
+                                    },
+                                    "repository": {
+                                        "type": "string",
+                                        "example": "baroneza-test"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        }
+    }
+}
