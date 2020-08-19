@@ -10,15 +10,12 @@
 - [x] Sends a message to slack if you want to start the release
 - [x] Waits for a reaction
 - [x] If you react, the train starts
-- [x] Guesses the next release by reading PR history
-- [x] Create a pull request from a `base` to a `target`
+- [x] Guesses the next release by reading the PR history
+- [x] Creates a pull request from a `base` to a `target`
+- [x] Creates the fix-version on Jira
 - [x] Parses Jira tags from commit history of a Pull Request and set the `fix-version` field
-- [x] Create automatically the version on Jira
-
-## 🛣 Roadmap
-- [ ] Add tests
-- [ ] Send message to channel mentioning all Jira issues
-- [ ] Tag all pull requests with created release
+- [x] Creates Changelogs based on the KeepAChangelogFormat
+- [x] Creates a Github draft release with the Changelog
 
 ## 🔨 Getting started
 You will need `npm` and then you can do `npm run start:watch`.
@@ -38,34 +35,4 @@ You can configure many options in the `config.json` file.
 SOON
 
 ## 📖 Documentation
-The API's that are supported right now:
-- POST `createRelease`
-```
-{
-  "branchName": string, // (the name of the branch of your release, e.g. rc-1.0)
-  "referenceBranch": string, // (the name of the branch to branch from, e.g. develop)
-  "title": string, // (the title of your pull request, e.g. Release Candidate 1.0)
-  "targetBranch": string // (the branch that will be used as target, e.g. master)
-  "projectTag": string, // (the tag that will be used in jira)
-  "repository": string
-}
-```
-
-- POST `tagPullRequest`
-```
-{
-  "number": int, // (pull request number)
-  "identifier": string, // (Jira release identifier)
-  "repository": string
-}
-```
-
-- POST `startTrain`
-```
-{
-  repository: string, // (the repository to create the PR)
-  baseBranch: string, // (base branch, for example: develop)
-  targetBranch: string, // (base branch, for example: release-candidate)
-  channel: string, // (the channel to send the confirmation, if the channel is private, the bot needs to be a member)
-}
-```
+You can check the supported endpoints in the swagger page: `localhost:3000/swagger`
