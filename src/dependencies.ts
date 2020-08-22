@@ -110,16 +110,18 @@ export class Dependencies
     this.config.githubOwner
   );
 
+  messageSender = new SlackMessageSender(this.slackWebClient);
+
   createReleaseUseCase = new CreateReleaseUseCase(
     this.createBranchUseCase,
     this.pullRequestCreator,
     this.tagUseCase,
     this.createChangeLogUseCase,
     this.releasePageCreator,
-    this.pullRequestDescriptionWriter
+    this.pullRequestDescriptionWriter,
+    this.messageSender
   );
 
-  messageSender = new SlackMessageSender(this.slackWebClient);
   reactionsReader = new SlackReactionsReader(this.slackWebClient);
   nextReleaseGuesser = new GithubNextReleaseGuesser(
     this.githubService,

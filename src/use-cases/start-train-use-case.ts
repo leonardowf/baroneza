@@ -85,7 +85,8 @@ export class StartTrainUseCase {
                     `${this.pullRequestTitlePrefix} ${version}`,
                     version,
                     this.project,
-                    input.repository
+                    input.repository,
+                    input.channel
                   )
                 );
               } else {

@@ -12,6 +12,7 @@ import {
 } from './create-changelog-use-case';
 import { ReleasePageCreator } from '../workers/release-page-creator';
 import { PullRequestDescriptionWriter } from '../workers/pull-request-description-writer';
+import { MessageSender, MessageSenderInput } from '../workers/message-sender';
 
 export class CreateReleaseUseCaseInput {
   branchName: string;
@@ -21,6 +22,7 @@ export class CreateReleaseUseCaseInput {
   projectTag: string; // this is the tag, better naming please, example 1.0.0
   project: string;
   repository: string;
+  channel: string;
 
   constructor(
     branchName: string,
@@ -29,7 +31,8 @@ export class CreateReleaseUseCaseInput {
     title: string,
     projectTag: string,
     project: string,
-    repository: string
+    repository: string,
+    channel: string
   ) {
     this.branchName = branchName;
     this.referenceBranch = referenceBranch;
@@ -38,6 +41,7 @@ export class CreateReleaseUseCaseInput {
     this.projectTag = projectTag;
     this.project = project;
     this.repository = repository;
+    this.channel = channel;
   }
 }
 
@@ -50,6 +54,7 @@ export class CreateReleaseUseCase {
   private readonly createChangelogUseCase: CreateChangelogUseCase;
   private readonly releasePageCreator: ReleasePageCreator;
   private readonly pullRequestDescriptionWriter: PullRequestDescriptionWriter;
+  private readonly messageSender: MessageSender;
 
   constructor(
     createBranchUseCase: CreateBranchUseCase,
@@ -57,7 +62,8 @@ export class CreateReleaseUseCase {
     tagUseCase: TagUseCase,
     createChangelogUseCase: CreateChangelogUseCase,
     releasePageCreator: ReleasePageCreator,
-    pullRequestDescriptionWriter: PullRequestDescriptionWriter
+    pullRequestDescriptionWriter: PullRequestDescriptionWriter,
+    messageSender: MessageSender
   ) {
     this.createBranchUseCase = createBranchUseCase;
     this.pullRequestCreator = pullRequestCreator;
@@ -65,6 +71,7 @@ export class CreateReleaseUseCase {
     this.createChangelogUseCase = createChangelogUseCase;
     this.releasePageCreator = releasePageCreator;
     this.pullRequestDescriptionWriter = pullRequestDescriptionWriter;
+    this.messageSender = messageSender;
   }
 
   execute(
@@ -112,12 +119,19 @@ export class CreateReleaseUseCase {
                   .pipe(
                     flatMap((changelog) => {
                       let writeOnPR: Observable<void> = of(void 0);
+                      let messageSender: Observable<void> = of(void 0);
                       if (changelog !== undefined) {
                         writeOnPR = this.pullRequestDescriptionWriter.write(
                           x.identifier,
                           input.repository,
                           changelog
                         );
+
+                        messageSender = this.messageSender
+                          .send(
+                            new MessageSenderInput(input.channel, changelog)
+                          )
+                          .pipe(mapTo(void 0));
                       }
 
                       return zip(
@@ -127,7 +141,8 @@ export class CreateReleaseUseCase {
                           input.repository,
                           changelog
                         ),
-                        writeOnPR
+                        writeOnPR,
+                        messageSender
                       );
                     })
                   );
