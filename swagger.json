@@ -126,6 +126,10 @@
                                     "repository": {
                                         "type": "string",
                                         "example": "baroneza-test"
+                                    },
+                                    "channel": {
+                                        "type": "string",
+                                        "example": "ios-devs"
                                     }
                                 }
                             }
