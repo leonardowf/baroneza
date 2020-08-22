@@ -42,6 +42,7 @@ class TestCreateReleaseInput implements CreateReleaseEndpointInput {
   projectTag = 'projectTag';
   project = 'project';
   repository = 'repository';
+  channel = 'channel';
 }
 
 class TestTagEndpointDependencies implements TagEndpointDependencies {

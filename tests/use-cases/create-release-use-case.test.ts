@@ -25,6 +25,11 @@ import { PullRequestDescriptionWriter } from '../../src/workers/pull-request-des
 
 import { mock, instance, when, deepEqual } from 'ts-mockito';
 import { of } from 'rxjs';
+import {
+  MessageSender,
+  MessageSenderInput,
+  MessageSenderOutput
+} from '../../src/workers/message-sender';
 
 describe('the create release use case', () => {
   it('executes correctly', (done) => {
@@ -36,6 +41,8 @@ describe('the create release use case', () => {
     const pullRequestDescriptionWriterMock = mock<
       PullRequestDescriptionWriter
     >();
+
+    const messageSenderMock = mock<MessageSender>();
 
     when(
       createBranchUseCaseMock.execute(
@@ -81,6 +88,12 @@ describe('the create release use case', () => {
       )
     ).thenReturn(of(void 0));
 
+    when(
+      messageSenderMock.send(
+        deepEqual(new MessageSenderInput('channel', 'changelog'))
+      )
+    ).thenReturn(of(new MessageSenderOutput('123', '456')));
+
     const createBranchUseCase = instance(createBranchUseCaseMock);
     const pullRequestCreator = instance(pullRequestCreatorMock);
     const tagUseCase = instance(tagUseCaseMock);
@@ -89,6 +102,7 @@ describe('the create release use case', () => {
     const pullRequestDescriptionWriter = instance(
       pullRequestDescriptionWriterMock
     );
+    const messageSender = instance(messageSenderMock);
 
     const sut = new CreateReleaseUseCase(
       createBranchUseCase,
@@ -96,7 +110,8 @@ describe('the create release use case', () => {
       tagUseCase,
       createChangelogUseCase,
       releasePageCreator,
-      pullRequestDescriptionWriter
+      pullRequestDescriptionWriter,
+      messageSender
     );
 
     sut
@@ -108,7 +123,8 @@ describe('the create release use case', () => {
           'title',
           'projectTag',
           'project',
-          'repository'
+          'repository',
+          'channel'
         )
       )
       .subscribe({
