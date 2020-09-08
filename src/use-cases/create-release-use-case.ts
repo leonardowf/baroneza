@@ -1,4 +1,4 @@
-import { Observable, of, zip } from 'rxjs';
+import { Observable, of, zip, merge } from 'rxjs';
 import {
   CreateBranchUseCase,
   CreateBranchUseCaseInput
@@ -13,6 +13,7 @@ import {
 import { ReleasePageCreator } from '../workers/release-page-creator';
 import { PullRequestDescriptionWriter } from '../workers/pull-request-description-writer';
 import { MessageSender, MessageSenderInput } from '../workers/message-sender';
+import { CreateMilestoneUseCase, CreateMilestoneUseCaseInput } from './create-milestone-use-case';
 
 export class CreateReleaseUseCaseInput {
   branchName: string;
@@ -55,6 +56,7 @@ export class CreateReleaseUseCase {
   private readonly releasePageCreator: ReleasePageCreator;
   private readonly pullRequestDescriptionWriter: PullRequestDescriptionWriter;
   private readonly messageSender: MessageSender;
+  private readonly createMilestoneUseCase: CreateMilestoneUseCase;
 
   constructor(
     createBranchUseCase: CreateBranchUseCase,
@@ -63,7 +65,8 @@ export class CreateReleaseUseCase {
     createChangelogUseCase: CreateChangelogUseCase,
     releasePageCreator: ReleasePageCreator,
     pullRequestDescriptionWriter: PullRequestDescriptionWriter,
-    messageSender: MessageSender
+    messageSender: MessageSender,
+    createMilestoneUseCase: CreateMilestoneUseCase,
   ) {
     this.createBranchUseCase = createBranchUseCase;
     this.pullRequestCreator = pullRequestCreator;
@@ -72,6 +75,7 @@ export class CreateReleaseUseCase {
     this.releasePageCreator = releasePageCreator;
     this.pullRequestDescriptionWriter = pullRequestDescriptionWriter;
     this.messageSender = messageSender;
+    this.createMilestoneUseCase = createMilestoneUseCase;
   }
 
   execute(
@@ -97,21 +101,23 @@ export class CreateReleaseUseCase {
       )
       .pipe(
         flatMap((x) =>
-          this.tagUseCase
-            .execute(
-              new TagUseCaseInput(
-                x.identifier,
-                input.projectTag,
-                input.project,
-                input.repository
+          zip(this.createMilestoneUseCase.execute(new CreateMilestoneUseCaseInput(x.pullRequestNumber, input.repository, input.projectTag, x.id)),
+            this.tagUseCase
+              .execute(
+                new TagUseCaseInput(
+                  x.pullRequestNumber,
+                  input.projectTag,
+                  input.project,
+                  input.repository
+                )
               )
-            )
+          )
             .pipe(
               flatMap(() => {
                 return this.createChangelogUseCase
                   .execute(
                     new CreateChangelogInput(
-                      x.identifier,
+                      x.pullRequestNumber,
                       input.repository,
                       input.projectTag
                     )
@@ -122,7 +128,7 @@ export class CreateReleaseUseCase {
                       let messageSender: Observable<void> = of(void 0);
                       if (changelog !== undefined) {
                         writeOnPR = this.pullRequestDescriptionWriter.write(
-                          x.identifier,
+                          x.pullRequestNumber,
                           input.repository,
                           changelog
                         );
