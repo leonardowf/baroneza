@@ -33,6 +33,8 @@ import { ConcreteKeepChangelogBuilder } from './workers/keep-changelog-builder';
 import { GithubReleasePageCreator } from './workers/release-page-creator';
 import { GithubPullRequestDescriptionWriter } from './workers/pull-request-description-writer';
 import { SlackAskConfirmationUseCase } from './use-cases/ask-confirmation-use-case';
+import { GithubCreateMilestoneUseCase } from './use-cases/create-milestone-use-case';
+import { GithubMilestoneCreator } from './workers/milestone-creator';
 
 export class Dependencies
   implements
@@ -112,6 +114,18 @@ export class Dependencies
 
   messageSender = new SlackMessageSender(this.slackWebClient);
 
+  milestoneCreator = new GithubMilestoneCreator(
+    this.githubService,
+    this.config.githubOwner
+  );
+
+  createMilestoneUseCase = new GithubCreateMilestoneUseCase(
+    this.config.githubOwner,
+    this.pullRequestNumberExtractor,
+    this.milestoneCreator,
+    this.githubService
+  );
+
   createReleaseUseCase = new CreateReleaseUseCase(
     this.createBranchUseCase,
     this.pullRequestCreator,
@@ -119,7 +133,8 @@ export class Dependencies
     this.createChangeLogUseCase,
     this.releasePageCreator,
     this.pullRequestDescriptionWriter,
-    this.messageSender
+    this.messageSender,
+    this.createMilestoneUseCase
   );
 
   reactionsReader = new SlackReactionsReader(this.slackWebClient);

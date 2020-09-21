@@ -3,10 +3,12 @@ import { Octokit } from '@octokit/rest';
 import { map } from 'rxjs/operators';
 
 export class PullRequestCreatorOutput {
-  identifier: number;
+  readonly pullRequestNumber: number;
+  readonly id: number;
 
-  constructor(identifier: number) {
-    this.identifier = identifier;
+  constructor(pullRequestNumber: number, id: number) {
+    this.pullRequestNumber = pullRequestNumber;
+    this.id = id;
   }
 }
 
@@ -42,6 +44,6 @@ export class GithubPullRequestCreator implements PullRequestCreator {
         base,
         head
       })
-    ).pipe(map((x) => new PullRequestCreatorOutput(x.data.number)));
+    ).pipe(map((x) => new PullRequestCreatorOutput(x.data.number, x.data.id)));
   }
 }
