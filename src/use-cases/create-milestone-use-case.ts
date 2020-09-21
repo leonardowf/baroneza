@@ -1,55 +1,79 @@
-import { Observable, of, forkJoin } from "rxjs";
-import { PullRequestNumberExtractor } from "../workers/pr-number-extractor";
-import { flatMap, mapTo } from "rxjs/operators";
-import { MilestoneCreator } from "../workers/milestone-creator";
-import { GithubService } from "../services/github-service";
+import { Observable, forkJoin } from 'rxjs';
+import { PullRequestNumberExtractor } from '../workers/pr-number-extractor';
+import { flatMap, mapTo } from 'rxjs/operators';
+import { MilestoneCreator } from '../workers/milestone-creator';
+import { GithubService } from '../services/github-service';
 
 export class CreateMilestoneUseCaseInput {
-    readonly pullNumber: number
-    readonly repository: string
-    readonly title: string
-    readonly issueIdentifier: number;
+  readonly pullNumber: number;
+  readonly repository: string;
+  readonly title: string;
+  readonly issueIdentifier: number;
 
-    constructor(pullNumber: number, repository: string, title: string, issueIdentifier: number) {
-        this.pullNumber = pullNumber
-        this.issueIdentifier = issueIdentifier
-        this.repository = repository
-        this.title = title
-    }
+  constructor(
+    pullNumber: number,
+    repository: string,
+    title: string,
+    issueIdentifier: number
+  ) {
+    this.pullNumber = pullNumber;
+    this.issueIdentifier = issueIdentifier;
+    this.repository = repository;
+    this.title = title;
+  }
 }
 
-export class CreateMilestoneUseCaseOutput {
-    
-}
+export class CreateMilestoneUseCaseOutput {}
 
 export interface CreateMilestoneUseCase {
-    execute(input: CreateMilestoneUseCaseInput): Observable<CreateMilestoneUseCaseOutput>;
+  execute(
+    input: CreateMilestoneUseCaseInput
+  ): Observable<CreateMilestoneUseCaseOutput>;
 }
 
 export class GithubCreateMilestoneUseCase implements CreateMilestoneUseCase {
-    private readonly pullRequestNumberExtractor: PullRequestNumberExtractor;
-    private readonly milestoneCreator: MilestoneCreator;
-    private readonly githubService: GithubService;
-    private readonly owner: string;
+  private readonly pullRequestNumberExtractor: PullRequestNumberExtractor;
+  private readonly milestoneCreator: MilestoneCreator;
+  private readonly githubService: GithubService;
+  private readonly owner: string;
 
-    constructor(owner: string, pullRequestNumberExtractor: PullRequestNumberExtractor, milestoneCreator: MilestoneCreator, githubService: GithubService) {
-        this.pullRequestNumberExtractor = pullRequestNumberExtractor
-        this.milestoneCreator = milestoneCreator;
-        this.githubService = githubService;
-        this.owner = owner;
-    }
+  constructor(
+    owner: string,
+    pullRequestNumberExtractor: PullRequestNumberExtractor,
+    milestoneCreator: MilestoneCreator,
+    githubService: GithubService
+  ) {
+    this.pullRequestNumberExtractor = pullRequestNumberExtractor;
+    this.milestoneCreator = milestoneCreator;
+    this.githubService = githubService;
+    this.owner = owner;
+  }
 
-    execute(input: CreateMilestoneUseCaseInput): Observable<CreateMilestoneUseCaseOutput> {
-        return this.pullRequestNumberExtractor.extract(input.pullNumber, input.repository).pipe(flatMap((numbers) => {
-            return this.milestoneCreator.create(input.title, input.repository).pipe(flatMap((milestoneId) => {
-                
+  execute(
+    input: CreateMilestoneUseCaseInput
+  ): Observable<CreateMilestoneUseCaseOutput> {
+    return this.pullRequestNumberExtractor
+      .extract(input.pullNumber, input.repository)
+      .pipe(
+        flatMap((numbers) => {
+          return this.milestoneCreator
+            .create(input.title, input.repository)
+            .pipe(
+              flatMap((milestoneId) => {
                 const setMilestoneToPrs = numbers.map((prNumber) => {
-                    return this.githubService.setMilestoneToPR(this.owner, input.repository, milestoneId, prNumber)
-                })
+                  return this.githubService.setMilestoneToPR(
+                    this.owner,
+                    input.repository,
+                    milestoneId,
+                    prNumber
+                  );
+                });
 
-                return forkJoin(setMilestoneToPrs)
-            }))
-        })).pipe(mapTo(new CreateMilestoneUseCaseOutput()))
-    }
-    
+                return forkJoin(setMilestoneToPrs);
+              })
+            );
+        })
+      )
+      .pipe(mapTo(new CreateMilestoneUseCaseOutput()));
+  }
 }

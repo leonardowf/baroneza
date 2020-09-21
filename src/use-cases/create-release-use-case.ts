@@ -1,4 +1,4 @@
-import { Observable, of, zip, merge } from 'rxjs';
+import { Observable, of, zip } from 'rxjs';
 import {
   CreateBranchUseCase,
   CreateBranchUseCaseInput
@@ -13,7 +13,10 @@ import {
 import { ReleasePageCreator } from '../workers/release-page-creator';
 import { PullRequestDescriptionWriter } from '../workers/pull-request-description-writer';
 import { MessageSender, MessageSenderInput } from '../workers/message-sender';
-import { CreateMilestoneUseCase, CreateMilestoneUseCaseInput } from './create-milestone-use-case';
+import {
+  CreateMilestoneUseCase,
+  CreateMilestoneUseCaseInput
+} from './create-milestone-use-case';
 
 export class CreateReleaseUseCaseInput {
   branchName: string;
@@ -66,7 +69,7 @@ export class CreateReleaseUseCase {
     releasePageCreator: ReleasePageCreator,
     pullRequestDescriptionWriter: PullRequestDescriptionWriter,
     messageSender: MessageSender,
-    createMilestoneUseCase: CreateMilestoneUseCase,
+    createMilestoneUseCase: CreateMilestoneUseCase
   ) {
     this.createBranchUseCase = createBranchUseCase;
     this.pullRequestCreator = pullRequestCreator;
@@ -101,59 +104,63 @@ export class CreateReleaseUseCase {
       )
       .pipe(
         flatMap((x) =>
-          zip(this.createMilestoneUseCase.execute(new CreateMilestoneUseCaseInput(x.pullRequestNumber, input.repository, input.projectTag, x.id)),
-            this.tagUseCase
-              .execute(
-                new TagUseCaseInput(
-                  x.pullRequestNumber,
-                  input.projectTag,
-                  input.project,
-                  input.repository
-                )
+          zip(
+            this.createMilestoneUseCase.execute(
+              new CreateMilestoneUseCaseInput(
+                x.pullRequestNumber,
+                input.repository,
+                input.projectTag,
+                x.id
               )
-          )
-            .pipe(
-              flatMap(() => {
-                return this.createChangelogUseCase
-                  .execute(
-                    new CreateChangelogInput(
-                      x.pullRequestNumber,
-                      input.repository,
-                      input.projectTag
-                    )
-                  )
-                  .pipe(
-                    flatMap((changelog) => {
-                      let writeOnPR: Observable<void> = of(void 0);
-                      let messageSender: Observable<void> = of(void 0);
-                      if (changelog !== undefined) {
-                        writeOnPR = this.pullRequestDescriptionWriter.write(
-                          x.pullRequestNumber,
-                          input.repository,
-                          changelog
-                        );
-
-                        messageSender = this.messageSender
-                          .send(
-                            new MessageSenderInput(input.channel, changelog)
-                          )
-                          .pipe(mapTo(void 0));
-                      }
-
-                      return zip(
-                        this.releasePageCreator.create(
-                          input.projectTag,
-                          input.projectTag,
-                          input.repository,
-                          changelog
-                        ),
-                        writeOnPR,
-                        messageSender
-                      );
-                    })
-                  );
-              })
+            ),
+            this.tagUseCase.execute(
+              new TagUseCaseInput(
+                x.pullRequestNumber,
+                input.projectTag,
+                input.project,
+                input.repository
+              )
             )
+          ).pipe(
+            flatMap(() => {
+              return this.createChangelogUseCase
+                .execute(
+                  new CreateChangelogInput(
+                    x.pullRequestNumber,
+                    input.repository,
+                    input.projectTag
+                  )
+                )
+                .pipe(
+                  flatMap((changelog) => {
+                    let writeOnPR: Observable<void> = of(void 0);
+                    let messageSender: Observable<void> = of(void 0);
+                    if (changelog !== undefined) {
+                      writeOnPR = this.pullRequestDescriptionWriter.write(
+                        x.pullRequestNumber,
+                        input.repository,
+                        changelog
+                      );
+
+                      messageSender = this.messageSender
+                        .send(new MessageSenderInput(input.channel, changelog))
+                        .pipe(mapTo(void 0));
+                    }
+
+                    return zip(
+                      this.releasePageCreator.create(
+                        input.projectTag,
+                        input.projectTag,
+                        input.repository,
+                        changelog
+                      ),
+                      writeOnPR,
+                      messageSender
+                    );
+                  })
+                );
+            })
+          )
         )
       )
       .pipe(mapTo(new CreateReleaseUseCaseOutput()));

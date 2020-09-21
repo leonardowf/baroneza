@@ -6,7 +6,6 @@ export class PullRequestCreatorOutput {
   readonly pullRequestNumber: number;
   readonly id: number;
 
-
   constructor(pullRequestNumber: number, id: number) {
     this.pullRequestNumber = pullRequestNumber;
     this.id = id;

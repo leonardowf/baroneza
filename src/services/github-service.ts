@@ -34,11 +34,24 @@ export interface GithubService {
 
   getSHA(owner: string, repo: string, branchName: string): Observable<string>;
 
-  getMilestone(owner: string, repo: string, title: string): Observable<number | undefined>;
+  getMilestone(
+    owner: string,
+    repo: string,
+    title: string
+  ): Observable<number | undefined>;
 
-  createMilestone(owner: string, repo: string, title: string): Observable<number>;
+  createMilestone(
+    owner: string,
+    repo: string,
+    title: string
+  ): Observable<number>;
 
-  setMilestoneToPR(owner: string, repo: string, milestoneId: number, prNumber: number): Observable<void>;
+  setMilestoneToPR(
+    owner: string,
+    repo: string,
+    milestoneId: number,
+    prNumber: number
+  ): Observable<void>;
 }
 
 export class PullRequestLoginDescriptionDateOutput {
@@ -168,29 +181,51 @@ export class ConcreteGithubService implements GithubService {
     ).pipe(map((x) => x.data.object.sha));
   }
 
-  createMilestone(owner: string, repo: string, title: string): Observable<number> {
-    return from(this.octokit.issues.createMilestone({
-      owner,
-      repo,
-      title
-    })).pipe(map((x) => x.data.number))
+  createMilestone(
+    owner: string,
+    repo: string,
+    title: string
+  ): Observable<number> {
+    return from(
+      this.octokit.issues.createMilestone({
+        owner,
+        repo,
+        title
+      })
+    ).pipe(map((x) => x.data.number));
   }
 
-  getMilestone(owner: string, repo: string, title: string): Observable<number | undefined> {
-    return from(this.octokit.issues.listMilestones({
-      owner,
-      repo
-    })).pipe(map((response) => {
-      return response.data.filter((x) => x.title === title).shift()?.number
-    }))
+  getMilestone(
+    owner: string,
+    repo: string,
+    title: string
+  ): Observable<number | undefined> {
+    return from(
+      this.octokit.issues.listMilestones({
+        owner,
+        repo
+      })
+    ).pipe(
+      map((response) => {
+        return response.data.filter((x) => x.title === title).shift()?.number;
+      })
+    );
   }
 
-  setMilestoneToPR(owner: string, repo: string, milestoneId: number, prNumber: number): Observable<void> {
-    return from(this.octokit.issues.update({
-      owner,
-      repo,
-      issue_number: prNumber,
-      milestone: milestoneId
-    })).pipe(mapTo(void 0))
+  setMilestoneToPR(
+    owner: string,
+    repo: string,
+    milestoneId: number,
+    prNumber: number
+  ): Observable<void> {
+    return from(
+      this.octokit.issues.update({
+        owner,
+        repo,
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        issue_number: prNumber,
+        milestone: milestoneId
+      })
+    ).pipe(mapTo(void 0));
   }
 }

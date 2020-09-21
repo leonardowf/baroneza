@@ -30,7 +30,11 @@ import {
   MessageSenderInput,
   MessageSenderOutput
 } from '../../src/workers/message-sender';
-import { CreateMilestoneUseCase, CreateMilestoneUseCaseInput, CreateMilestoneUseCaseOutput } from '../../src/use-cases/create-milestone-use-case';
+import {
+  CreateMilestoneUseCase,
+  CreateMilestoneUseCaseInput,
+  CreateMilestoneUseCaseOutput
+} from '../../src/use-cases/create-milestone-use-case';
 
 describe('the create release use case', () => {
   it('executes correctly', (done) => {
@@ -96,8 +100,15 @@ describe('the create release use case', () => {
       )
     ).thenReturn(of(new MessageSenderOutput('123', '456')));
 
-    const createMilestoneUseCaseInput = new CreateMilestoneUseCaseInput(123, 'repository', 'projectTag', 456)
-    when(createMilestoneUseCaseMock.execute(deepEqual(createMilestoneUseCaseInput))).thenReturn(of(new CreateMilestoneUseCaseOutput()))
+    const createMilestoneUseCaseInput = new CreateMilestoneUseCaseInput(
+      123,
+      'repository',
+      'projectTag',
+      456
+    );
+    when(
+      createMilestoneUseCaseMock.execute(deepEqual(createMilestoneUseCaseInput))
+    ).thenReturn(of(new CreateMilestoneUseCaseOutput()));
 
     const createBranchUseCase = instance(createBranchUseCaseMock);
     const pullRequestCreator = instance(pullRequestCreatorMock);

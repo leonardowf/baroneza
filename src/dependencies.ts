@@ -114,9 +114,17 @@ export class Dependencies
 
   messageSender = new SlackMessageSender(this.slackWebClient);
 
-  milestoneCreator = new GithubMilestoneCreator(this.githubService, this.config.githubOwner)
+  milestoneCreator = new GithubMilestoneCreator(
+    this.githubService,
+    this.config.githubOwner
+  );
 
-  createMilestoneUseCase = new GithubCreateMilestoneUseCase(this.config.githubOwner, this.pullRequestNumberExtractor, this.milestoneCreator, this.githubService);
+  createMilestoneUseCase = new GithubCreateMilestoneUseCase(
+    this.config.githubOwner,
+    this.pullRequestNumberExtractor,
+    this.milestoneCreator,
+    this.githubService
+  );
 
   createReleaseUseCase = new CreateReleaseUseCase(
     this.createBranchUseCase,
