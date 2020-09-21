@@ -30,6 +30,7 @@ import {
   MessageSenderInput,
   MessageSenderOutput
 } from '../../src/workers/message-sender';
+import { CreateMilestoneUseCase, CreateMilestoneUseCaseInput, CreateMilestoneUseCaseOutput } from '../../src/use-cases/create-milestone-use-case';
 
 describe('the create release use case', () => {
   it('executes correctly', (done) => {
@@ -41,6 +42,7 @@ describe('the create release use case', () => {
     const pullRequestDescriptionWriterMock = mock<
       PullRequestDescriptionWriter
     >();
+    const createMilestoneUseCaseMock = mock<CreateMilestoneUseCase>();
 
     const messageSenderMock = mock<MessageSender>();
 
@@ -63,7 +65,7 @@ describe('the create release use case', () => {
         'targetBranch',
         'repository'
       )
-    ).thenReturn(of(new PullRequestCreatorOutput(123)));
+    ).thenReturn(of(new PullRequestCreatorOutput(123, 456)));
     when(
       tagUseCaseMock.execute(
         deepEqual(
@@ -94,6 +96,9 @@ describe('the create release use case', () => {
       )
     ).thenReturn(of(new MessageSenderOutput('123', '456')));
 
+    const createMilestoneUseCaseInput = new CreateMilestoneUseCaseInput(123, 'repository', 'projectTag', 456)
+    when(createMilestoneUseCaseMock.execute(deepEqual(createMilestoneUseCaseInput))).thenReturn(of(new CreateMilestoneUseCaseOutput()))
+
     const createBranchUseCase = instance(createBranchUseCaseMock);
     const pullRequestCreator = instance(pullRequestCreatorMock);
     const tagUseCase = instance(tagUseCaseMock);
@@ -103,6 +108,7 @@ describe('the create release use case', () => {
       pullRequestDescriptionWriterMock
     );
     const messageSender = instance(messageSenderMock);
+    const createMilestoneUseCase = instance(createMilestoneUseCaseMock);
 
     const sut = new CreateReleaseUseCase(
       createBranchUseCase,
@@ -111,7 +117,8 @@ describe('the create release use case', () => {
       createChangelogUseCase,
       releasePageCreator,
       pullRequestDescriptionWriter,
-      messageSender
+      messageSender,
+      createMilestoneUseCase
     );
 
     sut
