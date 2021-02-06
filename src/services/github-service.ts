@@ -52,6 +52,8 @@ export interface GithubService {
     milestoneId: number,
     prNumber: number
   ): Observable<void>;
+
+  tags(owner: string, repo: string): Observable<string[]>;
 }
 
 export class PullRequestLoginDescriptionDateOutput {
@@ -109,8 +111,8 @@ export class ConcreteGithubService implements GithubService {
         (response) =>
           new PullRequestLoginDescriptionDateOutput(
             number,
-            response.data.user.login,
-            response.data.body,
+            response.data.user.login ?? "",
+            response.data.body ?? "",
             response.data.merged_at
           )
       )
@@ -227,5 +229,21 @@ export class ConcreteGithubService implements GithubService {
         milestone: milestoneId
       })
     ).pipe(mapTo(void 0));
+  }
+
+  tags(owner: string, repo: string): Observable<string[]> {
+    return from(
+      this.octokit.git.listMatchingRefs({
+        owner,
+        repo,
+        ref: 'tags/'
+      })
+    ).pipe(
+      map((res) => {
+        return res.data.map((data) => {
+          return data.ref.replace('refs/tags/', '');
+        });
+      })
+    );
   }
 }

@@ -1,9 +1,9 @@
 import { mock, instance, when, anything } from 'ts-mockito';
 import { GithubService } from '../../src/services/github-service';
 import { of } from 'rxjs';
-import { GithubNextReleaseGuesser } from '../../src/workers/next-release-guesser';
+import { GithubPRNextReleaseGuesser } from '../../src/workers/github-pr-next-release-guesser';
 
-describe('the github next release guesser', () => {
+describe('the github PR next release guesser', () => {
   it('fails without semver in the title', (done) => {
     const githubServiceMock = mock<GithubService>();
     const titles: string[] = ['title1'];
@@ -13,7 +13,7 @@ describe('the github next release guesser', () => {
     ).thenReturn(of(titles));
 
     const githubService = instance(githubServiceMock);
-    const sut = new GithubNextReleaseGuesser(githubService, 'owner');
+    const sut = new GithubPRNextReleaseGuesser(githubService, 'owner');
 
     sut.guess('repository').subscribe({
       next: () => {
@@ -36,7 +36,7 @@ describe('the github next release guesser', () => {
 
     const githubService = instance(githubServiceMock);
 
-    const sut = new GithubNextReleaseGuesser(githubService, 'owner');
+    const sut = new GithubPRNextReleaseGuesser(githubService, 'owner');
     sut.guess('repository').subscribe({
       next: (version) => {
         expect(version).toEqual('1.0.1');
@@ -58,7 +58,7 @@ describe('the github next release guesser', () => {
 
     const githubService = instance(githubServiceMock);
 
-    const sut = new GithubNextReleaseGuesser(githubService, 'owner');
+    const sut = new GithubPRNextReleaseGuesser(githubService, 'owner');
     sut.guess('repository').subscribe({
       next: (version) => {
         expect(version).toEqual('1.0.1');

@@ -20,7 +20,7 @@ import { StartTrainUseCase } from './use-cases/start-train-use-case';
 import { SlackMessageSender } from './workers/message-sender';
 import { WebClient } from '@slack/web-api';
 import { SlackReactionsReader } from './workers/reactions-reader';
-import { GithubNextReleaseGuesser } from './workers/next-release-guesser';
+import { GithubTagNextReleaseGuesser } from './workers/github-tag-next-release-guesser';
 import { ConcreteJiraTickerParser } from './workers/jira-ticket-parser';
 import { ConcreteGithubService } from './services/github-service';
 import { ConcreteJiraService } from './services/jira-service';
@@ -138,7 +138,7 @@ export class Dependencies
   );
 
   reactionsReader = new SlackReactionsReader(this.slackWebClient);
-  nextReleaseGuesser = new GithubNextReleaseGuesser(
+  nextReleaseGuesser = new GithubTagNextReleaseGuesser(
     this.githubService,
     this.config.githubOwner
   );

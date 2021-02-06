@@ -1,5 +1,5 @@
 {
-    "jira_host": "baroneza.atlassian.net",
+    "jira_host": "baroneza-test.atlassian.net",
     "github_owner": "leonardowf",
     "confirmation_emoji": ":100:",
     "release_target_branch": "release-candidate",
