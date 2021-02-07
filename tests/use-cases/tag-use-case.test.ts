@@ -3,7 +3,7 @@ import {
   TagUseCaseInput
 } from '../../src/use-cases/tag-use-case';
 import { CommitExtractor } from '../../src/workers/commit-extractor';
-import { mock, instance, when, anything, verify } from 'ts-mockito';
+import { mock, instance, when, anything, verify, deepEqual } from 'ts-mockito';
 import { of } from 'rxjs';
 import { JiraTicketParser } from '../../src/workers/jira-ticket-parser';
 import {
@@ -12,6 +12,7 @@ import {
 } from '../../src/workers/jira-tagger';
 import {
   CreateVersionUseCase,
+  CreateVersionUseCaseInput,
   CreateVersionUseCaseOutput
 } from '../../src/use-cases/create-version-use-case';
 
@@ -48,13 +49,17 @@ describe('The tag use case', () => {
     });
 
     jiraTagUseCase
-      .execute(new TagUseCaseInput(1, 'v1.0', 'PSF', 'repository'))
+      .execute(new TagUseCaseInput(1, 'v1.0', 'PSF', 'repository', ' suffix'))
       .subscribe({
         next: (x) => {
           verify(commitExtractorMock.commits(anything(), 'repository')).once();
           verify(jiraTickerParserMock.parse(anything())).once();
           verify(jiraTicketTaggerMock.tag(anything(), anything())).once();
-          verify(createVersionUseCaseMock.execute(anything())).once();
+          verify(
+            createVersionUseCaseMock.execute(
+              deepEqual(new CreateVersionUseCaseInput('PSF', 'v1.0 suffix'))
+            )
+          ).once();
 
           expect(x.successes[0]).toEqual('123');
           done();

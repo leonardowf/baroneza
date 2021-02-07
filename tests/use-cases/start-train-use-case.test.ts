@@ -48,7 +48,8 @@ describe('The Start Train Use Case', () => {
       'repository',
       'baseBranch',
       'targetBranch',
-      'channel'
+      'channel',
+      ' suffix'
     );
     const sut = new StartTrainUseCase(
       nextReleaseGuesser,
@@ -103,7 +104,8 @@ describe('The Start Train Use Case', () => {
       'repository',
       'baseBranch',
       'targetBranch',
-      'channel'
+      'channel',
+      ' suffix'
     );
     const sut = new StartTrainUseCase(
       nextReleaseGuesser,

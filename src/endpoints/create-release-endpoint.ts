@@ -11,6 +11,7 @@ export interface CreateReleaseEndpointInput {
   readonly project: string;
   readonly repository: string;
   readonly channel: string;
+  readonly jiraTagSuffix: string;
 }
 
 export class CreateReleaseEndpointOutput {}
@@ -38,7 +39,8 @@ export class CreateReleaseEndpoint {
         projectTag: input.projectTag,
         project: input.project,
         repository: input.repository,
-        channel: input.channel
+        channel: input.channel,
+        jiraTagSuffix: input.jiraTagSuffix
       })
       .pipe(mapTo(new CreateReleaseEndpointOutput()));
   }

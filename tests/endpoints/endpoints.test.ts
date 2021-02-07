@@ -43,6 +43,7 @@ class TestCreateReleaseInput implements CreateReleaseEndpointInput {
   project = 'project';
   repository = 'repository';
   channel = 'channel';
+  jiraTagSuffix = ' suffix'
 }
 
 class TestTagEndpointDependencies implements TagEndpointDependencies {
@@ -55,6 +56,7 @@ class TestTagEndpointInput implements TagEndpointInput {
   number = 123;
   tag = 'tag';
   repository = 'repository';
+  jiraTagSuffix = ' suffix'
 }
 
 describe('The start traint endpoint', () => {
@@ -73,7 +75,8 @@ describe('The start traint endpoint', () => {
           'repo',
           'baseBranch',
           'targetBranch',
-          'channel'
+          'channel',
+          ' suffix'
         )
       )
       .subscribe({

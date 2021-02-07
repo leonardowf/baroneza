@@ -73,7 +73,7 @@ describe('the create release use case', () => {
     when(
       tagUseCaseMock.execute(
         deepEqual(
-          new TagUseCaseInput(123, 'projectTag', 'project', 'repository')
+          new TagUseCaseInput(123, 'projectTag', 'project', 'repository', ' suffix')
         )
       )
     ).thenReturn(of(new TagUseCaseOutput([], [])));
@@ -142,7 +142,8 @@ describe('the create release use case', () => {
           'projectTag',
           'project',
           'repository',
-          'channel'
+          'channel',
+          ' suffix'
         )
       )
       .subscribe({
