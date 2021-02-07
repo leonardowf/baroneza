@@ -17,17 +17,20 @@ export class TagUseCaseInput {
   readonly tag: string;
   readonly project: string;
   readonly repository: string;
+  readonly jiraTagSuffix: string;
 
   constructor(
     identifier: number,
     tag: string,
     project: string,
-    repository: string
+    repository: string,
+    jiraTagSuffix: string
   ) {
     this.identifier = identifier;
     this.tag = tag;
     this.project = project;
     this.repository = repository;
+    this.jiraTagSuffix = jiraTagSuffix;
   }
 }
 export class TagUseCaseOutput {
@@ -66,11 +69,10 @@ export class JiraTagUseCase implements TagUseCase {
       .pipe(map((commits) => this.jiraTickerParser.parse(commits)))
       .pipe(
         flatMap((ticketIds) => {
+          const tag = `${input.tag}${input.jiraTagSuffix}`;
           return this.createVersionUseCase
-            .execute(new CreateVersionUseCaseInput(input.project, input.tag))
-            .pipe(
-              flatMap(() => this.jiraTicketTagger.tag(ticketIds, input.tag))
-            );
+            .execute(new CreateVersionUseCaseInput(input.project, tag))
+            .pipe(flatMap(() => this.jiraTicketTagger.tag(ticketIds, tag)));
         })
       )
       .pipe(

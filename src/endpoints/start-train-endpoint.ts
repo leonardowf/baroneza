@@ -14,6 +14,7 @@ export interface StartTrainEndpointInput {
   baseBranch: string;
   targetBranch: string;
   channel: string;
+  jiraTagSuffix: string;
 }
 
 export class StartTrainEndpointOutput {}
@@ -34,7 +35,8 @@ export class StartTrainEndpoint {
           input.repository,
           input.baseBranch,
           input.targetBranch,
-          input.channel
+          input.channel,
+          input.jiraTagSuffix
         )
       )
       .pipe(map(() => new StartTrainEndpointOutput()));

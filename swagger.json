@@ -40,7 +40,12 @@
                                     },
                                     "channel": {
                                         "type": "string",
-                                        "example": "ios-devs"
+                                        "example": "automation"
+                                    },
+                                    "jiraTagSuffix": {
+                                        "type": "string",
+                                        "example": "-backend",
+                                        "description": "This field will be concatenated as a suffix of the guessed next release"
                                     }
                                 }
                             }
@@ -77,6 +82,11 @@
                                         "type": "string",
                                         "description": "The Github repository",
                                         "example": "baroneza-test"
+                                    },
+                                    "jiraTagSuffix": {
+                                        "type": "string",
+                                        "example": "-backend",
+                                        "description": "This field will be concatenated as a suffix of the guessed next release"
                                     }
                                 }
                             }
@@ -129,7 +139,12 @@
                                     },
                                     "channel": {
                                         "type": "string",
-                                        "example": "ios-devs"
+                                        "example": "automation"
+                                    },
+                                    "jiraTagSuffix": {
+                                        "type": "string",
+                                        "example": "-backend",
+                                        "description": "This field will be concatenated as a suffix of the guessed next release"
                                     }
                                 }
                             }

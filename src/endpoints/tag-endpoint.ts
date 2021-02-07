@@ -43,7 +43,8 @@ export class TagEndpoint {
       input.number,
       input.tag,
       this.project,
-      input.repository
+      input.repository,
+      input.jiraTagSuffix
     );
 
     return this.tagUseCase
@@ -56,4 +57,5 @@ export interface TagEndpointInput {
   readonly number: number;
   readonly tag: string;
   readonly repository: string;
+  readonly jiraTagSuffix: string;
 }

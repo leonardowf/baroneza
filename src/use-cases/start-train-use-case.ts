@@ -15,17 +15,20 @@ export class StartTrainUseCaseInput {
   readonly baseBranch: string;
   readonly targetBranch: string;
   readonly channel: string;
+  readonly jiraTagSuffix: string;
 
   constructor(
     repository: string,
     baseBranch: string,
     targetBranch: string,
-    channel: string
+    channel: string,
+    jiraTagSuffix: string
   ) {
     this.repository = repository;
     this.baseBranch = baseBranch;
     this.targetBranch = targetBranch;
     this.channel = channel;
+    this.jiraTagSuffix = jiraTagSuffix;
   }
 }
 
@@ -86,7 +89,8 @@ export class StartTrainUseCase {
                     version,
                     this.project,
                     input.repository,
-                    input.channel
+                    input.channel,
+                    input.jiraTagSuffix
                   )
                 );
               } else {
