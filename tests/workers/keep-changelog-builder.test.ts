@@ -1,18 +1,16 @@
-import {
-  ConcreteKeepChangelogBuilder,
-  KeepChangelogItem
-} from '../../src/workers/keep-changelog-builder';
+import { KeepChangelogItem } from "../../src/workers/keep-changelog-builder/keep-changelog-builder";
+import { MarkdownKeepChangelogBuilder } from "../../src/workers/keep-changelog-builder/markdown-keep-changelog-builder";
 
 describe('the keep changelog builder', () => {
   it('empty returns undefined', () => {
-    const keepChangelogBuilder = new ConcreteKeepChangelogBuilder();
+    const keepChangelogBuilder = new MarkdownKeepChangelogBuilder();
     const result = keepChangelogBuilder.build('1.0.0', [], [], [], [], [], []);
 
     expect(result).toBeUndefined();
   });
 
   it('creates the correct changelog', () => {
-    const keepChangelogBuilder = new ConcreteKeepChangelogBuilder();
+    const keepChangelogBuilder = new MarkdownKeepChangelogBuilder();
 
     const result = keepChangelogBuilder.build(
       '1.0.0',

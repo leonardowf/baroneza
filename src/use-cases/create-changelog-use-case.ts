@@ -6,7 +6,7 @@ import { KeepChangelogParser } from '../workers/keep-changelog-parser';
 import {
   KeepChangelogBuilder,
   KeepChangelogItem
-} from '../workers/keep-changelog-builder';
+} from '../workers/keep-changelog-builder/keep-changelog-builder';
 
 export interface CreateChangelogUseCase {
   execute(input: CreateChangelogInput): Observable<string | undefined>;

@@ -11,7 +11,7 @@ import {
 import {
   KeepChangelogBuilder,
   KeepChangelogItem
-} from '../../src/workers/keep-changelog-builder';
+} from '../../src/workers/keep-changelog-builder/keep-changelog-builder';
 import {
   ReadPullRequestInfoUseCase,
   ReadPullRequestInfoUseCaseOutput,
