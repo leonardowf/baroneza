@@ -1,6 +1,6 @@
 import { KeepChangelogBuilder, KeepChangelogItem } from "./keep-changelog-builder";
 
-export class MarkdownKeepChangelogBuilder implements KeepChangelogBuilder {
+export class MarkdownKeepChangelogBuilder implements KeepChangelogBuilder<string> {
   build(
     version: string,
     added: KeepChangelogItem[],

@@ -1,4 +1,4 @@
-export interface KeepChangelogBuilder {
+export interface KeepChangelogBuilder<T> {
   build(
     version: string,
     added: KeepChangelogItem[],
@@ -7,7 +7,7 @@ export interface KeepChangelogBuilder {
     removed: KeepChangelogItem[],
     fixed: KeepChangelogItem[],
     security: KeepChangelogItem[]
-  ): string | undefined;
+  ): T | undefined;
 }
 
 export class KeepChangelogItem {

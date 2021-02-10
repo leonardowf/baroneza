@@ -30,13 +30,13 @@ export class GithubCreateChangelogUseCase implements CreateChangelogUseCase {
   private readonly pullRequestNumberExtractor: PullRequestNumberExtractor;
   private readonly pullRequestInfoUseCase: ReadPullRequestInfoUseCase;
   private readonly keepChangelogParser: KeepChangelogParser;
-  private readonly keepChangelogBuilder: KeepChangelogBuilder;
+  private readonly keepChangelogBuilder: KeepChangelogBuilder<string>;
 
   constructor(
     pullRequestNumberExtractor: PullRequestNumberExtractor,
     pullRequestInfoUseCase: ReadPullRequestInfoUseCase,
     keepChangelogParser: KeepChangelogParser,
-    keepChangelogBuilder: KeepChangelogBuilder
+    keepChangelogBuilder: KeepChangelogBuilder<string>
   ) {
     this.pullRequestNumberExtractor = pullRequestNumberExtractor;
     this.pullRequestInfoUseCase = pullRequestInfoUseCase;
