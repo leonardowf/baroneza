@@ -15,11 +15,15 @@ export class KeepChangelogItem {
   author: string;
   date: string;
   identifier: string;
+  url: string;
+  authorImageUrl: string | undefined;
 
-  constructor(text: string, author: string, date: string, identifier: string) {
+  constructor(text: string, author: string, date: string, identifier: string, url: string, authorImageUrl: string | undefined = undefined) {
     this.text = text;
     this.author = author;
     this.date = date;
     this.identifier = identifier;
+    this.url = url;
+    this.authorImageUrl = authorImageUrl
   }
 }

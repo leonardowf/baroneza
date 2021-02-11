@@ -1,4 +1,4 @@
-import { Block, ContextBlock, KnownBlock, MrkdwnElement } from "@slack/web-api";
+import { Block, ContextBlock, ImageBlock, ImageElement, KnownBlock, MrkdwnElement, PlainTextElement, SectionBlock } from "@slack/web-api";
 import { KeepChangelogBuilder, KeepChangelogItem } from "./keep-changelog-builder";
 
 export class SlackKeepChangelogBuilder implements KeepChangelogBuilder<Block[]> {
@@ -38,49 +38,71 @@ export class SlackKeepChangelogBuilder implements KeepChangelogBuilder<Block[]> 
       text: text
     })
 
+    const makeSection = (text: string): SectionBlock => (
+      {
+        type: "section",
+        text: {
+          type: "mrkdwn",
+          text: text
+        }
+      }
+    )
+
+    const makeImage = (url: string): ImageBlock => ({
+      type: "image",
+      image_url: url,
+      alt_text: "author's avatar"
+    })
+
 
     const makeContext = (item: KeepChangelogItem): Block => {
+      let elements: (MrkdwnElement | PlainTextElement | ImageElement)[] = [
+        makeMarkdown(`- ${item.text.trim().replace('- ', '')}`),
+        makeMarkdown(`by: ${item.author}`),
+        makeMarkdown(`<${item.url}|PR #${item.identifier}>`),
+      ]
+
+      if (item.authorImageUrl) {
+        elements.push(makeImage(item.authorImageUrl))
+      }
+
       const context: ContextBlock = {
         type: "context",
-        elements: [
-          makeMarkdown(`${item.text}`),
-          makeMarkdown(`${item.author}`),
-          makeMarkdown(`${item.identifier}`)
-        ]
+        elements: elements
       }
       return context
     }
 
-    blocks.push(makeHeader(version))
+    blocks.push(makeHeader(`Changelog - ${version}`))
     blocks.push({type: "divider"})
 
     if (added.length > 0) {
-      blocks.push(makeHeader(":sparkles: Added"))
+      blocks.push(makeSection(":sparkles: *Added*"))
       added.map(makeContext).forEach((value) => blocks.push(value))
     }
 
     if (changed.length > 0) {
-      blocks.push(makeHeader(":recycle: Changed"))
+      blocks.push(makeSection(":recycle: *Changed*"))
       changed.map(makeContext).forEach((value) => blocks.push(value))
     }
 
     if (deprecated.length > 0) {
-      blocks.push(makeHeader(":sparkles: Deprecated"))
+      blocks.push(makeSection(":sparkles: *Deprecated*"))
       deprecated.map(makeContext).forEach((value) => blocks.push(value))
     }
 
     if (removed.length > 0) {
-      blocks.push(makeHeader(":fire: Removed"))
+      blocks.push(makeSection(":fire: *Removed*"))
       removed.map(makeContext).forEach((value) => blocks.push(value))
     }
 
     if (fixed.length > 0) {
-      blocks.push(makeHeader(":bug: Fixed"))
+      blocks.push(makeSection(":bug: *Fixed*"))
       fixed.map(makeContext).forEach((value) => blocks.push(value))
     }
 
     if (security.length > 0) {
-      blocks.push(makeHeader(":lock: Security"))
+      blocks.push(makeSection(":lock: *Security*"))
       security.map(makeContext).forEach((value) => blocks.push(value))
     }
 

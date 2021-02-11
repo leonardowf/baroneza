@@ -2,13 +2,22 @@ import { Observable, from } from 'rxjs';
 import { Octokit } from '@octokit/rest';
 import { map, mapTo } from 'rxjs/operators';
 
+export interface PullRequestData {
+  readonly number: number;
+  readonly login: string;
+  readonly description: string;
+  readonly mergedAt: string;
+  readonly url: string;
+  readonly authorImageUrl: string
+}
+
 export interface GithubService {
   pullRequestTitles(owner: string, repo: string): Observable<string[]>;
-  pullRequestLoginDescriptionDate(
+  pullRequestData(
     owner: string,
     repo: string,
     number: number
-  ): Observable<PullRequestLoginDescriptionDateOutput>;
+  ): Observable<PullRequestData>;
 
   createPreRelease(
     tag: string,
@@ -56,25 +65,6 @@ export interface GithubService {
   tags(owner: string, repo: string): Observable<string[]>;
 }
 
-export class PullRequestLoginDescriptionDateOutput {
-  readonly number: number;
-  readonly login: string;
-  readonly description: string;
-  readonly mergedAt: string;
-
-  constructor(
-    number: number,
-    login: string,
-    description: string,
-    mergedAt: string
-  ) {
-    this.number = number;
-    this.login = login;
-    this.description = description;
-    this.mergedAt = mergedAt;
-  }
-}
-
 export class ConcreteGithubService implements GithubService {
   private readonly octokit: Octokit;
 
@@ -94,11 +84,11 @@ export class ConcreteGithubService implements GithubService {
     ).pipe(map((response) => response.data.map((pull) => pull.title)));
   }
 
-  pullRequestLoginDescriptionDate(
+  pullRequestData(
     owner: string,
     repo: string,
     number: number
-  ): Observable<PullRequestLoginDescriptionDateOutput> {
+  ): Observable<PullRequestData> {
     return from(
       this.octokit.pulls.get({
         owner,
@@ -108,13 +98,14 @@ export class ConcreteGithubService implements GithubService {
       })
     ).pipe(
       map(
-        (response) =>
-          new PullRequestLoginDescriptionDateOutput(
-            number,
-            response.data.user.login ?? "",
-            response.data.body ?? "",
-            response.data.merged_at
-          )
+        (response): PullRequestData => ({
+          number: number,
+          login: response.data.user.login,
+          mergedAt: response.data.merged_at,
+          description: response.data.body,
+          url: response.data.html_url,
+          authorImageUrl: response.data.user.avatar_url
+        })
       )
     );
   }

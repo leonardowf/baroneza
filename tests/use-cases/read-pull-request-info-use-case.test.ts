@@ -2,7 +2,7 @@ import { GithubPullRequestInfoUseCase } from '../../src/use-cases/read-pull-requ
 import { mock, instance, when, anything, verify } from 'ts-mockito';
 import {
   GithubService,
-  PullRequestLoginDescriptionDateOutput
+  PullRequestData
 } from '../../src/services/github-service';
 import { of, throwError } from 'rxjs';
 
@@ -12,15 +12,15 @@ describe('The read pull request info use case', () => {
     const githubService = instance(githubServiceMock);
 
     when(
-      githubServiceMock.pullRequestLoginDescriptionDate('owner', 'repo', 123)
+      githubServiceMock.pullRequestData('owner', 'repo', 123)
     ).thenReturn(
       of(
-        new PullRequestLoginDescriptionDateOutput(
-          123,
-          'login',
-          'description',
-          'mergedAt'
-        )
+        {
+          number: 123,
+          login: 'login',
+          description: 'description',
+          mergedAt: 'mergedAt'
+        }
       )
     );
 
@@ -34,7 +34,7 @@ describe('The read pull request info use case', () => {
         expect(result.pullRequests[0].identifier).toEqual(123);
 
         verify(
-          githubServiceMock.pullRequestLoginDescriptionDate(
+          githubServiceMock.pullRequestData(
             anything(),
             anything(),
             anything()
@@ -50,17 +50,17 @@ describe('The read pull request info use case', () => {
     const githubService = instance(githubServiceMock);
 
     when(
-      githubServiceMock.pullRequestLoginDescriptionDate('owner', 'repo', 123)
+      githubServiceMock.pullRequestData('owner', 'repo', 123)
     )
       .thenReturn(throwError('Error'))
       .thenReturn(
         of(
-          new PullRequestLoginDescriptionDateOutput(
-            123,
-            'login',
-            'description',
-            'mergedAt'
-          )
+          {
+            number: 123,
+            login: 'login',
+            description: 'description',
+            mergedAt: 'mergedAt'
+          }
         )
       );
 
@@ -74,7 +74,7 @@ describe('The read pull request info use case', () => {
         expect(result.pullRequests[0].description).toEqual('description');
         expect(result.pullRequests[0].identifier).toEqual(123);
         verify(
-          githubServiceMock.pullRequestLoginDescriptionDate(
+          githubServiceMock.pullRequestData(
             anything(),
             anything(),
             anything()

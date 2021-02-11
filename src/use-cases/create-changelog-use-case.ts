@@ -80,7 +80,9 @@ export class GithubCreateChangelogUseCase implements CreateChangelogUseCase {
                       a,
                       pullRequest.pullRequest.author,
                       pullRequest.pullRequest.date,
-                      pullRequest.pullRequest.identifier.toString()
+                      pullRequest.pullRequest.identifier.toString(),
+                      pullRequest.pullRequest.url,
+                      pullRequest.pullRequest.authorImageUrl
                     )
                 )
               );
@@ -91,7 +93,9 @@ export class GithubCreateChangelogUseCase implements CreateChangelogUseCase {
                       a,
                       pullRequest.pullRequest.author,
                       pullRequest.pullRequest.date,
-                      pullRequest.pullRequest.identifier.toString()
+                      pullRequest.pullRequest.identifier.toString(),
+                      pullRequest.pullRequest.url,
+                      pullRequest.pullRequest.authorImageUrl
                     )
                 )
               );
@@ -102,7 +106,9 @@ export class GithubCreateChangelogUseCase implements CreateChangelogUseCase {
                       a,
                       pullRequest.pullRequest.author,
                       pullRequest.pullRequest.date,
-                      pullRequest.pullRequest.identifier.toString()
+                      pullRequest.pullRequest.identifier.toString(),
+                      pullRequest.pullRequest.url,
+                      pullRequest.pullRequest.authorImageUrl
                     )
                 )
               );
@@ -113,7 +119,9 @@ export class GithubCreateChangelogUseCase implements CreateChangelogUseCase {
                       a,
                       pullRequest.pullRequest.author,
                       pullRequest.pullRequest.date,
-                      pullRequest.pullRequest.identifier.toString()
+                      pullRequest.pullRequest.identifier.toString(),
+                      pullRequest.pullRequest.url,
+                      pullRequest.pullRequest.authorImageUrl
                     )
                 )
               );
@@ -124,7 +132,9 @@ export class GithubCreateChangelogUseCase implements CreateChangelogUseCase {
                       a,
                       pullRequest.pullRequest.author,
                       pullRequest.pullRequest.date,
-                      pullRequest.pullRequest.identifier.toString()
+                      pullRequest.pullRequest.identifier.toString(),
+                      pullRequest.pullRequest.url,
+                      pullRequest.pullRequest.authorImageUrl
                     )
                 )
               );
@@ -135,7 +145,9 @@ export class GithubCreateChangelogUseCase implements CreateChangelogUseCase {
                       a,
                       pullRequest.pullRequest.author,
                       pullRequest.pullRequest.date,
-                      pullRequest.pullRequest.identifier.toString()
+                      pullRequest.pullRequest.identifier.toString(),                      
+                      pullRequest.pullRequest.url,
+                      pullRequest.pullRequest.authorImageUrl
                     )
                 )
               );

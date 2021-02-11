@@ -1,7 +1,7 @@
 import { Observable, of, forkJoin } from 'rxjs';
 import {
   GithubService,
-  PullRequestLoginDescriptionDateOutput
+  PullRequestData
 } from '../services/github-service';
 import { catchError, map } from 'rxjs/operators';
 
@@ -25,17 +25,23 @@ export class PullRequestInfo {
   description: string;
   date: string;
   identifier: number;
+  url: string;
+  authorImageUrl: string;
 
   constructor(
     author: string,
     description: string,
     date: string,
-    identifier: number
+    identifier: number,
+    url: string,
+    authorImageUrl: string
   ) {
     this.author = author;
     this.description = description;
     this.date = date;
     this.identifier = identifier;
+    this.url = url
+    this.authorImageUrl = authorImageUrl
   }
 }
 
@@ -55,7 +61,7 @@ export class GithubPullRequestInfoUseCase
   ): Observable<ReadPullRequestInfoUseCaseOutput> {
     const infos = pullRequestNumbers.map((number) =>
       this.githubService
-        .pullRequestLoginDescriptionDate(this.owner, repo, number)
+        .pullRequestData(this.owner, repo, number)
         .pipe(catchError(() => of(null)))
     );
 
@@ -64,7 +70,7 @@ export class GithubPullRequestInfoUseCase
     const succesfulPullRequestInfo = fetchInfos.pipe(
       map((descriptions) => {
         return descriptions.filter(
-          (x): x is PullRequestLoginDescriptionDateOutput => x !== null
+          (x): x is PullRequestData => x !== null
         );
       })
     );
@@ -74,7 +80,7 @@ export class GithubPullRequestInfoUseCase
         map((loginDescriptionDates) => {
           return loginDescriptionDates.map(
             (x) =>
-              new PullRequestInfo(x.login, x.description, x.mergedAt, x.number)
+              new PullRequestInfo(x.login, x.description, x.mergedAt, x.number, x.url, x.authorImageUrl)
           );
         })
       )
