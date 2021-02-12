@@ -7,9 +7,26 @@ import {
   KeepChangelogBuilder,
   KeepChangelogItem
 } from '../workers/keep-changelog-builder/keep-changelog-builder';
+import { Block } from '@slack/web-api';
+
+export type KnownChangelogType = "markdown" | "blocks"
+
+export interface ChangelogType {
+  readonly type: KnownChangelogType
+}
+
+export interface BlockChangelog extends ChangelogType {
+  type: "markdown"
+  content: Block[]
+}
+
+export interface MarkdownChangelog extends ChangelogType {
+  type: "markdown"
+  content: string
+}
 
 export interface CreateChangelogUseCase {
-  execute(input: CreateChangelogInput): Observable<string | undefined>;
+  execute(input: CreateChangelogInput): Observable<CreateChangelogOutput | undefined>;
 }
 
 export class CreateChangelogInput {
@@ -24,27 +41,33 @@ export class CreateChangelogInput {
   }
 }
 
-export class CreateChangelogOutput {}
+export interface CreateChangelogOutput {
+  readonly blocks: BlockChangelog
+  readonly markdown: MarkdownChangelog
+}
 
 export class GithubCreateChangelogUseCase implements CreateChangelogUseCase {
   private readonly pullRequestNumberExtractor: PullRequestNumberExtractor;
   private readonly pullRequestInfoUseCase: ReadPullRequestInfoUseCase;
   private readonly keepChangelogParser: KeepChangelogParser;
-  private readonly keepChangelogBuilder: KeepChangelogBuilder<string>;
+  private readonly markdownKeepChangelogBuilder: KeepChangelogBuilder<string>;
+  private readonly blocksKeepChangelogBuilder: KeepChangelogBuilder<Block[]>;
 
   constructor(
     pullRequestNumberExtractor: PullRequestNumberExtractor,
     pullRequestInfoUseCase: ReadPullRequestInfoUseCase,
     keepChangelogParser: KeepChangelogParser,
-    keepChangelogBuilder: KeepChangelogBuilder<string>
+    keepChangelogBuilder: KeepChangelogBuilder<string>,
+    blocksKeepChangelogBuilder: KeepChangelogBuilder<Block[]>
   ) {
     this.pullRequestNumberExtractor = pullRequestNumberExtractor;
     this.pullRequestInfoUseCase = pullRequestInfoUseCase;
     this.keepChangelogParser = keepChangelogParser;
-    this.keepChangelogBuilder = keepChangelogBuilder;
+    this.markdownKeepChangelogBuilder = keepChangelogBuilder;
+    this.blocksKeepChangelogBuilder = blocksKeepChangelogBuilder
   }
 
-  execute(input: CreateChangelogInput): Observable<string | undefined> {
+  execute(input: CreateChangelogInput): Observable<CreateChangelogOutput | undefined> {
     return this.pullRequestNumberExtractor
       .extract(input.pullRequestNumber, input.repository)
       .pipe(
@@ -154,15 +177,21 @@ export class GithubCreateChangelogUseCase implements CreateChangelogUseCase {
             }
           });
 
-          return this.keepChangelogBuilder.build(
-            input.version,
-            added,
-            changed,
-            deprecated,
-            removed,
-            fixed,
-            security
-          );
+          const blocks = this.blocksKeepChangelogBuilder.build(input.version, added, changed, deprecated, removed, fixed, security)
+          const markdown = this.markdownKeepChangelogBuilder.build(input.version, added, changed, deprecated, removed, fixed, security)
+          
+          if (blocks === undefined) {
+            return undefined
+          }
+
+          if (markdown === undefined) {
+            return undefined
+          }
+
+          return {
+            blocks: { type: "markdown", content: blocks},
+            markdown: { type: "markdown", content: markdown}
+          }
         })
       );
   }

@@ -1,14 +1,47 @@
-import { Observable, from } from 'rxjs';
-import { WebClient } from '@slack/web-api';
+import { Observable, from, of } from 'rxjs';
+import { Block, WebClient } from '@slack/web-api';
 import { map } from 'rxjs/operators';
 
-export class MessageSenderInput {
-  channel: string;
-  text: string;
+export interface MessageSenderInput<T> {
+  destination: string
+  content: T
+}
 
-  constructor(channel: string, text: string) {
-    this.channel = channel;
-    this.text = text;
+export interface MessageSender<T> {
+  send(message: MessageSenderInput<T>): Observable<MessageSenderOutput>
+}
+
+export type KnownMessageType = string | Block[]
+
+export class SlackMessageSender implements MessageSender<(KnownMessageType)> {
+  private webClient: WebClient;
+
+  constructor(webClient: WebClient) {
+    this.webClient = webClient;
+  }
+
+  send(message: MessageSenderInput<(KnownMessageType)>): Observable<MessageSenderOutput> {
+    switch (typeof message.content) {
+      case 'string':
+        return from(this.webClient.chat.postMessage({
+          channel: message.destination,
+          text: message.content
+        })).pipe(map(
+          (response) => {
+            return new MessageSenderOutput(response.ts as string, response.channel as string);
+          }
+        ))
+      default:
+        return from(this.webClient.chat.postMessage({
+          blocks: message.content,
+          channel: message.destination,
+          text: "blocks"
+        })).pipe(map(
+          (response) => {
+            return new MessageSenderOutput(response.ts as string, response.channel as string);
+          }
+        ))
+    }
   }
 }
 
@@ -19,30 +52,5 @@ export class MessageSenderOutput {
   constructor(messageIdentifier: string, channelIdentifier: string) {
     this.messageIdentifier = messageIdentifier;
     this.channelIdentifier = channelIdentifier;
-  }
-}
-
-export interface MessageSender {
-  send(input: MessageSenderInput): Observable<MessageSenderOutput>;
-}
-
-export class SlackMessageSender implements MessageSender {
-  private webClient: WebClient;
-
-  constructor(webClient: WebClient) {
-    this.webClient = webClient;
-  }
-
-  send(input: MessageSenderInput): Observable<MessageSenderOutput> {
-    return from(
-      this.webClient.chat.postMessage({
-        channel: input.channel,
-        text: input.text
-      })
-    ).pipe(
-      map((x) => {
-        return new MessageSenderOutput(x.ts as string, x.channel as string);
-      })
-    );
   }
 }

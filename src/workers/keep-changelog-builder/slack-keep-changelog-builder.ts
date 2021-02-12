@@ -87,7 +87,7 @@ export class SlackKeepChangelogBuilder implements KeepChangelogBuilder<Block[]> 
     }
 
     if (deprecated.length > 0) {
-      blocks.push(makeSection(":sparkles: *Deprecated*"))
+      blocks.push(makeSection(":wastebasket: *Deprecated*"))
       deprecated.map(makeContext).forEach((value) => blocks.push(value))
     }
 
