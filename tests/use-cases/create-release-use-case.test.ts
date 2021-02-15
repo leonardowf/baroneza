@@ -18,7 +18,8 @@ import {
 } from '../../src/use-cases/tag-use-case';
 import {
   CreateChangelogUseCase,
-  CreateChangelogInput
+  CreateChangelogInput,
+  CreateChangelogOutput
 } from '../../src/use-cases/create-changelog-use-case';
 import { ReleasePageCreator } from '../../src/workers/release-page-creator';
 import { PullRequestDescriptionWriter } from '../../src/workers/pull-request-description-writer';
@@ -27,7 +28,6 @@ import { mock, instance, when, deepEqual } from 'ts-mockito';
 import { of } from 'rxjs';
 import {
   MessageSender,
-  MessageSenderInput,
   MessageSenderOutput
 } from '../../src/workers/message-sender';
 import {
@@ -35,6 +35,7 @@ import {
   CreateMilestoneUseCaseInput,
   CreateMilestoneUseCaseOutput
 } from '../../src/use-cases/create-milestone-use-case';
+import { Block } from '@slack/web-api';
 
 describe('the create release use case', () => {
   it('executes correctly', (done) => {
@@ -48,7 +49,7 @@ describe('the create release use case', () => {
     >();
     const createMilestoneUseCaseMock = mock<CreateMilestoneUseCase>();
 
-    const messageSenderMock = mock<MessageSender>();
+    const messageSenderMock = mock<MessageSender<Block[]>>();
 
     when(
       createBranchUseCaseMock.execute(
@@ -62,6 +63,11 @@ describe('the create release use case', () => {
       )
     ).thenReturn(of(new CreateBranchUseCaseOutput()));
 
+    const createChangelogOutput: CreateChangelogOutput = {
+      blocks: { type: 'blocks', content: [] },
+      markdown: { type: 'markdown', content: 'changelog' }
+    };
+
     when(
       pullRequestCreatorMock.create(
         'title',
@@ -73,7 +79,13 @@ describe('the create release use case', () => {
     when(
       tagUseCaseMock.execute(
         deepEqual(
-          new TagUseCaseInput(123, 'projectTag', 'project', 'repository', ' suffix')
+          new TagUseCaseInput(
+            123,
+            'projectTag',
+            'project',
+            'repository',
+            ' suffix'
+          )
         )
       )
     ).thenReturn(of(new TagUseCaseOutput([], [])));
@@ -81,7 +93,7 @@ describe('the create release use case', () => {
       createChangelogUseCaseMock.execute(
         deepEqual(new CreateChangelogInput(123, 'repository', 'projectTag'))
       )
-    ).thenReturn(of('changelog'));
+    ).thenReturn(of(createChangelogOutput));
     when(
       pullRequestDescriptionWriterMock.write(123, 'repository', 'changelog')
     ).thenReturn(of(void 0));
@@ -95,9 +107,7 @@ describe('the create release use case', () => {
     ).thenReturn(of(void 0));
 
     when(
-      messageSenderMock.send(
-        deepEqual(new MessageSenderInput('channel', 'changelog'))
-      )
+      messageSenderMock.send(deepEqual({ destination: 'channel', content: [] }))
     ).thenReturn(of(new MessageSenderOutput('123', '456')));
 
     const createMilestoneUseCaseInput = new CreateMilestoneUseCaseInput(

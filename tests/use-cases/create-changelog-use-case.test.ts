@@ -11,20 +11,24 @@ import {
 import {
   KeepChangelogBuilder,
   KeepChangelogItem
-} from '../../src/workers/keep-changelog-builder';
+} from '../../src/workers/keep-changelog-builder/keep-changelog-builder';
 import {
   ReadPullRequestInfoUseCase,
   ReadPullRequestInfoUseCaseOutput,
   PullRequestInfo
 } from '../../src/use-cases/read-pull-request-info-use-case';
 import { of } from 'rxjs';
+import { Block } from '@slack/web-api';
 
 describe('the create changelog use case', () => {
   it('executes as expected', (done) => {
     const pullRequestNumberExtractorMock = mock<PullRequestNumberExtractor>();
     const pullRequestInfoUseCaseMock = mock<ReadPullRequestInfoUseCase>();
     const keepChangelogParserMock = mock<KeepChangelogParser>();
-    const keepChangelogBuilderMock = mock<KeepChangelogBuilder>();
+    const keepChangelogBuilderMock = mock<KeepChangelogBuilder<string>>();
+    const blocksKeepChangelogBuilderMock = mock<
+      KeepChangelogBuilder<Block[]>
+    >();
 
     when(pullRequestNumberExtractorMock.extract(123, 'repository')).thenReturn(
       of([1, 2])
@@ -34,7 +38,14 @@ describe('the create changelog use case', () => {
     ).thenReturn(
       of(
         new ReadPullRequestInfoUseCaseOutput([
-          new PullRequestInfo('Leo', 'hello', '10/10/10', 123)
+          new PullRequestInfo(
+            'Leo',
+            'hello',
+            '10/10/10',
+            123,
+            'www.google.com',
+            'www.image.com'
+          )
         ])
       )
     );
@@ -42,14 +53,134 @@ describe('the create changelog use case', () => {
       new KeepChangelogOutput(['added'], ['b'], ['c'], ['d'], ['e'], ['f'])
     );
     when(
+      blocksKeepChangelogBuilderMock.build(
+        '1.0.0',
+        deepEqual([
+          new KeepChangelogItem(
+            'added',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ]),
+        deepEqual([
+          new KeepChangelogItem(
+            'b',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ]),
+        deepEqual([
+          new KeepChangelogItem(
+            'c',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ]),
+        deepEqual([
+          new KeepChangelogItem(
+            'd',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ]),
+        deepEqual([
+          new KeepChangelogItem(
+            'e',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ]),
+        deepEqual([
+          new KeepChangelogItem(
+            'f',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ])
+      )
+    ).thenReturn(new Array<Block>());
+
+    when(
       keepChangelogBuilderMock.build(
         '1.0.0',
-        deepEqual([new KeepChangelogItem('added', 'Leo', '10/10/10', '123')]),
-        deepEqual([new KeepChangelogItem('b', 'Leo', '10/10/10', '123')]),
-        deepEqual([new KeepChangelogItem('c', 'Leo', '10/10/10', '123')]),
-        deepEqual([new KeepChangelogItem('d', 'Leo', '10/10/10', '123')]),
-        deepEqual([new KeepChangelogItem('e', 'Leo', '10/10/10', '123')]),
-        deepEqual([new KeepChangelogItem('f', 'Leo', '10/10/10', '123')])
+        deepEqual([
+          new KeepChangelogItem(
+            'added',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ]),
+        deepEqual([
+          new KeepChangelogItem(
+            'b',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ]),
+        deepEqual([
+          new KeepChangelogItem(
+            'c',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ]),
+        deepEqual([
+          new KeepChangelogItem(
+            'd',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ]),
+        deepEqual([
+          new KeepChangelogItem(
+            'e',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ]),
+        deepEqual([
+          new KeepChangelogItem(
+            'f',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ])
       )
     ).thenReturn('success');
 
@@ -57,19 +188,22 @@ describe('the create changelog use case', () => {
     const pullRequestInfoUseCase = instance(pullRequestInfoUseCaseMock);
     const keepChangelogParser = instance(keepChangelogParserMock);
     const keepChangelogBuilder = instance(keepChangelogBuilderMock);
+    const blockKeepChangelogBuilder = instance(blocksKeepChangelogBuilderMock);
 
     const sut = new GithubCreateChangelogUseCase(
       pullRequestNumberExtractor,
       pullRequestInfoUseCase,
       keepChangelogParser,
-      keepChangelogBuilder
+      keepChangelogBuilder,
+      blockKeepChangelogBuilder
     );
 
     sut
       .execute(new CreateChangelogInput(123, 'repository', '1.0.0'))
       .subscribe({
         next: (result) => {
-          expect(result).toEqual('success');
+          expect(result?.blocks.content).toEqual([]);
+          expect(result?.markdown.content).toEqual('success');
         },
         complete: done
       });
@@ -79,7 +213,8 @@ describe('the create changelog use case', () => {
     const pullRequestNumberExtractorMock = mock<PullRequestNumberExtractor>();
     const pullRequestInfoUseCaseMock = mock<ReadPullRequestInfoUseCase>();
     const keepChangelogParserMock = mock<KeepChangelogParser>();
-    const keepChangelogBuilderMock = mock<KeepChangelogBuilder>();
+    const keepChangelogBuilderMock = mock<KeepChangelogBuilder<string>>();
+    const blockKeepChangelogBuilderMock = mock<KeepChangelogBuilder<Block[]>>();
 
     when(pullRequestNumberExtractorMock.extract(123, 'repository')).thenReturn(
       of([1, 2])
@@ -89,7 +224,14 @@ describe('the create changelog use case', () => {
     ).thenReturn(
       of(
         new ReadPullRequestInfoUseCaseOutput([
-          new PullRequestInfo('Leo', 'hello', '10/10/10', 123)
+          new PullRequestInfo(
+            'Leo',
+            'hello',
+            '10/10/10',
+            123,
+            'www.google.com',
+            'www.image.com'
+          )
         ])
       )
     );
@@ -110,12 +252,14 @@ describe('the create changelog use case', () => {
     const pullRequestInfoUseCase = instance(pullRequestInfoUseCaseMock);
     const keepChangelogParser = instance(keepChangelogParserMock);
     const keepChangelogBuilder = instance(keepChangelogBuilderMock);
+    const blockKeepChangelogBuilder = instance(blockKeepChangelogBuilderMock);
 
     const sut = new GithubCreateChangelogUseCase(
       pullRequestNumberExtractor,
       pullRequestInfoUseCase,
       keepChangelogParser,
-      keepChangelogBuilder
+      keepChangelogBuilder,
+      blockKeepChangelogBuilder
     );
 
     sut

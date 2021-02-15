@@ -1,42 +1,85 @@
-import {
-  ConcreteKeepChangelogBuilder,
-  KeepChangelogItem
-} from '../../src/workers/keep-changelog-builder';
+import { KeepChangelogItem } from '../../src/workers/keep-changelog-builder/keep-changelog-builder';
+import { MarkdownKeepChangelogBuilder } from '../../src/workers/keep-changelog-builder/markdown-keep-changelog-builder';
 
 describe('the keep changelog builder', () => {
   it('empty returns undefined', () => {
-    const keepChangelogBuilder = new ConcreteKeepChangelogBuilder();
+    const keepChangelogBuilder = new MarkdownKeepChangelogBuilder();
     const result = keepChangelogBuilder.build('1.0.0', [], [], [], [], [], []);
 
     expect(result).toBeUndefined();
   });
 
   it('creates the correct changelog', () => {
-    const keepChangelogBuilder = new ConcreteKeepChangelogBuilder();
+    const keepChangelogBuilder = new MarkdownKeepChangelogBuilder();
 
     const result = keepChangelogBuilder.build(
       '1.0.0',
-      [new KeepChangelogItem('Amazing feature', 'Bruno', '10/10/10', '12')],
-      [new KeepChangelogItem('Feature flag name', 'Giorno', '12/10/10', '32')],
-      [new KeepChangelogItem('Deprecated API call', 'Dio', '13/10/10', '43')],
+      [
+        new KeepChangelogItem(
+          'Amazing feature',
+          'Bruno',
+          '10/10/10',
+          '12',
+          'www.pudim.com.br',
+          'http://www.image.com/'
+        )
+      ],
+      [
+        new KeepChangelogItem(
+          'Feature flag name',
+          'Giorno',
+          '12/10/10',
+          '32',
+          'www.pudim.com.br',
+          'http://www.image.com/'
+        )
+      ],
+      [
+        new KeepChangelogItem(
+          'Deprecated API call',
+          'Dio',
+          '13/10/10',
+          '43',
+          'www.pudim.com.br',
+          'http://www.image.com/'
+        )
+      ],
       [
         new KeepChangelogItem(
           'Removed support of old feature',
           'Joseph',
           '14/10/10',
-          '66'
+          '66',
+          'www.pudim.com.br',
+          'http://www.image.com/'
         )
       ],
       [
-        new KeepChangelogItem('NPE', 'Narancia', '14/10/10', '123'),
-        new KeepChangelogItem('Memory leak', 'Abacchio', '17/10/10', '67')
+        new KeepChangelogItem(
+          'NPE',
+          'Narancia',
+          '14/10/10',
+          '123',
+          'www.pudim.com.br',
+          'http://www.image.com/'
+        ),
+        new KeepChangelogItem(
+          'Memory leak',
+          'Abacchio',
+          '17/10/10',
+          '67',
+          'www.pudim.com.br',
+          'http://www.image.com/'
+        )
       ],
       [
         new KeepChangelogItem(
           '- Secures token with BASE32',
           'Mista',
           '18/10/10',
-          '98'
+          '98',
+          'www.pudim.com.br',
+          'http://www.image.com/'
         )
       ]
     );

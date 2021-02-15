@@ -12,7 +12,7 @@ import {
 } from './create-changelog-use-case';
 import { ReleasePageCreator } from '../workers/release-page-creator';
 import { PullRequestDescriptionWriter } from '../workers/pull-request-description-writer';
-import { MessageSender, MessageSenderInput } from '../workers/message-sender';
+import { KnownMessageType, MessageSender } from '../workers/message-sender';
 import {
   CreateMilestoneUseCase,
   CreateMilestoneUseCaseInput
@@ -61,7 +61,7 @@ export class CreateReleaseUseCase {
   private readonly createChangelogUseCase: CreateChangelogUseCase;
   private readonly releasePageCreator: ReleasePageCreator;
   private readonly pullRequestDescriptionWriter: PullRequestDescriptionWriter;
-  private readonly messageSender: MessageSender;
+  private readonly messageSender: MessageSender<KnownMessageType>;
   private readonly createMilestoneUseCase: CreateMilestoneUseCase;
 
   constructor(
@@ -71,7 +71,7 @@ export class CreateReleaseUseCase {
     createChangelogUseCase: CreateChangelogUseCase,
     releasePageCreator: ReleasePageCreator,
     pullRequestDescriptionWriter: PullRequestDescriptionWriter,
-    messageSender: MessageSender,
+    messageSender: MessageSender<KnownMessageType>,
     createMilestoneUseCase: CreateMilestoneUseCase
   ) {
     this.createBranchUseCase = createBranchUseCase;
@@ -143,11 +143,14 @@ export class CreateReleaseUseCase {
                       writeOnPR = this.pullRequestDescriptionWriter.write(
                         x.pullRequestNumber,
                         input.repository,
-                        changelog
+                        changelog.markdown.content
                       );
 
                       messageSender = this.messageSender
-                        .send(new MessageSenderInput(input.channel, changelog))
+                        .send({
+                          destination: input.channel,
+                          content: changelog.blocks.content
+                        })
                         .pipe(mapTo(void 0));
                     }
 
@@ -156,7 +159,7 @@ export class CreateReleaseUseCase {
                         input.projectTag,
                         input.projectTag,
                         input.repository,
-                        changelog
+                        changelog?.markdown.content
                       ),
                       writeOnPR,
                       messageSender

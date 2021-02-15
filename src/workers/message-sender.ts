@@ -1,15 +1,10 @@
 import { Observable, from } from 'rxjs';
-import { WebClient } from '@slack/web-api';
+import { Block, WebClient } from '@slack/web-api';
 import { map } from 'rxjs/operators';
 
-export class MessageSenderInput {
-  channel: string;
-  text: string;
-
-  constructor(channel: string, text: string) {
-    this.channel = channel;
-    this.text = text;
-  }
+export interface MessageSenderInput<T> {
+  destination: string;
+  content: T;
 }
 
 export class MessageSenderOutput {
@@ -22,27 +17,52 @@ export class MessageSenderOutput {
   }
 }
 
-export interface MessageSender {
-  send(input: MessageSenderInput): Observable<MessageSenderOutput>;
+export interface MessageSender<T> {
+  send(message: MessageSenderInput<T>): Observable<MessageSenderOutput>;
 }
 
-export class SlackMessageSender implements MessageSender {
+export type KnownMessageType = string | Block[];
+
+export class SlackMessageSender implements MessageSender<KnownMessageType> {
   private webClient: WebClient;
 
   constructor(webClient: WebClient) {
     this.webClient = webClient;
   }
 
-  send(input: MessageSenderInput): Observable<MessageSenderOutput> {
-    return from(
-      this.webClient.chat.postMessage({
-        channel: input.channel,
-        text: input.text
-      })
-    ).pipe(
-      map((x) => {
-        return new MessageSenderOutput(x.ts as string, x.channel as string);
-      })
-    );
+  send(
+    message: MessageSenderInput<KnownMessageType>
+  ): Observable<MessageSenderOutput> {
+    switch (typeof message.content) {
+      case 'string':
+        return from(
+          this.webClient.chat.postMessage({
+            channel: message.destination,
+            text: message.content
+          })
+        ).pipe(
+          map((response) => {
+            return new MessageSenderOutput(
+              response.ts as string,
+              response.channel as string
+            );
+          })
+        );
+      default:
+        return from(
+          this.webClient.chat.postMessage({
+            blocks: message.content,
+            channel: message.destination,
+            text: 'blocks'
+          })
+        ).pipe(
+          map((response) => {
+            return new MessageSenderOutput(
+              response.ts as string,
+              response.channel as string
+            );
+          })
+        );
+    }
   }
 }

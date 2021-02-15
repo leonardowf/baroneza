@@ -29,12 +29,13 @@ import { GithubCreateChangelogUseCase } from './use-cases/create-changelog-use-c
 import { GithubPullRequestNumberExtractor } from './workers/pr-number-extractor';
 import { GithubPullRequestInfoUseCase } from './use-cases/read-pull-request-info-use-case';
 import { ConcreteKeepChangelogParser } from './workers/keep-changelog-parser';
-import { ConcreteKeepChangelogBuilder } from './workers/keep-changelog-builder';
 import { GithubReleasePageCreator } from './workers/release-page-creator';
 import { GithubPullRequestDescriptionWriter } from './workers/pull-request-description-writer';
 import { SlackAskConfirmationUseCase } from './use-cases/ask-confirmation-use-case';
 import { GithubCreateMilestoneUseCase } from './use-cases/create-milestone-use-case';
 import { GithubMilestoneCreator } from './workers/milestone-creator';
+import { MarkdownKeepChangelogBuilder } from './workers/keep-changelog-builder/markdown-keep-changelog-builder';
+import { SlackKeepChangelogBuilder } from './workers/keep-changelog-builder/slack-keep-changelog-builder';
 
 export class Dependencies
   implements
@@ -94,13 +95,15 @@ export class Dependencies
     this.config.githubOwner
   );
   keepChangelogParser = new ConcreteKeepChangelogParser();
-  keepChangelogBuilder = new ConcreteKeepChangelogBuilder();
+  markdownKeepChangelogBuilder = new MarkdownKeepChangelogBuilder();
+  blocksKeepChangelogBuilder = new SlackKeepChangelogBuilder();
 
   createChangeLogUseCase = new GithubCreateChangelogUseCase(
     this.pullRequestNumberExtractor,
     this.pullRequestInfoUseCase,
     this.keepChangelogParser,
-    this.keepChangelogBuilder
+    this.markdownKeepChangelogBuilder,
+    this.blocksKeepChangelogBuilder
   );
 
   releasePageCreator = new GithubReleasePageCreator(
