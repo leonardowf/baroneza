@@ -16,7 +16,7 @@ export interface ChangelogType {
 }
 
 export interface BlockChangelog extends ChangelogType {
-  type: "markdown"
+  type: "blocks"
   content: Block[]
 }
 
@@ -189,7 +189,7 @@ export class GithubCreateChangelogUseCase implements CreateChangelogUseCase {
           }
 
           return {
-            blocks: { type: "markdown", content: blocks},
+            blocks: { type: "blocks", content: blocks},
             markdown: { type: "markdown", content: markdown}
           }
         })

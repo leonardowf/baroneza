@@ -39,13 +39,13 @@ describe('The ask confirmation use case', () => {
   );
 
   it('waits the timeout and does not confirm with empty array', () => {
-    const messageSenderMock = mock<MessageSender>();
+    const messageSenderMock = mock<MessageSender<string>>();
     const reactionsReaderMock = mock<ReactionsReader>();
     const confirmationReaction = ':100:';
     const secondsTimeout = 7;
 
     scheduler.run((helpers) => {
-      const messageSenderInput = new MessageSenderInput('channel', 'question');
+      const messageSenderInput: MessageSenderInput<string> = { destination: "channel", content: "question" };
       const messageSenderOutput = new MessageSenderOutput(
         'messageIdentifier',
         'channelIdentifier'
@@ -86,13 +86,13 @@ describe('The ask confirmation use case', () => {
   });
 
   it('waits the timeout and confirm with the correct reaction', () => {
-    const messageSenderMock = mock<MessageSender>();
+    const messageSenderMock = mock<MessageSender<string>>();
     const reactionsReaderMock = mock<ReactionsReader>();
     const confirmationReaction = ':100:';
     const secondsTimeout = 7;
 
     scheduler.run((helpers) => {
-      const messageSenderInput = new MessageSenderInput('channel', 'question');
+      const messageSenderInput: MessageSenderInput<string> = { destination: "channel", content: "question" };
       const messageSenderOutput = new MessageSenderOutput(
         'messageIdentifier',
         'channelIdentifier'

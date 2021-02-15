@@ -19,7 +19,10 @@ describe('The read pull request info use case', () => {
           number: 123,
           login: 'login',
           description: 'description',
-          mergedAt: 'mergedAt'
+          mergedAt: 'mergedAt',
+          url: "www.pudim.com.br",
+          authorImageUrl: "www.image.com"
+
         }
       )
     );
@@ -59,7 +62,9 @@ describe('The read pull request info use case', () => {
             number: 123,
             login: 'login',
             description: 'description',
-            mergedAt: 'mergedAt'
+            mergedAt: 'mergedAt',
+            url: "www.pudim.com.br",
+            authorImageUrl: "www.image.com"
           }
         )
       );
