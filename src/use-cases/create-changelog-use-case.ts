@@ -9,24 +9,26 @@ import {
 } from '../workers/keep-changelog-builder/keep-changelog-builder';
 import { Block } from '@slack/web-api';
 
-export type KnownChangelogType = "markdown" | "blocks"
+export type KnownChangelogType = 'markdown' | 'blocks';
 
 export interface ChangelogType {
-  readonly type: KnownChangelogType
+  readonly type: KnownChangelogType;
 }
 
 export interface BlockChangelog extends ChangelogType {
-  type: "blocks"
-  content: Block[]
+  type: 'blocks';
+  content: Block[];
 }
 
 export interface MarkdownChangelog extends ChangelogType {
-  type: "markdown"
-  content: string
+  type: 'markdown';
+  content: string;
 }
 
 export interface CreateChangelogUseCase {
-  execute(input: CreateChangelogInput): Observable<CreateChangelogOutput | undefined>;
+  execute(
+    input: CreateChangelogInput
+  ): Observable<CreateChangelogOutput | undefined>;
 }
 
 export class CreateChangelogInput {
@@ -42,8 +44,8 @@ export class CreateChangelogInput {
 }
 
 export interface CreateChangelogOutput {
-  readonly blocks: BlockChangelog
-  readonly markdown: MarkdownChangelog
+  readonly blocks: BlockChangelog;
+  readonly markdown: MarkdownChangelog;
 }
 
 export class GithubCreateChangelogUseCase implements CreateChangelogUseCase {
@@ -64,10 +66,12 @@ export class GithubCreateChangelogUseCase implements CreateChangelogUseCase {
     this.pullRequestInfoUseCase = pullRequestInfoUseCase;
     this.keepChangelogParser = keepChangelogParser;
     this.markdownKeepChangelogBuilder = keepChangelogBuilder;
-    this.blocksKeepChangelogBuilder = blocksKeepChangelogBuilder
+    this.blocksKeepChangelogBuilder = blocksKeepChangelogBuilder;
   }
 
-  execute(input: CreateChangelogInput): Observable<CreateChangelogOutput | undefined> {
+  execute(
+    input: CreateChangelogInput
+  ): Observable<CreateChangelogOutput | undefined> {
     return this.pullRequestNumberExtractor
       .extract(input.pullRequestNumber, input.repository)
       .pipe(
@@ -168,7 +172,7 @@ export class GithubCreateChangelogUseCase implements CreateChangelogUseCase {
                       a,
                       pullRequest.pullRequest.author,
                       pullRequest.pullRequest.date,
-                      pullRequest.pullRequest.identifier.toString(),                      
+                      pullRequest.pullRequest.identifier.toString(),
                       pullRequest.pullRequest.url,
                       pullRequest.pullRequest.authorImageUrl
                     )
@@ -177,21 +181,37 @@ export class GithubCreateChangelogUseCase implements CreateChangelogUseCase {
             }
           });
 
-          const blocks = this.blocksKeepChangelogBuilder.build(input.version, added, changed, deprecated, removed, fixed, security)
-          const markdown = this.markdownKeepChangelogBuilder.build(input.version, added, changed, deprecated, removed, fixed, security)
-          
+          const blocks = this.blocksKeepChangelogBuilder.build(
+            input.version,
+            added,
+            changed,
+            deprecated,
+            removed,
+            fixed,
+            security
+          );
+          const markdown = this.markdownKeepChangelogBuilder.build(
+            input.version,
+            added,
+            changed,
+            deprecated,
+            removed,
+            fixed,
+            security
+          );
+
           if (blocks === undefined) {
-            return undefined
+            return undefined;
           }
 
           if (markdown === undefined) {
-            return undefined
+            return undefined;
           }
 
           return {
-            blocks: { type: "blocks", content: blocks},
-            markdown: { type: "markdown", content: markdown}
-          }
+            blocks: { type: 'blocks', content: blocks },
+            markdown: { type: 'markdown', content: markdown }
+          };
         })
       );
   }

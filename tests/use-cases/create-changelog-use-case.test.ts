@@ -26,7 +26,9 @@ describe('the create changelog use case', () => {
     const pullRequestInfoUseCaseMock = mock<ReadPullRequestInfoUseCase>();
     const keepChangelogParserMock = mock<KeepChangelogParser>();
     const keepChangelogBuilderMock = mock<KeepChangelogBuilder<string>>();
-    const blocksKeepChangelogBuilderMock = mock<KeepChangelogBuilder<Block[]>>()
+    const blocksKeepChangelogBuilderMock = mock<
+      KeepChangelogBuilder<Block[]>
+    >();
 
     when(pullRequestNumberExtractorMock.extract(123, 'repository')).thenReturn(
       of([1, 2])
@@ -36,7 +38,14 @@ describe('the create changelog use case', () => {
     ).thenReturn(
       of(
         new ReadPullRequestInfoUseCaseOutput([
-          new PullRequestInfo('Leo', 'hello', '10/10/10', 123, "www.google.com", "www.image.com")
+          new PullRequestInfo(
+            'Leo',
+            'hello',
+            '10/10/10',
+            123,
+            'www.google.com',
+            'www.image.com'
+          )
         ])
       )
     );
@@ -46,24 +55,132 @@ describe('the create changelog use case', () => {
     when(
       blocksKeepChangelogBuilderMock.build(
         '1.0.0',
-        deepEqual([new KeepChangelogItem('added', 'Leo', '10/10/10', '123', 'www.google.com', 'www.image.com')]),
-        deepEqual([new KeepChangelogItem('b', 'Leo', '10/10/10', '123', 'www.google.com', 'www.image.com')]),
-        deepEqual([new KeepChangelogItem('c', 'Leo', '10/10/10', '123', 'www.google.com', 'www.image.com')]),
-        deepEqual([new KeepChangelogItem('d', 'Leo', '10/10/10', '123', 'www.google.com', 'www.image.com')]),
-        deepEqual([new KeepChangelogItem('e', 'Leo', '10/10/10', '123', 'www.google.com', 'www.image.com')]),
-        deepEqual([new KeepChangelogItem('f', 'Leo', '10/10/10', '123', 'www.google.com', 'www.image.com')])
+        deepEqual([
+          new KeepChangelogItem(
+            'added',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ]),
+        deepEqual([
+          new KeepChangelogItem(
+            'b',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ]),
+        deepEqual([
+          new KeepChangelogItem(
+            'c',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ]),
+        deepEqual([
+          new KeepChangelogItem(
+            'd',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ]),
+        deepEqual([
+          new KeepChangelogItem(
+            'e',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ]),
+        deepEqual([
+          new KeepChangelogItem(
+            'f',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ])
       )
-    ).thenReturn(new Array<Block>())
+    ).thenReturn(new Array<Block>());
 
     when(
       keepChangelogBuilderMock.build(
         '1.0.0',
-        deepEqual([new KeepChangelogItem('added', 'Leo', '10/10/10', '123', 'www.google.com', 'www.image.com')]),
-        deepEqual([new KeepChangelogItem('b', 'Leo', '10/10/10', '123', 'www.google.com', 'www.image.com')]),
-        deepEqual([new KeepChangelogItem('c', 'Leo', '10/10/10', '123', 'www.google.com', 'www.image.com')]),
-        deepEqual([new KeepChangelogItem('d', 'Leo', '10/10/10', '123', 'www.google.com', 'www.image.com')]),
-        deepEqual([new KeepChangelogItem('e', 'Leo', '10/10/10', '123', 'www.google.com', 'www.image.com')]),
-        deepEqual([new KeepChangelogItem('f', 'Leo', '10/10/10', '123', 'www.google.com', 'www.image.com')])
+        deepEqual([
+          new KeepChangelogItem(
+            'added',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ]),
+        deepEqual([
+          new KeepChangelogItem(
+            'b',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ]),
+        deepEqual([
+          new KeepChangelogItem(
+            'c',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ]),
+        deepEqual([
+          new KeepChangelogItem(
+            'd',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ]),
+        deepEqual([
+          new KeepChangelogItem(
+            'e',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ]),
+        deepEqual([
+          new KeepChangelogItem(
+            'f',
+            'Leo',
+            '10/10/10',
+            '123',
+            'www.google.com',
+            'www.image.com'
+          )
+        ])
       )
     ).thenReturn('success');
 
@@ -85,7 +202,7 @@ describe('the create changelog use case', () => {
       .execute(new CreateChangelogInput(123, 'repository', '1.0.0'))
       .subscribe({
         next: (result) => {
-          expect(result?.blocks.content).toEqual([])
+          expect(result?.blocks.content).toEqual([]);
           expect(result?.markdown.content).toEqual('success');
         },
         complete: done
@@ -107,7 +224,14 @@ describe('the create changelog use case', () => {
     ).thenReturn(
       of(
         new ReadPullRequestInfoUseCaseOutput([
-          new PullRequestInfo('Leo', 'hello', '10/10/10', 123, "www.google.com", "www.image.com")
+          new PullRequestInfo(
+            'Leo',
+            'hello',
+            '10/10/10',
+            123,
+            'www.google.com',
+            'www.image.com'
+          )
         ])
       )
     );

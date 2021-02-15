@@ -12,7 +12,7 @@ import {
 } from './create-changelog-use-case';
 import { ReleasePageCreator } from '../workers/release-page-creator';
 import { PullRequestDescriptionWriter } from '../workers/pull-request-description-writer';
-import { KnownMessageType, MessageSender, MessageSenderInput } from '../workers/message-sender';
+import { KnownMessageType, MessageSender } from '../workers/message-sender';
 import {
   CreateMilestoneUseCase,
   CreateMilestoneUseCaseInput
@@ -147,7 +147,10 @@ export class CreateReleaseUseCase {
                       );
 
                       messageSender = this.messageSender
-                        .send({destination: input.channel, content: changelog.blocks.content})
+                        .send({
+                          destination: input.channel,
+                          content: changelog.blocks.content
+                        })
                         .pipe(mapTo(void 0));
                     }
 

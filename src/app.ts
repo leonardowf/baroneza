@@ -34,6 +34,9 @@ app.post('/createRelease', (req, res) => {
 });
 
 app.post('/startTrain', (req, res) => {
+  res.setTimeout(
+    dependencies.config.secondsToConfirmationTimeout * 1000 + 10000
+  );
   new StartTrainEndpoint(dependencies).execute(req.body).subscribe(
     (x) => res.send(x),
     (error) => {

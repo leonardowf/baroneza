@@ -104,7 +104,6 @@ export class Dependencies
     this.keepChangelogParser,
     this.markdownKeepChangelogBuilder,
     this.blocksKeepChangelogBuilder
-
   );
 
   releasePageCreator = new GithubReleasePageCreator(

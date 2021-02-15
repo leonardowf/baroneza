@@ -45,7 +45,10 @@ describe('The ask confirmation use case', () => {
     const secondsTimeout = 7;
 
     scheduler.run((helpers) => {
-      const messageSenderInput: MessageSenderInput<string> = { destination: "channel", content: "question" };
+      const messageSenderInput: MessageSenderInput<string> = {
+        destination: 'channel',
+        content: 'question'
+      };
       const messageSenderOutput = new MessageSenderOutput(
         'messageIdentifier',
         'channelIdentifier'
@@ -92,7 +95,10 @@ describe('The ask confirmation use case', () => {
     const secondsTimeout = 7;
 
     scheduler.run((helpers) => {
-      const messageSenderInput: MessageSenderInput<string> = { destination: "channel", content: "question" };
+      const messageSenderInput: MessageSenderInput<string> = {
+        destination: 'channel',
+        content: 'question'
+      };
       const messageSenderOutput = new MessageSenderOutput(
         'messageIdentifier',
         'channelIdentifier'

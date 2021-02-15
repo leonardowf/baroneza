@@ -28,7 +28,6 @@ import { mock, instance, when, deepEqual } from 'ts-mockito';
 import { of } from 'rxjs';
 import {
   MessageSender,
-  MessageSenderInput,
   MessageSenderOutput
 } from '../../src/workers/message-sender';
 import {
@@ -65,10 +64,10 @@ describe('the create release use case', () => {
     ).thenReturn(of(new CreateBranchUseCaseOutput()));
 
     const createChangelogOutput: CreateChangelogOutput = {
-      blocks: { type: "blocks", content: []},
-      markdown: { type: "markdown", content: "changelog"}
-    }
-            
+      blocks: { type: 'blocks', content: [] },
+      markdown: { type: 'markdown', content: 'changelog' }
+    };
+
     when(
       pullRequestCreatorMock.create(
         'title',
@@ -80,7 +79,13 @@ describe('the create release use case', () => {
     when(
       tagUseCaseMock.execute(
         deepEqual(
-          new TagUseCaseInput(123, 'projectTag', 'project', 'repository', ' suffix')
+          new TagUseCaseInput(
+            123,
+            'projectTag',
+            'project',
+            'repository',
+            ' suffix'
+          )
         )
       )
     ).thenReturn(of(new TagUseCaseOutput([], [])));
@@ -88,7 +93,7 @@ describe('the create release use case', () => {
       createChangelogUseCaseMock.execute(
         deepEqual(new CreateChangelogInput(123, 'repository', 'projectTag'))
       )
-    ).thenReturn(of(createChangelogOutput))
+    ).thenReturn(of(createChangelogOutput));
     when(
       pullRequestDescriptionWriterMock.write(123, 'repository', 'changelog')
     ).thenReturn(of(void 0));
@@ -102,9 +107,7 @@ describe('the create release use case', () => {
     ).thenReturn(of(void 0));
 
     when(
-      messageSenderMock.send(
-        deepEqual({ destination: 'channel', content: [] })
-      )
+      messageSenderMock.send(deepEqual({ destination: 'channel', content: [] }))
     ).thenReturn(of(new MessageSenderOutput('123', '456')));
 
     const createMilestoneUseCaseInput = new CreateMilestoneUseCaseInput(
@@ -154,7 +157,7 @@ describe('the create release use case', () => {
         )
       )
       .subscribe({
-        error: (error) => {
+        error: () => {
           done.fail();
         },
         complete: done

@@ -1,9 +1,6 @@
 import { GithubPullRequestInfoUseCase } from '../../src/use-cases/read-pull-request-info-use-case';
 import { mock, instance, when, anything, verify } from 'ts-mockito';
-import {
-  GithubService,
-  PullRequestData
-} from '../../src/services/github-service';
+import { GithubService } from '../../src/services/github-service';
 import { of, throwError } from 'rxjs';
 
 describe('The read pull request info use case', () => {
@@ -11,20 +8,15 @@ describe('The read pull request info use case', () => {
     const githubServiceMock = mock<GithubService>();
     const githubService = instance(githubServiceMock);
 
-    when(
-      githubServiceMock.pullRequestData('owner', 'repo', 123)
-    ).thenReturn(
-      of(
-        {
-          number: 123,
-          login: 'login',
-          description: 'description',
-          mergedAt: 'mergedAt',
-          url: "www.pudim.com.br",
-          authorImageUrl: "www.image.com"
-
-        }
-      )
+    when(githubServiceMock.pullRequestData('owner', 'repo', 123)).thenReturn(
+      of({
+        number: 123,
+        login: 'login',
+        description: 'description',
+        mergedAt: 'mergedAt',
+        url: 'www.pudim.com.br',
+        authorImageUrl: 'www.image.com'
+      })
     );
 
     const sut = new GithubPullRequestInfoUseCase(githubService, 'owner');
@@ -37,11 +29,7 @@ describe('The read pull request info use case', () => {
         expect(result.pullRequests[0].identifier).toEqual(123);
 
         verify(
-          githubServiceMock.pullRequestData(
-            anything(),
-            anything(),
-            anything()
-          )
+          githubServiceMock.pullRequestData(anything(), anything(), anything())
         ).once();
       },
       complete: done
@@ -52,21 +40,17 @@ describe('The read pull request info use case', () => {
     const githubServiceMock = mock<GithubService>();
     const githubService = instance(githubServiceMock);
 
-    when(
-      githubServiceMock.pullRequestData('owner', 'repo', 123)
-    )
+    when(githubServiceMock.pullRequestData('owner', 'repo', 123))
       .thenReturn(throwError('Error'))
       .thenReturn(
-        of(
-          {
-            number: 123,
-            login: 'login',
-            description: 'description',
-            mergedAt: 'mergedAt',
-            url: "www.pudim.com.br",
-            authorImageUrl: "www.image.com"
-          }
-        )
+        of({
+          number: 123,
+          login: 'login',
+          description: 'description',
+          mergedAt: 'mergedAt',
+          url: 'www.pudim.com.br',
+          authorImageUrl: 'www.image.com'
+        })
       );
 
     const sut = new GithubPullRequestInfoUseCase(githubService, 'owner');
@@ -79,11 +63,7 @@ describe('The read pull request info use case', () => {
         expect(result.pullRequests[0].description).toEqual('description');
         expect(result.pullRequests[0].identifier).toEqual(123);
         verify(
-          githubServiceMock.pullRequestData(
-            anything(),
-            anything(),
-            anything()
-          )
+          githubServiceMock.pullRequestData(anything(), anything(), anything())
         ).twice();
       },
       complete: done

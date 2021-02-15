@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { KnownMessageType, MessageSender, MessageSenderInput } from '../workers/message-sender';
+import { KnownMessageType, MessageSender } from '../workers/message-sender';
 import {
   ReactionsReaderInput,
   ReactionsReader
@@ -52,7 +52,7 @@ export class SlackAskConfirmationUseCase {
     input: AskConfirmationUseCaseInput
   ): Observable<AskConfirmationUseCaseOutput> {
     return this.messageSender
-      .send({destination: input.channel, content: input.question })
+      .send({ destination: input.channel, content: input.question })
       .pipe(delay(this.secondsTimeout * 1000))
       .pipe(
         flatMap((x) =>

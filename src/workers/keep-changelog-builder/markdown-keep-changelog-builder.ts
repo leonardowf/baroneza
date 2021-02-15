@@ -1,6 +1,10 @@
-import { KeepChangelogBuilder, KeepChangelogItem } from "./keep-changelog-builder";
+import {
+  KeepChangelogBuilder,
+  KeepChangelogItem
+} from './keep-changelog-builder';
 
-export class MarkdownKeepChangelogBuilder implements KeepChangelogBuilder<string> {
+export class MarkdownKeepChangelogBuilder
+  implements KeepChangelogBuilder<string> {
   build(
     version: string,
     added: KeepChangelogItem[],
@@ -65,10 +69,10 @@ export class MarkdownKeepChangelogBuilder implements KeepChangelogBuilder<string
   }
 
   private itemToMarkdownString(item: KeepChangelogItem): string {
-      let result = `${item.text}, by ${item.author} - (#${item.identifier})`;
-      if (!item.text.trim().includes('- ')) {
-        result = `- ${result}`;
-      }
-      return result;
+    let result = `${item.text}, by ${item.author} - (#${item.identifier})`;
+    if (!item.text.trim().includes('- ')) {
+      result = `- ${result}`;
+    }
+    return result;
   }
 }

@@ -8,7 +8,7 @@ export interface PullRequestData {
   readonly description: string;
   readonly mergedAt: string;
   readonly url: string;
-  readonly authorImageUrl: string
+  readonly authorImageUrl: string;
 }
 
 export interface GithubService {
