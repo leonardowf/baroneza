@@ -10,7 +10,8 @@ export class ConcreteJiraTickerParser implements JiraTicketParser {
       .map((x) => x.match(regex))
       .map((x) => (x == null ? [] : x))
       .filter((x) => x.length > 0)
-      .map((x) => x.map((y) => y.replace('[', '').replace(']', ''))).reduce((acc, x) => acc.concat(x), []);
+      .map((x) => x.map((y) => y.replace('[', '').replace(']', '')))
+      .reduce((acc, x) => acc.concat(x), []);
 
     return Array.from(new Set(extractedTicketIds));
   }

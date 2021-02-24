@@ -1,6 +1,12 @@
 import { Observable, from } from 'rxjs';
 import { Octokit } from '@octokit/rest';
 import { map, mapTo } from 'rxjs/operators';
+import {
+  PullsMergeResponse405Data,
+  PullsMergeResponse409Data,
+  PullsMergeResponseData,
+  ReposCompareCommitsResponseData
+} from '@octokit/types';
 
 export interface PullRequestData {
   readonly number: number;
@@ -9,6 +15,7 @@ export interface PullRequestData {
   readonly mergedAt: string;
   readonly url: string;
   readonly authorImageUrl: string;
+  readonly mergeable: boolean;
 }
 
 export interface GithubService {
@@ -63,6 +70,23 @@ export interface GithubService {
   ): Observable<void>;
 
   tags(owner: string, repo: string): Observable<string[]>;
+
+  merge(
+    owner: string,
+    repo: string,
+    pullNumber: number
+  ): Observable<
+    | PullsMergeResponseData
+    | PullsMergeResponse405Data
+    | PullsMergeResponse409Data
+  >;
+
+  compareCommits(
+    owner: string,
+    repo: string,
+    head: string,
+    base: string
+  ): Observable<ReposCompareCommitsResponseData>;
 }
 
 export class ConcreteGithubService implements GithubService {
@@ -104,7 +128,8 @@ export class ConcreteGithubService implements GithubService {
           mergedAt: response.data.merged_at,
           description: response.data.body,
           url: response.data.html_url,
-          authorImageUrl: response.data.user.avatar_url
+          authorImageUrl: response.data.user.avatar_url,
+          mergeable: response.data.mergeable
         })
       )
     );
@@ -236,5 +261,39 @@ export class ConcreteGithubService implements GithubService {
         });
       })
     );
+  }
+
+  merge(
+    owner: string,
+    repo: string,
+    pullNumber: number
+  ): Observable<
+    | PullsMergeResponseData
+    | PullsMergeResponse405Data
+    | PullsMergeResponse409Data
+  > {
+    return from(
+      this.octokit.pulls.merge({
+        owner,
+        repo, // eslint-disable-next-line @typescript-eslint/camelcase
+        pull_number: pullNumber
+      })
+    ).pipe(map((response) => response.data));
+  }
+
+  compareCommits(
+    owner: string,
+    repo: string,
+    head: string,
+    base: string
+  ): Observable<ReposCompareCommitsResponseData> {
+    return from(
+      this.octokit.repos.compareCommits({
+        owner,
+        repo,
+        head,
+        base
+      })
+    ).pipe(map((response) => response.data));
   }
 }
