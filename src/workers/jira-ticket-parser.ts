@@ -4,7 +4,7 @@ export interface JiraTicketParser {
 
 export class ConcreteJiraTickerParser implements JiraTicketParser {
   parse(values: string[]): string[] {
-    const regex = /(PSF-\d+)/g;
+    const regex = /((?!([A-Z0-9a-z]{1,10})-?$)[A-Z]{1}[A-Z0-9]+-\d+)/g;
 
     const extractedTicketIds = values
       .map((x) => x.match(regex))

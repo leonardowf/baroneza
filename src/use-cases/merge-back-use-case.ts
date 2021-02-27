@@ -71,7 +71,7 @@ export class GithubMergeBackUseCase implements MergeBackUseCase {
       .compareCommits(this.owner, input.repository, input.head, input.base)
       .pipe(
         switchMap((response) => {
-          if (response.ahead_by > 0) {
+          if (response.aheadBy > 0) {
             return this.pullRequestCreator
               .create(
                 `Merge back ${input.head} -> ${input.base}`,
