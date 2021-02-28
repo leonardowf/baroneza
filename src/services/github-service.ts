@@ -1,6 +1,7 @@
 import { Observable, from } from 'rxjs';
 import { Octokit } from '@octokit/rest';
 import { map, mapTo } from 'rxjs/operators';
+import { PullsMergeResponseData } from '@octokit/types';
 
 export interface PullRequestData {
   readonly number: number;
@@ -9,6 +10,15 @@ export interface PullRequestData {
   readonly mergedAt: string;
   readonly url: string;
   readonly authorImageUrl: string;
+  readonly mergeable: boolean;
+}
+
+export interface MergeResponseData {
+  readonly merged: boolean;
+}
+
+export interface CompareResponseData {
+  readonly aheadBy: number;
 }
 
 export interface GithubService {
@@ -63,6 +73,19 @@ export interface GithubService {
   ): Observable<void>;
 
   tags(owner: string, repo: string): Observable<string[]>;
+
+  merge(
+    owner: string,
+    repo: string,
+    pullNumber: number
+  ): Observable<MergeResponseData>;
+
+  compareCommits(
+    owner: string,
+    repo: string,
+    head: string,
+    base: string
+  ): Observable<CompareResponseData>;
 }
 
 export class ConcreteGithubService implements GithubService {
@@ -104,7 +127,8 @@ export class ConcreteGithubService implements GithubService {
           mergedAt: response.data.merged_at,
           description: response.data.body,
           url: response.data.html_url,
-          authorImageUrl: response.data.user.avatar_url
+          authorImageUrl: response.data.user.avatar_url,
+          mergeable: response.data.mergeable
         })
       )
     );
@@ -235,6 +259,45 @@ export class ConcreteGithubService implements GithubService {
           return data.ref.replace('refs/tags/', '');
         });
       })
+    );
+  }
+
+  merge(
+    owner: string,
+    repo: string,
+    pullNumber: number
+  ): Observable<MergeResponseData> {
+    return from(
+      this.octokit.pulls.merge({
+        owner,
+        repo, // eslint-disable-next-line @typescript-eslint/camelcase
+        pull_number: pullNumber
+      })
+    ).pipe(
+      map((response) => response.data),
+      map((responseData) => {
+        const merged = (responseData as PullsMergeResponseData).merged ?? false;
+        return { merged };
+      })
+    );
+  }
+
+  compareCommits(
+    owner: string,
+    repo: string,
+    head: string,
+    base: string
+  ): Observable<CompareResponseData> {
+    return from(
+      this.octokit.repos.compareCommits({
+        owner,
+        repo,
+        head,
+        base
+      })
+    ).pipe(
+      map((response) => response.data),
+      map((responseData) => ({ aheadBy: responseData.ahead_by }))
     );
   }
 }

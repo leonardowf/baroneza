@@ -7,7 +7,9 @@ describe('The jira ticket parser', () => {
   });
 
   it('works with number tags', () => {
-    expect(sut.parse(['[PSF-123][PSF-456] [PSF-78910] Bla Bla'])).toStrictEqual(['PSF-123', 'PSF-456', 'PSF-78910']);
+    expect(
+      sut.parse(['[PSF-123][PSF-456] [PSF-78910] Bla Bla'])
+    ).toStrictEqual(['PSF-123', 'PSF-456', 'PSF-78910']);
   });
 
   it('does not work with number tags', () => {

@@ -15,7 +15,8 @@ describe('The read pull request info use case', () => {
         description: 'description',
         mergedAt: 'mergedAt',
         url: 'www.pudim.com.br',
-        authorImageUrl: 'www.image.com'
+        authorImageUrl: 'www.image.com',
+        mergeable: true
       })
     );
 
@@ -49,7 +50,8 @@ describe('The read pull request info use case', () => {
           description: 'description',
           mergedAt: 'mergedAt',
           url: 'www.pudim.com.br',
-          authorImageUrl: 'www.image.com'
+          authorImageUrl: 'www.image.com',
+          mergeable: true
         })
       );
 

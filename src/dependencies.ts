@@ -36,6 +36,7 @@ import { GithubCreateMilestoneUseCase } from './use-cases/create-milestone-use-c
 import { GithubMilestoneCreator } from './workers/milestone-creator';
 import { MarkdownKeepChangelogBuilder } from './workers/keep-changelog-builder/markdown-keep-changelog-builder';
 import { SlackKeepChangelogBuilder } from './workers/keep-changelog-builder/slack-keep-changelog-builder';
+import { GithubMergeBackUseCase } from './use-cases/merge-back-use-case';
 
 export class Dependencies
   implements
@@ -163,6 +164,12 @@ export class Dependencies
     this.config.pullRequestTitlePrefix,
     this.config.jiraProjectName,
     this.config.confirmationEmoji
+  );
+
+  mergeBackUseCase = new GithubMergeBackUseCase(
+    this.config.githubOwner,
+    this.pullRequestCreator,
+    this.githubService
   );
 
   project = this.config.jiraProjectName;
