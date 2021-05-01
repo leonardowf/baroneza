@@ -1,7 +1,6 @@
 import { TagEndpointDependencies } from './endpoints/tag-endpoint';
 import {
-  JiraTagUseCase,
-  JiraTagUseCaseDependencies
+  JiraTagUseCase
 } from './use-cases/tag-use-case';
 import { GithubPullRequestExtractor } from './workers/commit-extractor';
 import { Keychain } from './keys';
@@ -37,11 +36,13 @@ import { GithubMilestoneCreator } from './workers/milestone-creator';
 import { MarkdownKeepChangelogBuilder } from './workers/keep-changelog-builder/markdown-keep-changelog-builder';
 import { SlackKeepChangelogBuilder } from './workers/keep-changelog-builder/slack-keep-changelog-builder';
 import { GithubMergeBackUseCase } from './use-cases/merge-back-use-case';
+import { ConcreteExtractTicketsUseCase } from './use-cases/extract-tickets-use-case';
+import { CommitPRNumberParser, ConcreteCommitPRNumberParser } from './workers/keep-changelog-builder/commits-pr-number-parser';
+import { ConcreteUpdateReleaseUseCase } from './use-cases/update-release-use-case';
 
 export class Dependencies
   implements
     TagEndpointDependencies,
-    JiraTagUseCaseDependencies,
     CreateReleaseEndpointDependencies,
     StartTrainDependencies {
   keychain = new Keychain(process.env);
@@ -71,7 +72,8 @@ export class Dependencies
   jiraTicketParser = new ConcreteJiraTickerParser();
   jiraTicketTagger = new ConcreteJiraTickerTagger(this.jiraAPI());
   createVersionUseCase = new JiraCreateVersionUseCase(this.jiraService);
-  tagUseCase = new JiraTagUseCase(this);
+  extractTicketsUseCase = new ConcreteExtractTicketsUseCase(this.commitExtractor, this.jiraTicketParser);
+  tagUseCase = new JiraTagUseCase(this.extractTicketsUseCase, this.jiraTicketTagger, this.createVersionUseCase);
 
   shaFinder = new GithubSHAFinder(this.githubService, this.config.githubOwner);
   branchCreator = new GithubBranchCreator(
@@ -88,23 +90,29 @@ export class Dependencies
     this.config.githubOwner
   );
 
+  commitPRNumberParser = new ConcreteCommitPRNumberParser()
+
   pullRequestNumberExtractor = new GithubPullRequestNumberExtractor(
-    this.commitExtractor
+    this.commitExtractor,
+    this.commitPRNumberParser
   );
+
   pullRequestInfoUseCase = new GithubPullRequestInfoUseCase(
     this.githubService,
     this.config.githubOwner
   );
+
   keepChangelogParser = new ConcreteKeepChangelogParser();
   markdownKeepChangelogBuilder = new MarkdownKeepChangelogBuilder();
   blocksKeepChangelogBuilder = new SlackKeepChangelogBuilder();
 
   createChangeLogUseCase = new GithubCreateChangelogUseCase(
-    this.pullRequestNumberExtractor,
-    this.pullRequestInfoUseCase,
-    this.keepChangelogParser,
+    this.blocksKeepChangelogBuilder,
+    this.commitPRNumberParser,
     this.markdownKeepChangelogBuilder,
-    this.blocksKeepChangelogBuilder
+    this.keepChangelogParser,
+    this.pullRequestInfoUseCase,
+    this.pullRequestNumberExtractor,
   );
 
   releasePageCreator = new GithubReleasePageCreator(
@@ -165,6 +173,8 @@ export class Dependencies
     this.config.jiraProjectName,
     this.config.confirmationEmoji
   );
+
+  updateReleaseUseCase = new ConcreteUpdateReleaseUseCase(this.createChangeLogUseCase, this.extractTicketsUseCase, this.githubService, this.jiraService, this.config.githubOwner, this.messageSender, this.tagUseCase)
 
   mergeBackUseCase = new GithubMergeBackUseCase(
     this.config.githubOwner,

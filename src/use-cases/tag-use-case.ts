@@ -7,6 +7,7 @@ import {
   CreateVersionUseCase,
   CreateVersionUseCaseInput
 } from './create-version-use-case';
+import { ExtractTicketsUseCase } from './extract-tickets-use-case';
 
 export interface TagUseCase {
   execute(input: TagUseCaseInput): Observable<TagUseCaseOutput>;
@@ -42,37 +43,25 @@ export class TagUseCaseOutput {
     this.failures = failures;
   }
 }
-
-export interface JiraTagUseCaseDependencies {
-  readonly commitExtractor: CommitExtractor;
-  readonly jiraTicketParser: JiraTicketParser;
-  readonly jiraTicketTagger: JiraTicketTagger;
-  readonly createVersionUseCase: CreateVersionUseCase;
-}
-
 export class JiraTagUseCase implements TagUseCase {
-  private readonly commitExtractor: CommitExtractor;
-  private readonly jiraTickerParser: JiraTicketParser;
+  private readonly extractTicketsUseCase: ExtractTicketsUseCase;
   private readonly jiraTicketTagger: JiraTicketTagger;
   private readonly createVersionUseCase: CreateVersionUseCase;
 
-  constructor(dependencies: JiraTagUseCaseDependencies) {
-    this.commitExtractor = dependencies.commitExtractor;
-    this.jiraTickerParser = dependencies.jiraTicketParser;
-    this.jiraTicketTagger = dependencies.jiraTicketTagger;
-    this.createVersionUseCase = dependencies.createVersionUseCase;
+  constructor(extractTicketsUseCase: ExtractTicketsUseCase, jiraTicketTagger: JiraTicketTagger, createVersionUseCase: CreateVersionUseCase) {
+    this.extractTicketsUseCase = extractTicketsUseCase;
+    this.jiraTicketTagger = jiraTicketTagger;
+    this.createVersionUseCase = createVersionUseCase;
   }
 
   execute(input: TagUseCaseInput): Observable<TagUseCaseOutput> {
-    return this.commitExtractor
-      .commits(input.identifier, input.repository)
-      .pipe(map((commits) => this.jiraTickerParser.parse(commits)))
+    return this.extractTicketsUseCase.execute({pullRequestNumber: input.identifier, repository: input.repository})
       .pipe(
-        flatMap((ticketIds) => {
+        flatMap((extractTicketsOutput) => {
           const tag = `${input.tag}${input.jiraTagSuffix}`;
           return this.createVersionUseCase
             .execute(new CreateVersionUseCaseInput(input.project, tag))
-            .pipe(flatMap(() => this.jiraTicketTagger.tag(ticketIds, tag)));
+            .pipe(flatMap(() => this.jiraTicketTagger.tag(extractTicketsOutput.ticketIdsCommits.map((x) => x.ticketId), tag)));
         })
       )
       .pipe(

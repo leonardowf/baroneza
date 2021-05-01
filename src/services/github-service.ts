@@ -125,7 +125,7 @@ export class ConcreteGithubService implements GithubService {
           number: number,
           login: response.data.user.login,
           mergedAt: response.data.merged_at,
-          description: response.data.body,
+          description: response.data.body ?? "",
           url: response.data.html_url,
           authorImageUrl: response.data.user.avatar_url,
           mergeable: response.data.mergeable

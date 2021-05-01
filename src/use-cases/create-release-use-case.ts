@@ -130,7 +130,7 @@ export class CreateReleaseUseCase {
               return this.createChangelogUseCase
                 .execute(
                   new CreateChangelogInput(
-                    x.pullRequestNumber,
+                    { type: "pullRequestNumber", number: x.pullRequestNumber},
                     input.repository,
                     input.projectTag
                   )
