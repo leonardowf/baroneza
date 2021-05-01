@@ -113,7 +113,6 @@ export class CreateReleaseUseCase {
                 x.pullRequestNumber,
                 input.repository,
                 input.projectTag,
-                x.id
               )
             ),
             this.tagUseCase.execute(

@@ -8,16 +8,13 @@ export class CreateMilestoneUseCaseInput {
   readonly pullNumber: number;
   readonly repository: string;
   readonly title: string;
-  readonly issueIdentifier: number;
 
   constructor(
     pullNumber: number,
     repository: string,
     title: string,
-    issueIdentifier: number
   ) {
     this.pullNumber = pullNumber;
-    this.issueIdentifier = issueIdentifier;
     this.repository = repository;
     this.title = title;
   }

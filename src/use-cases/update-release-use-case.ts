@@ -4,6 +4,7 @@ import { GithubService } from "../services/github-service";
 import { JiraService } from "../services/jira-service";
 import { SlackMessageSender } from "../workers/message-sender";
 import { CreateChangelogOutput, CreateChangelogUseCase } from "./create-changelog-use-case";
+import { CreateMilestoneUseCase, CreateMilestoneUseCaseInput } from "./create-milestone-use-case";
 import { ExtractTicketsUseCase, TicketIdCommit } from "./extract-tickets-use-case"
 import { TagUseCase, TagUseCaseInput } from "./tag-use-case";
 
@@ -28,6 +29,7 @@ export interface UpdateReleaseUseCase {
 
 export class ConcreteUpdateReleaseUseCase implements UpdateReleaseUseCase {
     private readonly createChangelogUseCase: CreateChangelogUseCase;
+    private readonly createMilestoneUseCase: CreateMilestoneUseCase;
     private readonly extractTicketsUseCase: ExtractTicketsUseCase;
     private readonly githubService: GithubService;
     private readonly jiraService: JiraService;
@@ -37,6 +39,7 @@ export class ConcreteUpdateReleaseUseCase implements UpdateReleaseUseCase {
 
     constructor(
         createChangelogUseCase: CreateChangelogUseCase,
+        createMilestoneUseCase: CreateMilestoneUseCase,
         extractTicketsUseCase: ExtractTicketsUseCase, 
         githubService: GithubService,
         jiraService: JiraService, 
@@ -45,6 +48,7 @@ export class ConcreteUpdateReleaseUseCase implements UpdateReleaseUseCase {
         tagUseCase: TagUseCase
         ) {
         this.createChangelogUseCase = createChangelogUseCase;
+        this.createMilestoneUseCase = createMilestoneUseCase;
         this.extractTicketsUseCase = extractTicketsUseCase;
         this.githubService = githubService;
         this.jiraService = jiraService;
@@ -61,10 +65,10 @@ export class ConcreteUpdateReleaseUseCase implements UpdateReleaseUseCase {
             flatMap((extractTicketsOutput) => this.categorizeTicketIds(extractTicketsOutput.ticketIdsCommits)),
             flatMap((ticketsFixVersionData) => this.changelog(ticketsFixVersionData, input.repository, input.toVersion)),
             flatMap((createChangelogOutput) => this.notifyChangelog(createChangelogOutput, input.channel)),
-            flatMap(() => zip(this.updateJiraRelease(input.fromVersion, input.toVersion, input.jiraSuffix, input.project), this.updateMilestone(), this.updateTitleOfPr(input.pullRequestNumber, input.repository, input.title))),
-            flatMap(() => zip(this.tagTickets(input.pullRequestNumber, input.toVersion, input.jiraSuffix, input.project, input.repository), this.setMilestoneToPrs())),
+            flatMap(() => zip(this.updateJiraRelease(input.fromVersion, input.toVersion, input.jiraSuffix, input.project), this.updateMilestone(input.fromVersion, input.toVersion, input.repository), this.updateTitleOfPr(input.pullRequestNumber, input.repository, input.title))),
+            flatMap(() => zip(this.tagTickets(input.pullRequestNumber, input.toVersion, input.jiraSuffix, input.project, input.repository), this.setMilestoneToPrs(input.pullRequestNumber, input.toVersion, input.project, input.repository))),
             flatMap(() => this.buildChangelog(input.pullRequestNumber, input.repository, input.toVersion)),
-            flatMap((createChangelogOutput) => createChangelogOutput ? zip(this.updateDescriptionOfPr(createChangelogOutput, input.pullRequestNumber, input.repository), this.updateReleaseDescription(createChangelogOutput)) : of(void 0)),
+            flatMap((createChangelogOutput) => createChangelogOutput ? zip(this.updateDescriptionOfPr(createChangelogOutput, input.pullRequestNumber, input.repository), this.updateRelease(createChangelogOutput, input.fromVersion, input.toVersion, input.repository)) : of(void 0)),
             mapTo({})
         )
     }
@@ -112,8 +116,8 @@ export class ConcreteUpdateReleaseUseCase implements UpdateReleaseUseCase {
         return this.jiraService.updateFixVersion(`${fromVersion}${jiraSuffix}`,  `${toVersion}${jiraSuffix}`, project)
     }
 
-    private updateMilestone(): Observable<void> {
-        return of(void 0)
+    private updateMilestone(fromVersion: string, toVersion: string, repository: string): Observable<void> {
+        return this.githubService.updateMilestone(fromVersion, toVersion, this.owner, repository)
     }
 
     private buildChangelog(pullRequestNumber: number, repository: string, version: string): Observable<CreateChangelogOutput | undefined> {
@@ -125,19 +129,19 @@ export class ConcreteUpdateReleaseUseCase implements UpdateReleaseUseCase {
     }
 
     private updateTitleOfPr(pullRequestNumber: number, repository: string, title: string): Observable<void> {
-        return of(void 0)
+        return this.githubService.updateTitle(pullRequestNumber, title, this.owner, repository)
     }
 
-    private updateReleaseDescription(createChangelogOutput: CreateChangelogOutput): Observable<void> {
-        return of(void 0)
+    private updateRelease(createChangelogOutput: CreateChangelogOutput, fromVersion: string, toVersion: string, repository: string): Observable<void> {
+        return this.githubService.updateRelease(fromVersion, toVersion, createChangelogOutput.markdown.content, this.owner, repository)
     }
 
     private tagTickets(pullRequestNumber: number, toVersion: string, jiraSuffix: string, project: string, repository: string): Observable<void> {
         return this.tagUseCase.execute(new TagUseCaseInput(pullRequestNumber, toVersion, project, repository, jiraSuffix)).pipe(mapTo(void 0))
     }
 
-    private setMilestoneToPrs(): Observable<void> {
-        return of(void 0)
+    private setMilestoneToPrs(pullRequestNumber: number, version: string, project: string, repository: string): Observable<void> {
+        return this.createMilestoneUseCase.execute(new CreateMilestoneUseCaseInput(pullRequestNumber, repository, version)).pipe(mapTo(void 0))
     }
 }
 

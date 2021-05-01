@@ -49,11 +49,11 @@ app.post('/startTrain', (req, res) => {
 app.get('/hello', (req, res) => {
   dependencies.updateReleaseUseCase.execute({
     channel: "automation",
-    fromVersion: "1.0.1",
-    toVersion: "1.15.101",
+    fromVersion: "1.15.105",
+    toVersion: "1.16.0",
     jiraSuffix: "",
     repository: "baroneza-test",
-    title: "updated title",
+    title: "1.15.104",
     project: "PSF",
     pullRequestNumber: 57
   }).subscribe(

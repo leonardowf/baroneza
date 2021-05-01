@@ -174,7 +174,7 @@ export class Dependencies
     this.config.confirmationEmoji
   );
 
-  updateReleaseUseCase = new ConcreteUpdateReleaseUseCase(this.createChangeLogUseCase, this.extractTicketsUseCase, this.githubService, this.jiraService, this.config.githubOwner, this.messageSender, this.tagUseCase)
+  updateReleaseUseCase = new ConcreteUpdateReleaseUseCase(this.createChangeLogUseCase, this.createMilestoneUseCase, this.extractTicketsUseCase, this.githubService, this.jiraService, this.config.githubOwner, this.messageSender, this.tagUseCase)
 
   mergeBackUseCase = new GithubMergeBackUseCase(
     this.config.githubOwner,
