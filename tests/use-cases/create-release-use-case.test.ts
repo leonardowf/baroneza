@@ -91,7 +91,7 @@ describe('the create release use case', () => {
     ).thenReturn(of(new TagUseCaseOutput([], [])));
     when(
       createChangelogUseCaseMock.execute(
-        deepEqual(new CreateChangelogInput(123, 'repository', 'projectTag'))
+        deepEqual(new CreateChangelogInput({type: "pullRequestNumber", number: 123}, 'repository', 'projectTag'))
       )
     ).thenReturn(of(createChangelogOutput));
     when(
@@ -114,7 +114,6 @@ describe('the create release use case', () => {
       123,
       'repository',
       'projectTag',
-      456
     );
     when(
       createMilestoneUseCaseMock.execute(deepEqual(createMilestoneUseCaseInput))

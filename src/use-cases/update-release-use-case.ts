@@ -66,7 +66,7 @@ export class ConcreteUpdateReleaseUseCase implements UpdateReleaseUseCase {
             flatMap((ticketsFixVersionData) => this.changelog(ticketsFixVersionData, input.repository, input.toVersion)),
             flatMap((createChangelogOutput) => this.notifyChangelog(createChangelogOutput, input.channel)),
             flatMap(() => zip(this.updateJiraRelease(input.fromVersion, input.toVersion, input.jiraSuffix, input.project), this.updateMilestone(input.fromVersion, input.toVersion, input.repository), this.updateTitleOfPr(input.pullRequestNumber, input.repository, input.title))),
-            flatMap(() => zip(this.tagTickets(input.pullRequestNumber, input.toVersion, input.jiraSuffix, input.project, input.repository), this.setMilestoneToPrs(input.pullRequestNumber, input.toVersion, input.project, input.repository))),
+            flatMap(() => zip(this.tagTickets(input.pullRequestNumber, input.toVersion, input.jiraSuffix, input.project, input.repository), this.setMilestoneToPrs(input.pullRequestNumber, input.toVersion, input.repository))),
             flatMap(() => this.buildChangelog(input.pullRequestNumber, input.repository, input.toVersion)),
             flatMap((createChangelogOutput) => createChangelogOutput ? zip(this.updateDescriptionOfPr(createChangelogOutput, input.pullRequestNumber, input.repository), this.updateRelease(createChangelogOutput, input.fromVersion, input.toVersion, input.repository)) : of(void 0)),
             mapTo({})
@@ -140,7 +140,7 @@ export class ConcreteUpdateReleaseUseCase implements UpdateReleaseUseCase {
         return this.tagUseCase.execute(new TagUseCaseInput(pullRequestNumber, toVersion, project, repository, jiraSuffix)).pipe(mapTo(void 0))
     }
 
-    private setMilestoneToPrs(pullRequestNumber: number, version: string, project: string, repository: string): Observable<void> {
+    private setMilestoneToPrs(pullRequestNumber: number, version: string, repository: string): Observable<void> {
         return this.createMilestoneUseCase.execute(new CreateMilestoneUseCaseInput(pullRequestNumber, repository, version)).pipe(mapTo(void 0))
     }
 }

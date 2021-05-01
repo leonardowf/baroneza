@@ -15,7 +15,6 @@ describe('the create milestone use case', () => {
     const pullNumber = 123;
     const repository = 'repository';
     const title = 'title';
-    const issueIdentifier = 123;
     const extractedPullNumbers = [45, 67];
     const milestoneId = 898989;
 
@@ -66,7 +65,6 @@ describe('the create milestone use case', () => {
           pullNumber,
           repository,
           title,
-          issueIdentifier
         )
       )
       .subscribe({

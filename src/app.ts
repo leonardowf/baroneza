@@ -46,25 +46,6 @@ app.post('/startTrain', (req, res) => {
   );
 });
 
-app.get('/hello', (req, res) => {
-  dependencies.updateReleaseUseCase.execute({
-    channel: "automation",
-    fromVersion: "1.15.105",
-    toVersion: "1.16.0",
-    jiraSuffix: "",
-    repository: "baroneza-test",
-    title: "1.15.104",
-    project: "PSF",
-    pullRequestNumber: 57
-  }).subscribe(
-    (x) => res.send(x),
-    (error) => {
-      console.log(error);
-      res.send(error);
-    }
-  );
-});
-
 app.use('/swagger', swagger.serve, swagger.setup(swaggerDocument));
 
 app.listen(port, (err) => {

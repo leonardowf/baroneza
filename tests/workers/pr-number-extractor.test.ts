@@ -2,6 +2,7 @@ import { GithubPullRequestNumberExtractor } from '../../src/workers/pr-number-ex
 import { mock, when, instance } from 'ts-mockito';
 import { CommitExtractor } from '../../src/workers/commit-extractor';
 import { of } from 'rxjs';
+import { CommitPRNumberParser, ConcreteCommitPRNumberParser } from '../../src/workers/keep-changelog-builder/commits-pr-number-parser';
 
 describe('the pr-number-extractor', () => {
   it('finds pr numbers correctly', (done) => {
@@ -18,8 +19,9 @@ describe('the pr-number-extractor', () => {
       of(commits)
     );
     const commitExtractor = instance(commitExtractorMock);
+    const commitPRNumberParser = new ConcreteCommitPRNumberParser();
 
-    const sut = new GithubPullRequestNumberExtractor(commitExtractor);
+    const sut = new GithubPullRequestNumberExtractor(commitExtractor, commitPRNumberParser);
 
     sut.extract(123, 'repository').subscribe({
       next: (numbers) => {
