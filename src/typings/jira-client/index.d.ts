@@ -64,7 +64,9 @@ declare module 'jira-client' {
       version: JiraApi.CreateVersionOptions
     ): Promise<JiraApi.JsonResponse>;
 
-    updateVersion(version: JiraApi.UpdateVersionOptions): Promise<JiraApi.JsonResponse>;
+    updateVersion(
+      version: JiraApi.UpdateVersionOptions
+    ): Promise<JiraApi.JsonResponse>;
 
     deleteVersion(
       versionId: string,

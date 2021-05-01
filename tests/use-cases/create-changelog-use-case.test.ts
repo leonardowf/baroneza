@@ -200,11 +200,17 @@ describe('the create changelog use case', () => {
       keepChangelogBuilder,
       keepChangelogParser,
       pullRequestInfoUseCase,
-      pullRequestNumberExtractor,
+      pullRequestNumberExtractor
     );
 
     sut
-      .execute(new CreateChangelogInput({type: "pullRequestNumber", number: 123}, 'repository', '1.0.0'))
+      .execute(
+        new CreateChangelogInput(
+          { type: 'pullRequestNumber', number: 123 },
+          'repository',
+          '1.0.0'
+        )
+      )
       .subscribe({
         next: (result) => {
           expect(result?.blocks.content).toEqual([]);
@@ -267,11 +273,17 @@ describe('the create changelog use case', () => {
       keepChangelogBuilder,
       keepChangelogParser,
       pullRequestInfoUseCase,
-      pullRequestNumberExtractor,
+      pullRequestNumberExtractor
     );
 
     sut
-      .execute(new CreateChangelogInput({type: "pullRequestNumber", number: 123}, 'repository', '1.0.0'))
+      .execute(
+        new CreateChangelogInput(
+          { type: 'pullRequestNumber', number: 123 },
+          'repository',
+          '1.0.0'
+        )
+      )
       .subscribe({
         next: (result) => {
           expect(result).toBeUndefined();

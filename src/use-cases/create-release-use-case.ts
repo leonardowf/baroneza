@@ -112,7 +112,7 @@ export class CreateReleaseUseCase {
               new CreateMilestoneUseCaseInput(
                 x.pullRequestNumber,
                 input.repository,
-                input.projectTag,
+                input.projectTag
               )
             ),
             this.tagUseCase.execute(
@@ -129,7 +129,7 @@ export class CreateReleaseUseCase {
               return this.createChangelogUseCase
                 .execute(
                   new CreateChangelogInput(
-                    { type: "pullRequestNumber", number: x.pullRequestNumber},
+                    { type: 'pullRequestNumber', number: x.pullRequestNumber },
                     input.repository,
                     input.projectTag
                   )

@@ -10,21 +10,21 @@ import {
 import { Block } from '@slack/web-api';
 import { CommitPRNumberParser } from '../workers/keep-changelog-builder/commits-pr-number-parser';
 
-export type Origin = OriginCommits | OriginPullRequestNumber
+export type Origin = OriginCommits | OriginPullRequestNumber;
 export interface OriginType {
   type: KnownOriginType;
 }
 
-export type KnownOriginType = 'pullRequestNumber' | 'commits'
+export type KnownOriginType = 'pullRequestNumber' | 'commits';
 export interface OriginPullRequestNumber extends OriginType {
-  readonly type: 'pullRequestNumber'
+  readonly type: 'pullRequestNumber';
   readonly number: number;
-};
+}
 
 export interface OriginCommits extends OriginType {
-  readonly type: 'commits'
+  readonly type: 'commits';
   readonly commits: string[];
-};
+}
 
 export type KnownChangelogType = 'markdown' | 'blocks';
 export interface ChangelogType {
@@ -76,10 +76,10 @@ export class GithubCreateChangelogUseCase implements CreateChangelogUseCase {
     keepChangelogBuilder: KeepChangelogBuilder<string>,
     keepChangelogParser: KeepChangelogParser,
     pullRequestInfoUseCase: ReadPullRequestInfoUseCase,
-    pullRequestNumberExtractor: PullRequestNumberExtractor,
+    pullRequestNumberExtractor: PullRequestNumberExtractor
   ) {
     this.blocksKeepChangelogBuilder = blocksKeepChangelogBuilder;
-    this.commitPRNumberParser = commitPRNumberParser
+    this.commitPRNumberParser = commitPRNumberParser;
     this.keepChangelogParser = keepChangelogParser;
     this.markdownKeepChangelogBuilder = keepChangelogBuilder;
     this.pullRequestInfoUseCase = pullRequestInfoUseCase;
@@ -232,10 +232,13 @@ export class GithubCreateChangelogUseCase implements CreateChangelogUseCase {
       );
   }
 
-  private pullRequestNumbers(origin: Origin, repository: string): Observable<number[]> {
+  private pullRequestNumbers(
+    origin: Origin,
+    repository: string
+  ): Observable<number[]> {
     if (origin.type === 'commits') {
-      return of(this.commitPRNumberParser.parse(origin.commits))
+      return of(this.commitPRNumberParser.parse(origin.commits));
     }
-    return this.pullRequestNumberExtractor.extract(origin.number, repository)
+    return this.pullRequestNumberExtractor.extract(origin.number, repository);
   }
 }

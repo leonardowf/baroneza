@@ -9,11 +9,7 @@ export class CreateMilestoneUseCaseInput {
   readonly repository: string;
   readonly title: string;
 
-  constructor(
-    pullNumber: number,
-    repository: string,
-    title: string,
-  ) {
+  constructor(pullNumber: number, repository: string, title: string) {
     this.pullNumber = pullNumber;
     this.repository = repository;
     this.title = title;

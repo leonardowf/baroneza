@@ -1,8 +1,6 @@
 import { Observable } from 'rxjs';
-import { CommitExtractor } from '../workers/commit-extractor';
 import { map, flatMap } from 'rxjs/operators';
 import { JiraTicketTagger } from '../workers/jira-tagger';
-import { JiraTicketParser } from '../workers/jira-ticket-parser';
 import {
   CreateVersionUseCase,
   CreateVersionUseCaseInput
@@ -48,20 +46,35 @@ export class JiraTagUseCase implements TagUseCase {
   private readonly jiraTicketTagger: JiraTicketTagger;
   private readonly createVersionUseCase: CreateVersionUseCase;
 
-  constructor(extractTicketsUseCase: ExtractTicketsUseCase, jiraTicketTagger: JiraTicketTagger, createVersionUseCase: CreateVersionUseCase) {
+  constructor(
+    extractTicketsUseCase: ExtractTicketsUseCase,
+    jiraTicketTagger: JiraTicketTagger,
+    createVersionUseCase: CreateVersionUseCase
+  ) {
     this.extractTicketsUseCase = extractTicketsUseCase;
     this.jiraTicketTagger = jiraTicketTagger;
     this.createVersionUseCase = createVersionUseCase;
   }
 
   execute(input: TagUseCaseInput): Observable<TagUseCaseOutput> {
-    return this.extractTicketsUseCase.execute({pullRequestNumber: input.identifier, repository: input.repository})
+    return this.extractTicketsUseCase
+      .execute({
+        pullRequestNumber: input.identifier,
+        repository: input.repository
+      })
       .pipe(
         flatMap((extractTicketsOutput) => {
           const tag = `${input.tag}${input.jiraTagSuffix}`;
           return this.createVersionUseCase
             .execute(new CreateVersionUseCaseInput(input.project, tag))
-            .pipe(flatMap(() => this.jiraTicketTagger.tag(extractTicketsOutput.ticketIdsCommits.map((x) => x.ticketId), tag)));
+            .pipe(
+              flatMap(() =>
+                this.jiraTicketTagger.tag(
+                  extractTicketsOutput.ticketIdsCommits.map((x) => x.ticketId),
+                  tag
+                )
+              )
+            );
         })
       )
       .pipe(

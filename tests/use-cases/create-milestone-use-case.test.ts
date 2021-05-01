@@ -60,13 +60,7 @@ describe('the create milestone use case', () => {
     );
 
     sut
-      .execute(
-        new CreateMilestoneUseCaseInput(
-          pullNumber,
-          repository,
-          title,
-        )
-      )
+      .execute(new CreateMilestoneUseCaseInput(pullNumber, repository, title))
       .subscribe({
         complete: done
       });

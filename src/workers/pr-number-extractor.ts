@@ -11,14 +11,17 @@ export class GithubPullRequestNumberExtractor
   private readonly commitExtractor: CommitExtractor;
   private readonly commitPRNumberParser: CommitPRNumberParser;
 
-  constructor(commitExtractor: CommitExtractor, commitPRNumberParser: CommitPRNumberParser) {
+  constructor(
+    commitExtractor: CommitExtractor,
+    commitPRNumberParser: CommitPRNumberParser
+  ) {
     this.commitExtractor = commitExtractor;
     this.commitPRNumberParser = commitPRNumberParser;
   }
 
   extract(pullNumber: number, repository: string): Observable<number[]> {
-    return this.commitExtractor.commits(pullNumber, repository).pipe(
-      map(this.commitPRNumberParser.parse)
-    );
+    return this.commitExtractor
+      .commits(pullNumber, repository)
+      .pipe(map(this.commitPRNumberParser.parse));
   }
 }

@@ -1,4 +1,4 @@
-import { Observable, from, of, throwError } from 'rxjs';
+import { Observable, from, throwError } from 'rxjs';
 import JiraAPI from 'jira-client';
 import { flatMap, map, mapTo } from 'rxjs/operators';
 
@@ -6,8 +6,12 @@ export interface JiraService {
   createVersion(name: string, projectId: number): Observable<void>;
   projectId(project: string): Observable<number>;
   hasVersion(name: string, project: string): Observable<boolean>;
-  hasFixVersion(ticketId: string): Observable<boolean>;
-  updateFixVersion(fromVersion: string, toVersion: string, project: string): Observable<void>;
+  hasFixVersion(issueNumber: string): Observable<boolean>;
+  updateFixVersion(
+    fromVersion: string,
+    toVersion: string,
+    project: string
+  ): Observable<void>;
 }
 
 export class ConcreteJiraService {
@@ -43,29 +47,38 @@ export class ConcreteJiraService {
     );
   }
 
-  hasFixVersion(issueNumber: string) {
-    return from(this.jiraAPI.findIssue(issueNumber)).pipe(map((jsonResponse) => {
-      const jiraIssue = jsonResponse as Issue
-      return jiraIssue.fields.fixVersions.length > 0
-    }))
+  hasFixVersion(issueNumber: string): Observable<boolean> {
+    return from(this.jiraAPI.findIssue(issueNumber)).pipe(
+      map((jsonResponse) => {
+        const jiraIssue = jsonResponse as Issue;
+        return jiraIssue.fields.fixVersions.length > 0;
+      })
+    );
   }
 
-  updateFixVersion(fromVersion: string, toVersion: string, project: string): Observable<void> {
-    return from(this.jiraAPI.getVersions(project)).pipe(flatMap((x) => {
-      const versions = x as JiraVersion[];
-      const match = versions.find((version) => version.name.toLowerCase() === fromVersion.toLowerCase())
-      if (match) {
-        return this.jiraAPI.updateVersion({
-          id: match.id,
-          name: toVersion,
-          projectId: match.projectId
-        })
-      }
+  updateFixVersion(
+    fromVersion: string,
+    toVersion: string,
+    project: string
+  ): Observable<void> {
+    return from(this.jiraAPI.getVersions(project)).pipe(
+      flatMap((x) => {
+        const versions = x as JiraVersion[];
+        const match = versions.find(
+          (version) => version.name.toLowerCase() === fromVersion.toLowerCase()
+        );
+        if (match) {
+          return this.jiraAPI.updateVersion({
+            id: match.id,
+            name: toVersion,
+            projectId: match.projectId
+          });
+        }
 
-      return throwError({message: "Unable to find release"})
-    }),
+        return throwError({ message: 'Unable to find release' });
+      }),
       mapTo(void 0)
-    )
+    );
   }
 }
 
@@ -76,11 +89,11 @@ interface JiraVersion {
 }
 
 interface Issue {
-  readonly fields: Fields
+  readonly fields: Fields;
 }
 
 interface Fields {
-  readonly fixVersions: FixVersion[]
+  readonly fixVersions: FixVersion[];
 }
 
 interface FixVersion {

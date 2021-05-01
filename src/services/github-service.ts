@@ -1,4 +1,4 @@
-import { Observable, from, of, throwError } from 'rxjs';
+import { Observable, from, throwError } from 'rxjs';
 import { Octokit } from '@octokit/rest';
 import { flatMap, map, mapTo } from 'rxjs/operators';
 import { PullsMergeResponseData } from '@octokit/types';
@@ -87,9 +87,25 @@ export interface GithubService {
     base: string
   ): Observable<CompareResponseData>;
 
-  updateTitle(pullNumber: number, title: string, owner: string, repo: string): Observable<void>;
-  updateRelease(fromName: string, toName: string, body: string, owner: string, repo: string): Observable<void>;
-  updateMilestone(fromTitle: string, toTitle: string, owner: string, repo: string): Observable<void>;
+  updateTitle(
+    pullNumber: number,
+    title: string,
+    owner: string,
+    repo: string
+  ): Observable<void>;
+  updateRelease(
+    fromName: string,
+    toName: string,
+    body: string,
+    owner: string,
+    repo: string
+  ): Observable<void>;
+  updateMilestone(
+    fromTitle: string,
+    toTitle: string,
+    owner: string,
+    repo: string
+  ): Observable<void>;
 }
 
 export class ConcreteGithubService implements GithubService {
@@ -129,7 +145,7 @@ export class ConcreteGithubService implements GithubService {
           number: number,
           login: response.data.user.login,
           mergedAt: response.data.merged_at,
-          description: response.data.body ?? "",
+          description: response.data.body ?? '',
           url: response.data.html_url,
           authorImageUrl: response.data.user.avatar_url,
           mergeable: response.data.mergeable
@@ -305,49 +321,83 @@ export class ConcreteGithubService implements GithubService {
     );
   }
 
-  updateTitle(pullNumber: number, title: string, owner: string, repo: string): Observable<void> {
-    return from(this.octokit.pulls.update({
-      title,
-      owner,
-      repo,
-      pull_number: pullNumber
-    })).pipe(mapTo(void 0))
+  updateTitle(
+    pullNumber: number,
+    title: string,
+    owner: string,
+    repo: string
+  ): Observable<void> {
+    return from(
+      this.octokit.pulls.update({
+        title,
+        owner,
+        repo,
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        pull_number: pullNumber
+      })
+    ).pipe(mapTo(void 0));
   }
 
-  updateRelease(fromName: string, toName: string, body: string, owner: string, repo: string): Observable<void> {
-    return from(this.octokit.repos.listReleases({
-      owner,
-      repo,
-    })).pipe(
-      map((response) => response.data.find((release) => release.name.toLowerCase() === fromName.toLowerCase())),
+  updateRelease(
+    fromName: string,
+    toName: string,
+    body: string,
+    owner: string,
+    repo: string
+  ): Observable<void> {
+    return from(
+      this.octokit.repos.listReleases({
+        owner,
+        repo
+      })
+    ).pipe(
+      map((response) =>
+        response.data.find(
+          (release) => release.name.toLowerCase() === fromName.toLowerCase()
+        )
+      ),
       flatMap((release) => {
         if (release) {
-          return from(this.octokit.repos.updateRelease({
-            body,
-            owner,
-            repo,
-            release_id: release.id,
-            tag_name: toName,
-            name: toName
-          })).pipe(mapTo(void 0))
+          return from(
+            this.octokit.repos.updateRelease({
+              body,
+              owner,
+              repo,
+              // eslint-disable-next-line @typescript-eslint/camelcase
+              release_id: release.id,
+              // eslint-disable-next-line @typescript-eslint/camelcase
+              tag_name: toName,
+              name: toName
+            })
+          ).pipe(mapTo(void 0));
         }
-        return throwError({message: "Unable to find release"})
+        return throwError({ message: 'Unable to find release' });
       })
-      )
+    );
   }
 
-  updateMilestone(fromTitle: string, toTitle: string, owner: string, repo: string): Observable<void> {
-    return this.getMilestone(owner, repo, fromTitle).pipe(flatMap((milestone) => {
-      if (milestone) {
-        return from(this.octokit.issues.updateMilestone({
-          title: toTitle,
-          owner,
-          repo,
-          milestone_number: milestone
-        })).pipe(mapTo(void 0))
-      }
+  updateMilestone(
+    fromTitle: string,
+    toTitle: string,
+    owner: string,
+    repo: string
+  ): Observable<void> {
+    return this.getMilestone(owner, repo, fromTitle).pipe(
+      flatMap((milestone) => {
+        if (milestone) {
+          return from(
+            this.octokit.issues.updateMilestone({
+              title: toTitle,
+              owner,
+              repo,
+              // eslint-disable-next-line @typescript-eslint/camelcase
+              milestone_number: milestone
+            })
+          ).pipe(mapTo(void 0));
+        }
 
-      return throwError({message: "Unable to find milestone"})
-    }))
+        return throwError({ message: 'Unable to find milestone' });
+      })
+    );
   }
 }
