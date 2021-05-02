@@ -179,16 +179,16 @@ export class Dependencies
     this.config.confirmationEmoji
   );
 
-  updateReleaseUseCase = new ConcreteUpdateReleaseUseCase(
-    this.createChangeLogUseCase,
-    this.createMilestoneUseCase,
-    this.extractTicketsUseCase,
-    this.githubService,
-    this.jiraService,
-    this.config.githubOwner,
-    this.messageSender,
-    this.tagUseCase
-  );
+  updateReleaseUseCase = new ConcreteUpdateReleaseUseCase({
+    createChangelogUseCase: this.createChangeLogUseCase,
+    createMilestoneUseCase: this.createMilestoneUseCase,
+    extractTicketsUseCase: this.extractTicketsUseCase,
+    githubService: this.githubService,
+    jiraService: this.jiraService,
+    owner: this.config.githubOwner,
+    slackMessageSender: this.messageSender,
+    tagUseCase: this.tagUseCase
+  });
 
   mergeBackUseCase = new GithubMergeBackUseCase(
     this.config.githubOwner,

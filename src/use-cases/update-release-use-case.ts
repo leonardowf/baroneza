@@ -34,6 +34,16 @@ export interface UpdateReleaseUseCase {
   execute(input: UpdateReleaseInput): Observable<UpdateReleaseOutput>;
 }
 
+export interface ConcreteUpdateReleaseUseCaseDependencies {
+  createChangelogUseCase: CreateChangelogUseCase;
+  createMilestoneUseCase: CreateMilestoneUseCase;
+  extractTicketsUseCase: ExtractTicketsUseCase;
+  githubService: GithubService;
+  jiraService: JiraService;
+  owner: string;
+  slackMessageSender: SlackMessageSender;
+  tagUseCase: TagUseCase;
+}
 export class ConcreteUpdateReleaseUseCase implements UpdateReleaseUseCase {
   private readonly createChangelogUseCase: CreateChangelogUseCase;
   private readonly createMilestoneUseCase: CreateMilestoneUseCase;
@@ -44,24 +54,15 @@ export class ConcreteUpdateReleaseUseCase implements UpdateReleaseUseCase {
   private readonly slackMessageSender: SlackMessageSender;
   private readonly tagUseCase: TagUseCase;
 
-  constructor(
-    createChangelogUseCase: CreateChangelogUseCase,
-    createMilestoneUseCase: CreateMilestoneUseCase,
-    extractTicketsUseCase: ExtractTicketsUseCase,
-    githubService: GithubService,
-    jiraService: JiraService,
-    owner: string,
-    slackMessageSender: SlackMessageSender,
-    tagUseCase: TagUseCase
-  ) {
-    this.createChangelogUseCase = createChangelogUseCase;
-    this.createMilestoneUseCase = createMilestoneUseCase;
-    this.extractTicketsUseCase = extractTicketsUseCase;
-    this.githubService = githubService;
-    this.jiraService = jiraService;
-    this.owner = owner;
-    this.slackMessageSender = slackMessageSender;
-    this.tagUseCase = tagUseCase;
+  constructor(dependencies: ConcreteUpdateReleaseUseCaseDependencies) {
+    this.createChangelogUseCase = dependencies.createChangelogUseCase;
+    this.createMilestoneUseCase = dependencies.createMilestoneUseCase;
+    this.extractTicketsUseCase = dependencies.extractTicketsUseCase;
+    this.githubService = dependencies.githubService;
+    this.jiraService = dependencies.jiraService;
+    this.owner = dependencies.owner;
+    this.slackMessageSender = dependencies.slackMessageSender;
+    this.tagUseCase = dependencies.tagUseCase;
   }
 
   execute(input: UpdateReleaseInput): Observable<UpdateReleaseOutput> {
@@ -173,6 +174,10 @@ export class ConcreteUpdateReleaseUseCase implements UpdateReleaseUseCase {
   private categorizeTicketIds(
     ticketIdCommits: TicketIdCommit[]
   ): Observable<TicketFixVersionData[]> {
+    if (ticketIdCommits.length === 0) {
+      return of([]);
+    }
+
     const streams = ticketIdCommits.map((ticketIdCommit) => {
       return this.jiraService.hasFixVersion(ticketIdCommit.ticketId).pipe(
         map(
