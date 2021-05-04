@@ -1,18 +1,37 @@
 export interface JiraTicketParser {
-  parse(values: string[]): string[];
+  parse(values: string[]): JiraTicketParserOutput;
 }
 
+export type ParsedTicket = {
+  readonly value: string;
+  readonly ticket: string;
+};
+
+export type JiraTicketParserOutput = {
+  readonly parsedTickets: ParsedTicket[];
+};
 export class ConcreteJiraTickerParser implements JiraTicketParser {
-  parse(values: string[]): string[] {
+  parse(values: string[]): JiraTicketParserOutput {
     const regex = /((?!([A-Z0-9a-z]{1,10})-?$)[A-Z]{1}[A-Z0-9]+-\d+)/g;
 
-    const extractedTicketIds = values
-      .map((x) => x.match(regex))
-      .map((x) => (x == null ? [] : x))
-      .filter((x) => x.length > 0)
-      .map((x) => x.map((y) => y.replace('[', '').replace(']', '')))
-      .reduce((acc, x) => acc.concat(x), []);
+    const parsedTickets = values.map((value) => {
+      const match = value.match(regex) ?? [];
+      return match.map((match): ParsedTicket => ({ value, ticket: match }));
+    });
 
-    return Array.from(new Set(extractedTicketIds));
+    const flattened = parsedTickets.reduce(
+      (acc, array) => acc.concat(array),
+      []
+    );
+    const deduped: ParsedTicket[] = flattened.reduce((acc, item) => {
+      const hasItem =
+        acc.filter(
+          (accItem) =>
+            accItem.ticket === item.ticket && accItem.value === item.value
+        ).length > 0;
+      return hasItem ? acc : [...acc, item];
+    }, [] as ParsedTicket[]);
+
+    return { parsedTickets: deduped };
   }
 }

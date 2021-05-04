@@ -5,7 +5,10 @@ import {
 import { CommitExtractor } from '../../src/workers/commit-extractor';
 import { mock, instance, when, anything, verify, deepEqual } from 'ts-mockito';
 import { of } from 'rxjs';
-import { JiraTicketParser } from '../../src/workers/jira-ticket-parser';
+import {
+  JiraTicketParser,
+  JiraTicketParserOutput
+} from '../../src/workers/jira-ticket-parser';
 import {
   JiraTicketTagger,
   ConcreteJiraTicketTaggetOutput
@@ -15,11 +18,12 @@ import {
   CreateVersionUseCaseInput,
   CreateVersionUseCaseOutput
 } from '../../src/use-cases/create-version-use-case';
+import { ConcreteExtractTicketsUseCase } from '../../src/use-cases/extract-tickets-use-case';
 
 describe('The tag use case', () => {
   it('calls the workers', (done) => {
     const commitExtractorMock: CommitExtractor = mock<CommitExtractor>();
-    const jiraTickerParserMock: JiraTicketParser = mock<JiraTicketParser>();
+    const jiraTicketParserMock: JiraTicketParser = mock<JiraTicketParser>();
     const jiraTicketTaggerMock: JiraTicketTagger = mock<JiraTicketTagger>();
     const createVersionUseCaseMock: CreateVersionUseCase = mock<
       CreateVersionUseCase
@@ -28,7 +32,13 @@ describe('The tag use case', () => {
     when(commitExtractorMock.commits(anything(), 'repository')).thenReturn(
       of(['A commit message'])
     );
-    when(jiraTickerParserMock.parse(anything())).thenReturn(['123']);
+    const jiraTicketParserOutput: JiraTicketParserOutput = {
+      parsedTickets: [{ value: 'a commit message COM-123', ticket: '123' }]
+    };
+
+    when(jiraTicketParserMock.parse(anything())).thenReturn(
+      jiraTicketParserOutput
+    );
     when(jiraTicketTaggerMock.tag(anything(), anything())).thenReturn(
       of(new ConcreteJiraTicketTaggetOutput(['123'], []))
     );
@@ -37,23 +47,27 @@ describe('The tag use case', () => {
     );
 
     const commitExtractor = instance(commitExtractorMock);
-    const jiraTickerParser = instance(jiraTickerParserMock);
+    const jiraTickerParser = instance(jiraTicketParserMock);
     const jiraTicketTagger = instance(jiraTicketTaggerMock);
     const createVersionUseCase = instance(createVersionUseCaseMock);
 
-    const jiraTagUseCase = new JiraTagUseCase({
-      commitExtractor: commitExtractor,
-      jiraTicketParser: jiraTickerParser,
-      jiraTicketTagger: jiraTicketTagger,
+    const extractTicketsUseCase = new ConcreteExtractTicketsUseCase(
+      commitExtractor,
+      jiraTickerParser
+    );
+
+    const jiraTagUseCase = new JiraTagUseCase(
+      extractTicketsUseCase,
+      jiraTicketTagger,
       createVersionUseCase
-    });
+    );
 
     jiraTagUseCase
       .execute(new TagUseCaseInput(1, 'v1.0', 'PSF', 'repository', ' suffix'))
       .subscribe({
         next: (x) => {
           verify(commitExtractorMock.commits(anything(), 'repository')).once();
-          verify(jiraTickerParserMock.parse(anything())).once();
+          verify(jiraTicketParserMock.parse(anything())).once();
           verify(jiraTicketTaggerMock.tag(anything(), anything())).once();
           verify(
             createVersionUseCaseMock.execute(

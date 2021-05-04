@@ -19,6 +19,7 @@ import {
 } from '../../src/use-cases/read-pull-request-info-use-case';
 import { of } from 'rxjs';
 import { Block } from '@slack/web-api';
+import { CommitPRNumberParser } from '../../src/workers/keep-changelog-builder/commits-pr-number-parser';
 
 describe('the create changelog use case', () => {
   it('executes as expected', (done) => {
@@ -29,6 +30,8 @@ describe('the create changelog use case', () => {
     const blocksKeepChangelogBuilderMock = mock<
       KeepChangelogBuilder<Block[]>
     >();
+
+    const commitPRNumberParserMock = mock<CommitPRNumberParser>();
 
     when(pullRequestNumberExtractorMock.extract(123, 'repository')).thenReturn(
       of([1, 2])
@@ -189,17 +192,25 @@ describe('the create changelog use case', () => {
     const keepChangelogParser = instance(keepChangelogParserMock);
     const keepChangelogBuilder = instance(keepChangelogBuilderMock);
     const blockKeepChangelogBuilder = instance(blocksKeepChangelogBuilderMock);
+    const commitPRNumberParser = instance(commitPRNumberParserMock);
 
     const sut = new GithubCreateChangelogUseCase(
-      pullRequestNumberExtractor,
-      pullRequestInfoUseCase,
-      keepChangelogParser,
+      blockKeepChangelogBuilder,
+      commitPRNumberParser,
       keepChangelogBuilder,
-      blockKeepChangelogBuilder
+      keepChangelogParser,
+      pullRequestInfoUseCase,
+      pullRequestNumberExtractor
     );
 
     sut
-      .execute(new CreateChangelogInput(123, 'repository', '1.0.0'))
+      .execute(
+        new CreateChangelogInput(
+          { type: 'pullRequestNumber', number: 123 },
+          'repository',
+          '1.0.0'
+        )
+      )
       .subscribe({
         next: (result) => {
           expect(result?.blocks.content).toEqual([]);
@@ -215,6 +226,7 @@ describe('the create changelog use case', () => {
     const keepChangelogParserMock = mock<KeepChangelogParser>();
     const keepChangelogBuilderMock = mock<KeepChangelogBuilder<string>>();
     const blockKeepChangelogBuilderMock = mock<KeepChangelogBuilder<Block[]>>();
+    const commitPRNumberParserMock = mock<CommitPRNumberParser>();
 
     when(pullRequestNumberExtractorMock.extract(123, 'repository')).thenReturn(
       of([1, 2])
@@ -253,17 +265,25 @@ describe('the create changelog use case', () => {
     const keepChangelogParser = instance(keepChangelogParserMock);
     const keepChangelogBuilder = instance(keepChangelogBuilderMock);
     const blockKeepChangelogBuilder = instance(blockKeepChangelogBuilderMock);
+    const commitPRNumberParser = instance(commitPRNumberParserMock);
 
     const sut = new GithubCreateChangelogUseCase(
-      pullRequestNumberExtractor,
-      pullRequestInfoUseCase,
-      keepChangelogParser,
+      blockKeepChangelogBuilder,
+      commitPRNumberParser,
       keepChangelogBuilder,
-      blockKeepChangelogBuilder
+      keepChangelogParser,
+      pullRequestInfoUseCase,
+      pullRequestNumberExtractor
     );
 
     sut
-      .execute(new CreateChangelogInput(123, 'repository', '1.0.0'))
+      .execute(
+        new CreateChangelogInput(
+          { type: 'pullRequestNumber', number: 123 },
+          'repository',
+          '1.0.0'
+        )
+      )
       .subscribe({
         next: (result) => {
           expect(result).toBeUndefined();

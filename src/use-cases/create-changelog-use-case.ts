@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { PullRequestNumberExtractor } from '../workers/pr-number-extractor';
 import { ReadPullRequestInfoUseCase } from './read-pull-request-info-use-case';
 import { flatMap, map } from 'rxjs/operators';
@@ -8,21 +8,36 @@ import {
   KeepChangelogItem
 } from '../workers/keep-changelog-builder/keep-changelog-builder';
 import { Block } from '@slack/web-api';
+import { CommitPRNumberParser } from '../workers/keep-changelog-builder/commits-pr-number-parser';
+
+export type Origin = OriginCommits | OriginPullRequestNumber;
+export interface OriginType {
+  type: KnownOriginType;
+}
+
+export type KnownOriginType = 'pullRequestNumber' | 'commits';
+export interface OriginPullRequestNumber extends OriginType {
+  readonly type: 'pullRequestNumber';
+  readonly number: number;
+}
+
+export interface OriginCommits extends OriginType {
+  readonly type: 'commits';
+  readonly commits: string[];
+}
 
 export type KnownChangelogType = 'markdown' | 'blocks';
-
 export interface ChangelogType {
   readonly type: KnownChangelogType;
 }
-
 export interface BlockChangelog extends ChangelogType {
-  type: 'blocks';
-  content: Block[];
+  readonly type: 'blocks';
+  readonly content: Block[];
 }
 
 export interface MarkdownChangelog extends ChangelogType {
-  type: 'markdown';
-  content: string;
+  readonly type: 'markdown';
+  readonly content: string;
 }
 
 export interface CreateChangelogUseCase {
@@ -32,48 +47,49 @@ export interface CreateChangelogUseCase {
 }
 
 export class CreateChangelogInput {
-  readonly pullRequestNumber: number;
+  readonly origin: Origin;
   readonly repository: string;
   readonly version: string;
 
-  constructor(pullRequestNumber: number, repository: string, version: string) {
-    this.pullRequestNumber = pullRequestNumber;
+  constructor(origin: Origin, repository: string, version: string) {
+    this.origin = origin;
     this.repository = repository;
     this.version = version;
   }
 }
-
 export interface CreateChangelogOutput {
   readonly blocks: BlockChangelog;
   readonly markdown: MarkdownChangelog;
 }
 
 export class GithubCreateChangelogUseCase implements CreateChangelogUseCase {
-  private readonly pullRequestNumberExtractor: PullRequestNumberExtractor;
-  private readonly pullRequestInfoUseCase: ReadPullRequestInfoUseCase;
+  private readonly blocksKeepChangelogBuilder: KeepChangelogBuilder<Block[]>;
+  private readonly commitPRNumberParser: CommitPRNumberParser;
   private readonly keepChangelogParser: KeepChangelogParser;
   private readonly markdownKeepChangelogBuilder: KeepChangelogBuilder<string>;
-  private readonly blocksKeepChangelogBuilder: KeepChangelogBuilder<Block[]>;
+  private readonly pullRequestInfoUseCase: ReadPullRequestInfoUseCase;
+  private readonly pullRequestNumberExtractor: PullRequestNumberExtractor;
 
   constructor(
-    pullRequestNumberExtractor: PullRequestNumberExtractor,
-    pullRequestInfoUseCase: ReadPullRequestInfoUseCase,
-    keepChangelogParser: KeepChangelogParser,
+    blocksKeepChangelogBuilder: KeepChangelogBuilder<Block[]>,
+    commitPRNumberParser: CommitPRNumberParser,
     keepChangelogBuilder: KeepChangelogBuilder<string>,
-    blocksKeepChangelogBuilder: KeepChangelogBuilder<Block[]>
+    keepChangelogParser: KeepChangelogParser,
+    pullRequestInfoUseCase: ReadPullRequestInfoUseCase,
+    pullRequestNumberExtractor: PullRequestNumberExtractor
   ) {
-    this.pullRequestNumberExtractor = pullRequestNumberExtractor;
-    this.pullRequestInfoUseCase = pullRequestInfoUseCase;
+    this.blocksKeepChangelogBuilder = blocksKeepChangelogBuilder;
+    this.commitPRNumberParser = commitPRNumberParser;
     this.keepChangelogParser = keepChangelogParser;
     this.markdownKeepChangelogBuilder = keepChangelogBuilder;
-    this.blocksKeepChangelogBuilder = blocksKeepChangelogBuilder;
+    this.pullRequestInfoUseCase = pullRequestInfoUseCase;
+    this.pullRequestNumberExtractor = pullRequestNumberExtractor;
   }
 
   execute(
     input: CreateChangelogInput
   ): Observable<CreateChangelogOutput | undefined> {
-    return this.pullRequestNumberExtractor
-      .extract(input.pullRequestNumber, input.repository)
+    return this.pullRequestNumbers(input.origin, input.repository)
       .pipe(
         flatMap((numbers) => {
           return this.pullRequestInfoUseCase.execute(numbers, input.repository);
@@ -214,5 +230,15 @@ export class GithubCreateChangelogUseCase implements CreateChangelogUseCase {
           };
         })
       );
+  }
+
+  private pullRequestNumbers(
+    origin: Origin,
+    repository: string
+  ): Observable<number[]> {
+    if (origin.type === 'commits') {
+      return of(this.commitPRNumberParser.parse(origin.commits));
+    }
+    return this.pullRequestNumberExtractor.extract(origin.number, repository);
   }
 }

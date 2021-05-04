@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
 import { CommitExtractor } from './commit-extractor';
 import { map } from 'rxjs/operators';
-
+import { CommitPRNumberParser } from './keep-changelog-builder/commits-pr-number-parser';
 export interface PullRequestNumberExtractor {
   extract(pullNumber: number, repository: string): Observable<number[]>;
 }
@@ -9,25 +9,19 @@ export interface PullRequestNumberExtractor {
 export class GithubPullRequestNumberExtractor
   implements PullRequestNumberExtractor {
   private readonly commitExtractor: CommitExtractor;
+  private readonly commitPRNumberParser: CommitPRNumberParser;
 
-  constructor(commitExtractor: CommitExtractor) {
+  constructor(
+    commitExtractor: CommitExtractor,
+    commitPRNumberParser: CommitPRNumberParser
+  ) {
     this.commitExtractor = commitExtractor;
+    this.commitPRNumberParser = commitPRNumberParser;
   }
 
   extract(pullNumber: number, repository: string): Observable<number[]> {
-    return this.commitExtractor.commits(pullNumber, repository).pipe(
-      map((commits) => {
-        return commits
-          .map((commit) => {
-            const match = commit.match(/(?:#)(\d+)/);
-            if (match !== null) {
-              const asNumber: number = +match[1];
-              return asNumber;
-            }
-            return null;
-          })
-          .filter((x): x is number => x !== null);
-      })
-    );
+    return this.commitExtractor
+      .commits(pullNumber, repository)
+      .pipe(map(this.commitPRNumberParser.parse));
   }
 }
