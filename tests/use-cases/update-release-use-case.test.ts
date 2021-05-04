@@ -1,5 +1,5 @@
-import { of } from 'rxjs';
-import { anything, deepEqual, instance, mock, when } from 'ts-mockito';
+import { of, throwError } from 'rxjs';
+import { anything, deepEqual, instance, mock, verify, when } from 'ts-mockito';
 import { GithubService } from '../../src/services/github-service';
 import { JiraService } from '../../src/services/jira-service';
 import { CreateChangelogUseCase } from '../../src/use-cases/create-changelog-use-case';
@@ -127,6 +127,98 @@ const happyCaseNoChangelogNoCommits = (): {
   return { sut: new ConcreteUpdateReleaseUseCase(dependencies), mocks };
 };
 
+const jiraServiceFailing = (): {
+  sut: ConcreteUpdateReleaseUseCase;
+  mocks: ReturnType<typeof buildMocks>;
+} => {
+  const mocks = buildMocks();
+
+  when(
+    mocks.createChangelogUseCase.execute(
+      deepEqual({
+        origin: {
+          type: 'pullRequestNumber',
+          number: 123
+        },
+        repository: 'repository',
+        version: 'toVersion'
+      })
+    )
+  ).thenReturn(of(void 0));
+
+  when(
+    mocks.extractTicketsUseCase.execute(
+      deepEqual({
+        pullRequestNumber: 123,
+        repository: 'repository'
+      })
+    )
+  ).thenReturn(
+    of({
+      ticketIdsCommits: [
+        {
+          ticketId: "ABC-123",
+          commit: "ABC-123 Bugs the fix"
+        }
+      ]
+    })
+  );
+
+  when(mocks.jiraService.hasFixVersion('ABC-123')).thenReturn(throwError({}))
+
+  when(
+    mocks.jiraService.updateFixVersion('fromVersion', 'toVersion', 'project')
+  ).thenReturn(of(void 0));
+
+  when(
+    mocks.githubService.updateRelease(
+      'fromVersion',
+      'toVersion',
+      'body',
+      'owner',
+      'repository'
+    )
+  ).thenReturn(of(void 0));
+
+  when(
+    mocks.githubService.updateMilestone(
+      'fromVersion',
+      'toVersion',
+      'owner',
+      'repository'
+    )
+  ).thenReturn(of(void 0));
+
+  when(
+    mocks.githubService.updateDescription(123, 'owner', 'repository', 'body')
+  ).thenReturn(of(void 0));
+
+  when(
+    mocks.githubService.updateTitle(123, 'title', 'owner', 'repository')
+  ).thenReturn(of(void 0));
+
+  when(mocks.tagUseCase.execute(anything())).thenReturn(
+    of({
+      successes: [],
+      failures: []
+    })
+  );
+
+  const createMilestoneUseCaseInput = new CreateMilestoneUseCaseInput(
+    123,
+    'repository',
+    'toVersion'
+  );
+
+  when(
+    mocks.createMilestoneUseCase.execute(deepEqual(createMilestoneUseCaseInput))
+  ).thenReturn(of({}));
+
+  const dependencies = buildDependencies(mocks);
+
+  return { sut: new ConcreteUpdateReleaseUseCase(dependencies), mocks };
+};
+
 describe('the update release use case', () => {
   it('executes correctly in an empty happy case', (done) => {
     const { sut } = happyCaseNoChangelogNoCommits();
@@ -145,6 +237,33 @@ describe('the update release use case', () => {
       .subscribe({
         next: () => {
           done();
+        },
+        error: () => {
+          fail();
+        }
+      });
+  });
+  
+
+  it('does not notify slack if jira service fails all fix-version fetches', (done) => {
+    const { sut, mocks } = jiraServiceFailing();
+
+    sut
+      .execute({
+        channel: 'channel',
+        fromVersion: 'fromVersion',
+        jiraSuffix: '',
+        project: 'project',
+        pullRequestNumber: 123,
+        repository: 'repository',
+        title: 'title',
+        toVersion: 'toVersion'
+      })
+      .subscribe({
+        next: () => {
+          verify(mocks.slackMessageSender.send(anything())).never()
+          done();
+
         },
         error: () => {
           fail();
