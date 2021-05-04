@@ -371,7 +371,9 @@ export class ConcreteGithubService implements GithubService {
             })
           ).pipe(mapTo(void 0));
         }
-        return throwError({ message: 'Unable to find release' });
+        return throwError({
+          message: `Unable to find Github release named: ${fromName}`
+        });
       })
     );
   }

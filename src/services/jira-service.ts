@@ -75,7 +75,9 @@ export class ConcreteJiraService {
           });
         }
 
-        return throwError({ message: 'Unable to find release' });
+        return throwError({
+          message: `Unable to find JIRA release named ${fromVersion}`
+        });
       }),
       mapTo(void 0)
     );

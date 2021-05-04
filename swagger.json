@@ -157,6 +157,59 @@
                     }
                 }
             }
+        },
+        "/updateRelease": {
+            "post": {
+                "description": "This endpoint parses all commits of a branch, looks for Jira tickets, notify the ones that were not tagged yet, update milestone, Jira Release, PR description and Github release description",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "channel": {
+                                        "type": "string",
+                                        "example": "automation"
+                                    },
+                                    "fromVersion": {
+                                        "type": "string",
+                                        "example": "1.0.0"
+                                    },
+                                    "jiraSuffix": {
+                                        "type": "string",
+                                        "example": "-backend"
+                                    },
+                                    "project": {
+                                        "type": "string",
+                                        "example": "ABC"
+                                    },
+                                    "pullRequestNumber": {
+                                        "type": "number",
+                                        "example": 57
+                                    },
+                                    "repository": {
+                                        "type": "string",
+                                        "example": "baroneza-test"
+                                    },
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Baroneza Staging Nightly Build"
+                                    },
+                                    "toVersion": {
+                                        "type": "string",
+                                        "example": "2.0.0"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
         }
     }
 }
