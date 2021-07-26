@@ -157,14 +157,14 @@ const jiraServiceFailing = (): {
     of({
       ticketIdsCommits: [
         {
-          ticketId: "ABC-123",
-          commit: "ABC-123 Bugs the fix"
+          ticketId: 'ABC-123',
+          commit: 'ABC-123 Bugs the fix'
         }
       ]
     })
   );
 
-  when(mocks.jiraService.hasFixVersion('ABC-123')).thenReturn(throwError({}))
+  when(mocks.jiraService.hasFixVersion('ABC-123')).thenReturn(throwError({}));
 
   when(
     mocks.jiraService.updateFixVersion('fromVersion', 'toVersion', 'project')
@@ -243,7 +243,6 @@ describe('the update release use case', () => {
         }
       });
   });
-  
 
   it('does not notify slack if jira service fails all fix-version fetches', (done) => {
     const { sut, mocks } = jiraServiceFailing();
@@ -261,9 +260,8 @@ describe('the update release use case', () => {
       })
       .subscribe({
         next: () => {
-          verify(mocks.slackMessageSender.send(anything())).never()
+          verify(mocks.slackMessageSender.send(anything())).never();
           done();
-
         },
         error: () => {
           fail();

@@ -27,7 +27,9 @@ describe('The Start Train Use Case', () => {
     const project = 'project';
     const confirmationReaction = 'confirmationReaction';
 
-    when(nextReleaseGuesserMock.guess('repository')).thenReturn(of('1.0.0'));
+    when(nextReleaseGuesserMock.guess('repository', 'patch')).thenReturn(
+      of('1.0.0')
+    );
 
     const askConfirmationUseCaseInput = new AskConfirmationUseCaseInput(
       'Would you like to start the release train for version 1.0.0? confirmationReaction to continue!',
@@ -49,7 +51,8 @@ describe('The Start Train Use Case', () => {
       'baseBranch',
       'targetBranch',
       'channel',
-      ' suffix'
+      ' suffix',
+      'patch'
     );
     const sut = new StartTrainUseCase(
       nextReleaseGuesser,
@@ -81,7 +84,9 @@ describe('The Start Train Use Case', () => {
     const project = 'project';
     const confirmationReaction = 'confirmationReaction';
 
-    when(nextReleaseGuesserMock.guess('repository')).thenReturn(of('1.0.0'));
+    when(nextReleaseGuesserMock.guess('repository', 'patch')).thenReturn(
+      of('1.0.0')
+    );
 
     const askConfirmationUseCaseInput = new AskConfirmationUseCaseInput(
       'Would you like to start the release train for version 1.0.0? confirmationReaction to continue!',
@@ -105,7 +110,8 @@ describe('The Start Train Use Case', () => {
       'baseBranch',
       'targetBranch',
       'channel',
-      ' suffix'
+      ' suffix',
+      'patch'
     );
     const sut = new StartTrainUseCase(
       nextReleaseGuesser,

@@ -106,6 +106,8 @@ export interface GithubService {
     owner: string,
     repo: string
   ): Observable<void>;
+
+  releases(owner: string, repo: string): Observable<string[]>;
 }
 
 export class ConcreteGithubService implements GithubService {
@@ -400,6 +402,12 @@ export class ConcreteGithubService implements GithubService {
 
         return throwError({ message: 'Unable to find milestone' });
       })
+    );
+  }
+
+  releases(owner: string, repo: string): Observable<string[]> {
+    return from(this.octokit.repos.listReleases({ owner, repo })).pipe(
+      map((response) => response.data.map((release) => release.name))
     );
   }
 }
