@@ -62,9 +62,9 @@ describe('the github draft release guesser', () => {
     it('bumps correctly (major)', (done) => {
       githubServiceMock = githubServiceMock.withReleases(['1.0.0']);
       const sut = buildSut();
-      sut.guess(repo, 'minor').subscribe({
+      sut.guess(repo, 'major').subscribe({
         next: (version) => {
-          expect(version).toBe('1.1.0');
+          expect(version).toBe('2.0.0');
           done();
         },
         error: () => fail('Call should not have failed')
