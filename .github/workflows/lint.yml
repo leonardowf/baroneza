@@ -20,3 +20,4 @@ jobs:
         eslint: true
         prettier: true
         auto_fix: true
+        eslint_dir: src/
