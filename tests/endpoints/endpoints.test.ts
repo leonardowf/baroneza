@@ -76,7 +76,8 @@ describe('The start traint endpoint', () => {
           'baseBranch',
           'targetBranch',
           'channel',
-          ' suffix'
+          ' suffix',
+          'patch'
         )
       )
       .subscribe({

@@ -1,4 +1,4 @@
-import { of } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { instance, mock, when } from 'ts-mockito';
 import { GithubService } from '../../src/services/github-service';
 
@@ -75,6 +75,20 @@ export class GithubServiceMock {
     when(
       this.githubService.compareCommits(this.owner, this.repo, head, base)
     ).thenReturn(of({ aheadBy }));
+    return this;
+  }
+
+  releasesFailed(): GithubServiceMock {
+    when(this.githubService.releases(this.owner, this.repo)).thenReturn(
+      throwError('Some backend error')
+    );
+    return this;
+  }
+
+  withReleases(releases: string[]): GithubServiceMock {
+    when(this.githubService.releases(this.owner, this.repo)).thenReturn(
+      of(releases)
+    );
     return this;
   }
 }

@@ -17,7 +17,6 @@ import { StartTrainUseCase } from './use-cases/start-train-use-case';
 import { SlackMessageSender } from './workers/message-sender';
 import { WebClient } from '@slack/web-api';
 import { SlackReactionsReader } from './workers/reactions-reader';
-import { GithubTagNextReleaseGuesser } from './workers/github-tag-next-release-guesser';
 import { ConcreteJiraTickerParser } from './workers/jira-ticket-parser';
 import { ConcreteGithubService } from './services/github-service';
 import { ConcreteJiraService } from './services/jira-service';
@@ -37,6 +36,7 @@ import { GithubMergeBackUseCase } from './use-cases/merge-back-use-case';
 import { ConcreteExtractTicketsUseCase } from './use-cases/extract-tickets-use-case';
 import { ConcreteCommitPRNumberParser } from './workers/keep-changelog-builder/commits-pr-number-parser';
 import { ConcreteUpdateReleaseUseCase } from './use-cases/update-release-use-case';
+import { GithubDraftReleaseGuesser } from './workers/github-draft-release-guesser';
 
 export class Dependencies
   implements
@@ -155,7 +155,7 @@ export class Dependencies
   );
 
   reactionsReader = new SlackReactionsReader(this.slackWebClient);
-  nextReleaseGuesser = new GithubTagNextReleaseGuesser(
+  nextReleaseGuesser = new GithubDraftReleaseGuesser(
     this.githubService,
     this.config.githubOwner
   );

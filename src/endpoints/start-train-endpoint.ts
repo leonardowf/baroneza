@@ -4,6 +4,7 @@ import {
   StartTrainUseCaseInput
 } from '../use-cases/start-train-use-case';
 import { map } from 'rxjs/operators';
+import { ReleaseType } from '../workers/next-release-guesser';
 
 export interface StartTrainDependencies {
   readonly startTrainUseCase: StartTrainUseCase;
@@ -15,6 +16,7 @@ export interface StartTrainEndpointInput {
   targetBranch: string;
   channel: string;
   jiraTagSuffix: string;
+  releaseType: ReleaseType;
 }
 
 export class StartTrainEndpointOutput {}
@@ -36,7 +38,8 @@ export class StartTrainEndpoint {
           input.baseBranch,
           input.targetBranch,
           input.channel,
-          input.jiraTagSuffix
+          input.jiraTagSuffix,
+          input.releaseType
         )
       )
       .pipe(map(() => new StartTrainEndpointOutput()));
