@@ -72,12 +72,22 @@ describe('the github draft release guesser', () => {
     });
 
     it('bumps correctly (prerelease)', (done) => {
-      githubServiceMock = githubServiceMock.withReleases(['1.0.0']);
+
+
+
+
+
+
+      githubServiceMock = githubServiceMock.withReleases(['1.0.0'])
       const sut = buildSut();
       sut.guess(repo, 'prerelease').subscribe({
         next: (version) => {
           expect(version).toBe('1.0.1-0');
           done();
+
+
+
+          
         },
         error: () => fail('Call should not have failed')
       });
