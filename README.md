@@ -4,6 +4,10 @@
   <br />
   <br />
   **A service to automatically start a release train**
+   <br />
+   <br />
+ <a href="https://codebeat.co/projects/github-com-leonardowf-baroneza-master"><img alt="codebeat badge" src="https://codebeat.co/badges/f383f4eb-f2a8-43d3-bb66-f0502eeec036" /></a>
+
 </div>
 
 ## ✨ Features
