@@ -14,16 +14,16 @@ import {
 } from './ask-confirmation-use-case';
 
 export type StartTrainUseCaseInput = {
-   baseBranch: string,
-   branchPrefix: string,
-   channel: string,
-   jiraProjectName: string,
-   jiraTagSuffix: string,
-   pullRequestTitlePrefix: string,
-   releaseType: ReleaseType,
-   repository: string,
-   targetBranch: string,
-}
+  baseBranch: string;
+  branchPrefix: string;
+  channel: string;
+  jiraProjectName: string;
+  jiraTagSuffix: string;
+  pullRequestTitlePrefix: string;
+  releaseType: ReleaseType;
+  repository: string;
+  targetBranch: string;
+};
 
 export class StartTrainUseCaseOutput {}
 
@@ -33,19 +33,16 @@ export type StartTrainUseCaseDependencies = {
   askConfirmationUseCase: AskConfirmationUseCase;
   confirmationReaction: string;
   secondsToConfirmationTimeout: number;
-}
+};
 
 export class StartTrainUseCase {
   readonly dependencies: StartTrainUseCaseDependencies;
 
-  constructor(
-    dependencies: StartTrainUseCaseDependencies
-  ) {
-    this.dependencies = dependencies
+  constructor(dependencies: StartTrainUseCaseDependencies) {
+    this.dependencies = dependencies;
   }
 
   execute(input: StartTrainUseCaseInput): Observable<StartTrainUseCaseOutput> {
-
     return this.dependencies.nextReleaseGuesser
       .guess(input.repository, input.releaseType)
       .pipe(

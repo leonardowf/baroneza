@@ -20,11 +20,6 @@ describe('The Start Train Use Case', () => {
     const nextReleaseGuesserMock = mock<NextReleaseGuesser>();
     const createReleaseUseCaseMock = mock<CreateReleaseUseCase>();
     const askConfirmationUseCaseMock = mock<AskConfirmationUseCase>();
-    const branchPrefix = 'branchPrefix';
-    const baseBranch = 'baseBranch';
-    const targetBranch = 'targetBranch';
-    const pullRequestTitlePrefix = 'pullRequestTitlePrefix';
-    const project = 'project';
     const confirmationReaction = 'confirmationReaction';
     const secondsToConfirmationTimeout = 60;
 
@@ -52,9 +47,9 @@ describe('The Start Train Use Case', () => {
       channel: 'channel',
       jiraTagSuffix: ' suffix',
       releaseType: 'patch',
-      jiraProjectName: "jiraProjectName",
-      branchPrefix: "branchPrefix",
-      pullRequestTitlePrefix: "pullRequestTitlePrefix"
+      jiraProjectName: 'jiraProjectName',
+      branchPrefix: 'branchPrefix',
+      pullRequestTitlePrefix: 'pullRequestTitlePrefix'
     };
 
     const sut = new StartTrainUseCase({
@@ -63,8 +58,7 @@ describe('The Start Train Use Case', () => {
       askConfirmationUseCase,
       confirmationReaction,
       secondsToConfirmationTimeout
-    }
-    );
+    });
     sut.execute(sutInput).subscribe({
       next: () => {
         verify(createReleaseUseCaseMock.execute(anything())).never();
@@ -77,11 +71,6 @@ describe('The Start Train Use Case', () => {
     const nextReleaseGuesserMock = mock<NextReleaseGuesser>();
     const createReleaseUseCaseMock = mock<CreateReleaseUseCase>();
     const askConfirmationUseCaseMock = mock<AskConfirmationUseCase>();
-    const branchPrefix = 'branchPrefix';
-    const baseBranch = 'baseBranch';
-    const targetBranch = 'targetBranch';
-    const pullRequestTitlePrefix = 'pullRequestTitlePrefix';
-    const project = 'project';
     const confirmationReaction = 'confirmationReaction';
     const secondsToConfirmationTimeout = 600000;
 
@@ -115,9 +104,9 @@ describe('The Start Train Use Case', () => {
       channel: 'channel',
       jiraTagSuffix: ' suffix',
       releaseType: 'patch',
-      jiraProjectName: "jiraProjectName",
-      branchPrefix: "branchPrefix",
-      pullRequestTitlePrefix: "pullRequestTitlePrefix"
+      jiraProjectName: 'jiraProjectName',
+      branchPrefix: 'branchPrefix',
+      pullRequestTitlePrefix: 'pullRequestTitlePrefix'
     };
 
     const sut = new StartTrainUseCase({
@@ -126,8 +115,7 @@ describe('The Start Train Use Case', () => {
       askConfirmationUseCase,
       confirmationReaction,
       secondsToConfirmationTimeout
-    }
-    );
+    });
 
     sut.execute(sutInput).subscribe({
       next: () => {

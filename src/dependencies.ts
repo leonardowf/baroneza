@@ -173,8 +173,7 @@ export class Dependencies
     askConfirmationUseCase: this.askConfirmationUseCase,
     confirmationReaction: this.config.confirmationEmoji,
     secondsToConfirmationTimeout: this.config.secondsToConfirmationTimeout
-  }
-  );
+  });
 
   updateReleaseUseCase = new ConcreteUpdateReleaseUseCase({
     createChangelogUseCase: this.createChangeLogUseCase,

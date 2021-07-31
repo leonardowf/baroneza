@@ -5,8 +5,7 @@ import {
 import { mock, instance, when, anything, verify } from 'ts-mockito';
 import {
   StartTrainUseCase,
-  StartTrainUseCaseOutput,
-  StartTrainUseCaseInput
+  StartTrainUseCaseOutput
 } from '../../src/use-cases/start-train-use-case';
 import { of } from 'rxjs';
 import {
@@ -18,8 +17,7 @@ import { CreateReleaseUseCase } from '../../src/use-cases/create-release-use-cas
 import { CreateBranchUseCaseOutput } from '../../src/use-cases/create-branch-use-case';
 import {
   TagEndpoint,
-  TagEndpointDependencies,
-  TagEndpointInput
+  TagEndpointDependencies
 } from '../../src/endpoints/tag-endpoint';
 import { TagUseCase, TagUseCaseOutput } from '../../src/use-cases/tag-use-case';
 
@@ -62,19 +60,17 @@ describe('The start traint endpoint', () => {
     const sut = new StartTrainEndpoint(dependencies);
 
     sut
-      .execute(
-        {
-          baseBranch: 'baseBranch',
-          branchPrefix: 'branchPrefix',
-          channel: 'channel',
-          jiraProjectName: 'jiraProjectName',
-          jiraTagSuffix: ' suffix',
-          pullRequestTitlePrefix: 'pullRequestTitlePrefix',
-          releaseType: 'patch',
-          repository: 'repo',
-          targetBranch: 'targetBranch',
-        }
-      )
+      .execute({
+        baseBranch: 'baseBranch',
+        branchPrefix: 'branchPrefix',
+        channel: 'channel',
+        jiraProjectName: 'jiraProjectName',
+        jiraTagSuffix: ' suffix',
+        pullRequestTitlePrefix: 'pullRequestTitlePrefix',
+        releaseType: 'patch',
+        repository: 'repo',
+        targetBranch: 'targetBranch'
+      })
       .subscribe({
         complete: () => {
           verify(dependencies.startTrainUseCaseMock.execute(anything())).once();
@@ -115,17 +111,19 @@ describe('The tag endpoint', () => {
 
     const sut = new TagEndpoint(dependencies);
 
-    sut.execute({
-      jiraTagSuffix: "jiraTagSuffix",
-      number: 123,
-      project: "project",
-      repository: "repository",
-      tag: "tag"
-    }).subscribe({
-      complete: () => {
-        verify(dependencies.tagUseCaseMock.execute(anything())).once();
-        done();
-      }
-    });
+    sut
+      .execute({
+        jiraTagSuffix: 'jiraTagSuffix',
+        number: 123,
+        project: 'project',
+        repository: 'repository',
+        tag: 'tag'
+      })
+      .subscribe({
+        complete: () => {
+          verify(dependencies.tagUseCaseMock.execute(anything())).once();
+          done();
+        }
+      });
   });
 });
