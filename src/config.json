@@ -2,10 +2,5 @@
     "jira_host": "baroneza-test.atlassian.net",
     "github_owner": "leonardowf",
     "confirmation_emoji": ":x:",
-    "release_target_branch": "release-candidate",
-    "release_base_branch": "develop",
-    "new_branch_prefix": "rc-",
-    "pull_request_title_prefix": "Release Candidate ",
-    "jira_project_name": "PSF",
     "seconds_to_confirmation_timeout": 1800
 }

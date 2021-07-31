@@ -36,27 +36,19 @@ class TestCreateReleaseDependencies
 
 class TestCreateReleaseInput implements CreateReleaseEndpointInput {
   branchName = 'branchName';
-  referenceBranch = 'referenceBranch';
-  title = 'title';
-  targetBranch = 'targetBranch';
-  projectTag = 'projectTag';
-  project = 'project';
-  repository = 'repository';
   channel = 'channel';
   jiraTagSuffix = ' suffix';
+  project = 'project';
+  projectTag = 'projectTag';
+  referenceBranch = 'referenceBranch';
+  repository = 'repository';
+  targetBranch = 'targetBranch';
+  title = 'title';
 }
 
 class TestTagEndpointDependencies implements TagEndpointDependencies {
   tagUseCaseMock = mock<TagUseCase>();
   tagUseCase = instance(this.tagUseCaseMock);
-  project = 'project';
-}
-
-class TestTagEndpointInput implements TagEndpointInput {
-  number = 123;
-  tag = 'tag';
-  repository = 'repository';
-  jiraTagSuffix = ' suffix';
 }
 
 describe('The start traint endpoint', () => {
@@ -71,14 +63,17 @@ describe('The start traint endpoint', () => {
 
     sut
       .execute(
-        new StartTrainUseCaseInput(
-          'repo',
-          'baseBranch',
-          'targetBranch',
-          'channel',
-          ' suffix',
-          'patch'
-        )
+        {
+          baseBranch: 'baseBranch',
+          branchPrefix: 'branchPrefix',
+          channel: 'channel',
+          jiraProjectName: 'jiraProjectName',
+          jiraTagSuffix: ' suffix',
+          pullRequestTitlePrefix: 'pullRequestTitlePrefix',
+          releaseType: 'patch',
+          repository: 'repo',
+          targetBranch: 'targetBranch',
+        }
       )
       .subscribe({
         complete: () => {
@@ -120,7 +115,13 @@ describe('The tag endpoint', () => {
 
     const sut = new TagEndpoint(dependencies);
 
-    sut.execute(new TestTagEndpointInput()).subscribe({
+    sut.execute({
+      jiraTagSuffix: "jiraTagSuffix",
+      number: 123,
+      project: "project",
+      repository: "repository",
+      tag: "tag"
+    }).subscribe({
       complete: () => {
         verify(dependencies.tagUseCaseMock.execute(anything())).once();
         done();

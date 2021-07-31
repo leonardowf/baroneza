@@ -10,13 +10,16 @@ export interface StartTrainDependencies {
   readonly startTrainUseCase: StartTrainUseCase;
 }
 
-export interface StartTrainEndpointInput {
-  repository: string;
-  baseBranch: string;
-  targetBranch: string;
-  channel: string;
-  jiraTagSuffix: string;
-  releaseType: ReleaseType;
+export type StartTrainEndpointInput = {
+  baseBranch: string,
+  branchPrefix: string,
+  channel: string,
+  jiraProjectName: string,
+  jiraTagSuffix: string,
+  pullRequestTitlePrefix: string,
+  releaseType: ReleaseType,
+  repository: string,
+  targetBranch: string,
 }
 
 export class StartTrainEndpointOutput {}
@@ -32,16 +35,7 @@ export class StartTrainEndpoint {
     input: StartTrainEndpointInput
   ): Observable<StartTrainEndpointOutput> {
     return this.startTrainUseCase
-      .execute(
-        new StartTrainUseCaseInput(
-          input.repository,
-          input.baseBranch,
-          input.targetBranch,
-          input.channel,
-          input.jiraTagSuffix,
-          input.releaseType
-        )
-      )
+      .execute({...input})
       .pipe(map(() => new StartTrainEndpointOutput()));
   }
 }

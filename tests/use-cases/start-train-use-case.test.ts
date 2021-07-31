@@ -45,25 +45,25 @@ describe('The Start Train Use Case', () => {
     const createReleaseUseCase = instance(createReleaseUseCaseMock);
     const askConfirmationUseCase = instance(askConfirmationUseCaseMock);
 
-    const sutInput = new StartTrainUseCaseInput(
-      'repository',
-      'baseBranch',
-      'targetBranch',
-      'channel',
-      ' suffix',
-      'patch'
-    );
-    const sut = new StartTrainUseCase(
+    const sutInput: StartTrainUseCaseInput = {
+      repository: 'repository',
+      baseBranch: 'baseBranch',
+      targetBranch: 'targetBranch',
+      channel: 'channel',
+      jiraTagSuffix: ' suffix',
+      releaseType: 'patch',
+      jiraProjectName: "jiraProjectName",
+      branchPrefix: "branchPrefix",
+      pullRequestTitlePrefix: "pullRequestTitlePrefix"
+    };
+
+    const sut = new StartTrainUseCase({
       nextReleaseGuesser,
       createReleaseUseCase,
       askConfirmationUseCase,
-      branchPrefix,
-      baseBranch,
-      targetBranch,
-      pullRequestTitlePrefix,
-      project,
       confirmationReaction,
       secondsToConfirmationTimeout
+    }
     );
     sut.execute(sutInput).subscribe({
       next: () => {
@@ -108,25 +108,25 @@ describe('The Start Train Use Case', () => {
     const createReleaseUseCase = instance(createReleaseUseCaseMock);
     const askConfirmationUseCase = instance(askConfirmationUseCaseMock);
 
-    const sutInput = new StartTrainUseCaseInput(
-      'repository',
-      'baseBranch',
-      'targetBranch',
-      'channel',
-      ' suffix',
-      'patch'
-    );
-    const sut = new StartTrainUseCase(
+    const sutInput: StartTrainUseCaseInput = {
+      repository: 'repository',
+      baseBranch: 'baseBranch',
+      targetBranch: 'targetBranch',
+      channel: 'channel',
+      jiraTagSuffix: ' suffix',
+      releaseType: 'patch',
+      jiraProjectName: "jiraProjectName",
+      branchPrefix: "branchPrefix",
+      pullRequestTitlePrefix: "pullRequestTitlePrefix"
+    };
+
+    const sut = new StartTrainUseCase({
       nextReleaseGuesser,
       createReleaseUseCase,
       askConfirmationUseCase,
-      branchPrefix,
-      baseBranch,
-      targetBranch,
-      pullRequestTitlePrefix,
-      project,
       confirmationReaction,
       secondsToConfirmationTimeout
+    }
     );
 
     sut.execute(sutInput).subscribe({
