@@ -50,6 +50,7 @@ export class StartTrainUseCase {
   private readonly pullRequestTitlePrefix: string;
   private readonly project: string;
   private readonly confirmationReaction: string;
+  private secondsToConfirmationTimeout: number;
 
   constructor(
     nextReleaseGuesser: NextReleaseGuesser,
@@ -60,7 +61,8 @@ export class StartTrainUseCase {
     targetBranch: string,
     pullRequestTitlePrefix: string,
     project: string,
-    confirmationReaction: string
+    confirmationReaction: string,
+    secondsToConfirmationTimeout: number
   ) {
     this.nextReleaseGuesser = nextReleaseGuesser;
     this.createReleaseUseCase = createReleaseUseCase;
@@ -72,11 +74,22 @@ export class StartTrainUseCase {
     this.pullRequestTitlePrefix = pullRequestTitlePrefix;
     this.project = project;
     this.confirmationReaction = confirmationReaction;
+    this.secondsToConfirmationTimeout = secondsToConfirmationTimeout;
   }
 
   execute(input: StartTrainUseCaseInput): Observable<StartTrainUseCaseOutput> {
-    const confirmationCopyMaker = (version: string): string =>
-      `Would you like to start the release train for version ${version}? ${this.confirmationReaction} to continue!`;
+    const confirmationCopyMaker = (version: string): string => {
+      return (
+        `🚂 \n` +
+        'Chugga chugga chugga chugga chugga choo choooooo!\n' + // TODO: agree on how many chuggas before a choo choo
+        `---\n` +
+        `The train for version ${version} will depart in ${this.secondsToConfirmationTimeout} seconds\n` +
+        `---\n` +
+        'Be sure that everything is merged and the branches are properly aligned\n' +
+        `---\n` +
+        `React to this message with ${this.confirmationReaction} to stop the train`
+      );
+    };
 
     return this.nextReleaseGuesser
       .guess(input.repository, input.releaseType)
@@ -87,7 +100,7 @@ export class StartTrainUseCase {
             .execute(new AskConfirmationUseCaseInput(copy, input.channel))
             .pipe(
               flatMap((confirmationRequest) => {
-                if (confirmationRequest.confirmed) {
+                if (!confirmationRequest.reacted) {
                   return this.createReleaseUseCase.execute(
                     new CreateReleaseUseCaseInput(
                       `${this.branchPrefix}${version}`,

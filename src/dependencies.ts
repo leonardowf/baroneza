@@ -176,7 +176,8 @@ export class Dependencies
     this.config.releaseTargetBranch,
     this.config.pullRequestTitlePrefix,
     this.config.jiraProjectName,
-    this.config.confirmationEmoji
+    this.config.confirmationEmoji,
+    this.config.secondsToConfirmationTimeout
   );
 
   updateReleaseUseCase = new ConcreteUpdateReleaseUseCase({
