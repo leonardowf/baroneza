@@ -50,7 +50,7 @@ export class StartTrainUseCase {
   private readonly pullRequestTitlePrefix: string;
   private readonly project: string;
   private readonly confirmationReaction: string;
-  private secondsToConfirmationTimeout: number;
+  private readonly secondsToConfirmationTimeout: number;
 
   constructor(
     nextReleaseGuesser: NextReleaseGuesser,
