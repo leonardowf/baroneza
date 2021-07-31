@@ -78,24 +78,12 @@ export class StartTrainUseCase {
   }
 
   execute(input: StartTrainUseCaseInput): Observable<StartTrainUseCaseOutput> {
-    const confirmationCopyMaker = (version: string): string => {
-      return (
-        `🚂 \n` +
-        'Chugga chugga chugga chugga chugga choo choooooo!\n' + // TODO: agree on how many chuggas before a choo choo
-        `---\n` +
-        `The train for version ${version} will depart in ${this.secondsToConfirmationTimeout} seconds\n` +
-        `---\n` +
-        'Be sure that everything is merged and the branches are properly aligned\n' +
-        `---\n` +
-        `React to this message with ${this.confirmationReaction} to stop the train`
-      );
-    };
 
     return this.nextReleaseGuesser
       .guess(input.repository, input.releaseType)
       .pipe(
         flatMap((version) => {
-          const copy = confirmationCopyMaker(version);
+          const copy = this.confirmationCopyMaker(version);
           return this.askConfirmationUseCase
             .execute(new AskConfirmationUseCaseInput(copy, input.channel))
             .pipe(
@@ -121,5 +109,18 @@ export class StartTrainUseCase {
             );
         })
       );
+  }
+
+  private confirmationCopyMaker(version: string): string {
+    return (
+      `🚂 \n` +
+      'Chugga chugga chugga chugga chugga choo choooooo!\n' + // TODO: agree on how many chuggas before a choo choo
+      `---\n` +
+      `The train for version ${version} will depart in ${this.secondsToConfirmationTimeout} seconds\n` +
+      `---\n` +
+      'Be sure that everything is merged and the branches are properly aligned\n' +
+      `---\n` +
+      `React to this message with ${this.confirmationReaction} to stop the train`
+    );
   }
 }
