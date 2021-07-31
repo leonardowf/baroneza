@@ -167,17 +167,13 @@ export class Dependencies
     this.config.secondsToConfirmationTimeout
   );
 
-  startTrainUseCase = new StartTrainUseCase(
-    this.nextReleaseGuesser,
-    this.createReleaseUseCase,
-    this.askConfirmationUseCase,
-    this.config.newBranchPrefix,
-    this.config.releaseBaseBranch,
-    this.config.releaseTargetBranch,
-    this.config.pullRequestTitlePrefix,
-    this.config.jiraProjectName,
-    this.config.confirmationEmoji
-  );
+  startTrainUseCase = new StartTrainUseCase({
+    nextReleaseGuesser: this.nextReleaseGuesser,
+    createReleaseUseCase: this.createReleaseUseCase,
+    askConfirmationUseCase: this.askConfirmationUseCase,
+    confirmationReaction: this.config.confirmationEmoji,
+    secondsToConfirmationTimeout: this.config.secondsToConfirmationTimeout
+  });
 
   updateReleaseUseCase = new ConcreteUpdateReleaseUseCase({
     createChangelogUseCase: this.createChangeLogUseCase,
@@ -195,6 +191,4 @@ export class Dependencies
     this.pullRequestCreator,
     this.githubService
   );
-
-  project = this.config.jiraProjectName;
 }

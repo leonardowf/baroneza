@@ -8,7 +8,6 @@ import {
 
 export interface TagEndpointDependencies {
   readonly tagUseCase: TagUseCase;
-  project: string;
 }
 
 export interface TagEndpointInputMapper {
@@ -31,18 +30,16 @@ export interface TagEndpointOutputMapper {
 
 export class TagEndpoint {
   private readonly tagUseCase: TagUseCase;
-  private readonly project: string;
 
   constructor(dependencies: TagEndpointDependencies) {
     this.tagUseCase = dependencies.tagUseCase;
-    this.project = dependencies.project;
   }
 
   execute(input: TagEndpointInput): Observable<TagEndpointResponse> {
     const useCaseInput = new TagUseCaseInput(
       input.number,
       input.tag,
-      this.project,
+      input.project,
       input.repository,
       input.jiraTagSuffix
     );
@@ -54,8 +51,9 @@ export class TagEndpoint {
 }
 
 export interface TagEndpointInput {
-  readonly number: number;
-  readonly tag: string;
-  readonly repository: string;
   readonly jiraTagSuffix: string;
+  readonly number: number;
+  readonly project: string;
+  readonly repository: string;
+  readonly tag: string;
 }

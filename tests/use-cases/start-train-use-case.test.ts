@@ -16,28 +16,22 @@ import { mock, when, instance, deepEqual, anything, verify } from 'ts-mockito';
 import { of } from 'rxjs';
 
 describe('The Start Train Use Case', () => {
-  it('does not call things when no confirmation', (done) => {
+  it('call things when no confirmation', (done) => {
     const nextReleaseGuesserMock = mock<NextReleaseGuesser>();
     const createReleaseUseCaseMock = mock<CreateReleaseUseCase>();
     const askConfirmationUseCaseMock = mock<AskConfirmationUseCase>();
-    const branchPrefix = 'branchPrefix';
-    const baseBranch = 'baseBranch';
-    const targetBranch = 'targetBranch';
-    const pullRequestTitlePrefix = 'pullRequestTitlePrefix';
-    const project = 'project';
     const confirmationReaction = 'confirmationReaction';
+    const secondsToConfirmationTimeout = 60;
 
     when(nextReleaseGuesserMock.guess('repository', 'patch')).thenReturn(
       of('1.0.0')
     );
 
     const askConfirmationUseCaseInput = new AskConfirmationUseCaseInput(
-      'Would you like to start the release train for version 1.0.0? confirmationReaction to continue!',
+      '🚂 \nChugga chugga chugga chugga chugga choo choooooo!\n---\nThe train for version 1.0.0 will depart in 60 seconds\n---\nBe sure that everything is merged and the branches are properly aligned\n---\nReact to this message with confirmationReaction to stop the train',
       'channel'
     );
-    const askConfirmationUseCaseOutput = new AskConfirmationUseCaseOutput(
-      false
-    );
+    const askConfirmationUseCaseOutput = new AskConfirmationUseCaseOutput(true);
     when(
       askConfirmationUseCaseMock.execute(deepEqual(askConfirmationUseCaseInput))
     ).thenReturn(of(askConfirmationUseCaseOutput));
@@ -46,25 +40,25 @@ describe('The Start Train Use Case', () => {
     const createReleaseUseCase = instance(createReleaseUseCaseMock);
     const askConfirmationUseCase = instance(askConfirmationUseCaseMock);
 
-    const sutInput = new StartTrainUseCaseInput(
-      'repository',
-      'baseBranch',
-      'targetBranch',
-      'channel',
-      ' suffix',
-      'patch'
-    );
-    const sut = new StartTrainUseCase(
+    const sutInput: StartTrainUseCaseInput = {
+      repository: 'repository',
+      baseBranch: 'baseBranch',
+      targetBranch: 'targetBranch',
+      channel: 'channel',
+      jiraTagSuffix: ' suffix',
+      releaseType: 'patch',
+      jiraProjectName: 'jiraProjectName',
+      branchPrefix: 'branchPrefix',
+      pullRequestTitlePrefix: 'pullRequestTitlePrefix'
+    };
+
+    const sut = new StartTrainUseCase({
       nextReleaseGuesser,
       createReleaseUseCase,
       askConfirmationUseCase,
-      branchPrefix,
-      baseBranch,
-      targetBranch,
-      pullRequestTitlePrefix,
-      project,
-      confirmationReaction
-    );
+      confirmationReaction,
+      secondsToConfirmationTimeout
+    });
     sut.execute(sutInput).subscribe({
       next: () => {
         verify(createReleaseUseCaseMock.execute(anything())).never();
@@ -73,26 +67,24 @@ describe('The Start Train Use Case', () => {
     });
   });
 
-  it('call things when confirmation is true', (done) => {
+  it('does not call things when confirmation is true', (done) => {
     const nextReleaseGuesserMock = mock<NextReleaseGuesser>();
     const createReleaseUseCaseMock = mock<CreateReleaseUseCase>();
     const askConfirmationUseCaseMock = mock<AskConfirmationUseCase>();
-    const branchPrefix = 'branchPrefix';
-    const baseBranch = 'baseBranch';
-    const targetBranch = 'targetBranch';
-    const pullRequestTitlePrefix = 'pullRequestTitlePrefix';
-    const project = 'project';
     const confirmationReaction = 'confirmationReaction';
+    const secondsToConfirmationTimeout = 600000;
 
     when(nextReleaseGuesserMock.guess('repository', 'patch')).thenReturn(
-      of('1.0.0')
+      of('1.0.1')
     );
 
     const askConfirmationUseCaseInput = new AskConfirmationUseCaseInput(
-      'Would you like to start the release train for version 1.0.0? confirmationReaction to continue!',
+      '🚂 \nChugga chugga chugga chugga chugga choo choooooo!\n---\nThe train for version 1.0.1 will depart in 600000 seconds\n---\nBe sure that everything is merged and the branches are properly aligned\n---\nReact to this message with confirmationReaction to stop the train',
       'channel'
     );
-    const askConfirmationUseCaseOutput = new AskConfirmationUseCaseOutput(true);
+    const askConfirmationUseCaseOutput = new AskConfirmationUseCaseOutput(
+      false
+    );
     when(
       askConfirmationUseCaseMock.execute(deepEqual(askConfirmationUseCaseInput))
     ).thenReturn(of(askConfirmationUseCaseOutput));
@@ -105,25 +97,25 @@ describe('The Start Train Use Case', () => {
     const createReleaseUseCase = instance(createReleaseUseCaseMock);
     const askConfirmationUseCase = instance(askConfirmationUseCaseMock);
 
-    const sutInput = new StartTrainUseCaseInput(
-      'repository',
-      'baseBranch',
-      'targetBranch',
-      'channel',
-      ' suffix',
-      'patch'
-    );
-    const sut = new StartTrainUseCase(
+    const sutInput: StartTrainUseCaseInput = {
+      repository: 'repository',
+      baseBranch: 'baseBranch',
+      targetBranch: 'targetBranch',
+      channel: 'channel',
+      jiraTagSuffix: ' suffix',
+      releaseType: 'patch',
+      jiraProjectName: 'jiraProjectName',
+      branchPrefix: 'branchPrefix',
+      pullRequestTitlePrefix: 'pullRequestTitlePrefix'
+    };
+
+    const sut = new StartTrainUseCase({
       nextReleaseGuesser,
       createReleaseUseCase,
       askConfirmationUseCase,
-      branchPrefix,
-      baseBranch,
-      targetBranch,
-      pullRequestTitlePrefix,
-      project,
-      confirmationReaction
-    );
+      confirmationReaction,
+      secondsToConfirmationTimeout
+    });
 
     sut.execute(sutInput).subscribe({
       next: () => {

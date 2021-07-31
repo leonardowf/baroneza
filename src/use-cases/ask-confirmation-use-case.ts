@@ -23,10 +23,10 @@ export class AskConfirmationUseCaseInput {
 }
 
 export class AskConfirmationUseCaseOutput {
-  readonly confirmed: boolean;
+  readonly reacted: boolean;
 
-  constructor(confirmed: boolean) {
-    this.confirmed = confirmed;
+  constructor(reacted: boolean) {
+    this.reacted = reacted;
   }
 }
 
@@ -70,8 +70,8 @@ export class SlackAskConfirmationUseCase {
       )
       .pipe(map((x) => x.length > 0))
       .pipe(
-        map((confirmed) => {
-          return new AskConfirmationUseCaseOutput(confirmed);
+        map((reacted) => {
+          return new AskConfirmationUseCaseOutput(reacted);
         })
       );
   }

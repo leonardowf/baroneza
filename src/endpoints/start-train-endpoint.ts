@@ -1,8 +1,5 @@
 import { Observable } from 'rxjs';
-import {
-  StartTrainUseCase,
-  StartTrainUseCaseInput
-} from '../use-cases/start-train-use-case';
+import { StartTrainUseCase } from '../use-cases/start-train-use-case';
 import { map } from 'rxjs/operators';
 import { ReleaseType } from '../workers/next-release-guesser';
 
@@ -10,14 +7,17 @@ export interface StartTrainDependencies {
   readonly startTrainUseCase: StartTrainUseCase;
 }
 
-export interface StartTrainEndpointInput {
-  repository: string;
+export type StartTrainEndpointInput = {
   baseBranch: string;
-  targetBranch: string;
+  branchPrefix: string;
   channel: string;
+  jiraProjectName: string;
   jiraTagSuffix: string;
+  pullRequestTitlePrefix: string;
   releaseType: ReleaseType;
-}
+  repository: string;
+  targetBranch: string;
+};
 
 export class StartTrainEndpointOutput {}
 
@@ -32,16 +32,7 @@ export class StartTrainEndpoint {
     input: StartTrainEndpointInput
   ): Observable<StartTrainEndpointOutput> {
     return this.startTrainUseCase
-      .execute(
-        new StartTrainUseCaseInput(
-          input.repository,
-          input.baseBranch,
-          input.targetBranch,
-          input.channel,
-          input.jiraTagSuffix,
-          input.releaseType
-        )
-      )
+      .execute({ ...input })
       .pipe(map(() => new StartTrainEndpointOutput()));
   }
 }
