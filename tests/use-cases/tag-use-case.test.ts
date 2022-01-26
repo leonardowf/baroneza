@@ -71,7 +71,7 @@ describe('The tag use case', () => {
           verify(jiraTicketTaggerMock.tag(anything(), anything())).once();
           verify(
             createVersionUseCaseMock.execute(
-              deepEqual(new CreateVersionUseCaseInput('PSF', 'v1.0 suffix'))
+              deepEqual(new CreateVersionUseCaseInput(['PSF'], 'v1.0 suffix'))
             )
           ).once();
 

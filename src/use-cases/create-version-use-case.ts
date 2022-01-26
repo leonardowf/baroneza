@@ -1,6 +1,7 @@
 import { Observable, of } from 'rxjs';
 import { JiraService } from '../services/jira-service';
 import { flatMap, mapTo } from 'rxjs/operators';
+import { forkJoin } from 'rxjs'
 
 export interface CreateVersionUseCase {
   execute(
@@ -9,11 +10,11 @@ export interface CreateVersionUseCase {
 }
 
 export class CreateVersionUseCaseInput {
-  readonly project: string;
+  readonly projectKeys: string[];
   readonly version: string;
 
-  constructor(project: string, version: string) {
-    this.project = project;
+  constructor(projectKeys: string[], version: string) {
+    this.projectKeys = projectKeys;
     this.version = version;
   }
 }
@@ -29,17 +30,24 @@ export class JiraCreateVersionUseCase implements CreateVersionUseCase {
 
   execute(
     input: CreateVersionUseCaseInput
-  ): Observable<CreateVersionUseCaseOutput> {
+  ): Observable<CreateVersionUseCaseOutput[]> {
+     const createdVersions = input.projectKeys.map((projectKey) => {
+      return this.createVersion(projectKey, input.version)
+     });
+     return forkJoin(createdVersions)
+  }
+
+  private createVersion(projectKey: string, version: string): Observable<CreateVersionUseCaseOutput> {
     const createVersion = this.jiraService
-      .projectId(input.project)
+      .projectIdFromKey(projectKey)
       .pipe(
         flatMap((projectId) =>
-          this.jiraService.createVersion(input.version, projectId)
+          this.jiraService.createVersion(version, projectId)
         )
       )
       .pipe(mapTo(new CreateVersionUseCaseOutput()));
 
-    return this.jiraService.hasVersion(input.version, input.project).pipe(
+    return this.jiraService.hasVersion(version, projectKey).pipe(
       flatMap((x) => {
         if (!x) {
           return createVersion;

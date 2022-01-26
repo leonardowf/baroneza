@@ -66,7 +66,7 @@ export class JiraTagUseCase implements TagUseCase {
         flatMap((extractTicketsOutput) => {
           const tag = `${input.tag}${input.jiraTagSuffix}`;
           return this.createVersionUseCase
-            .execute(new CreateVersionUseCaseInput(input.project, tag))
+            .execute(new CreateVersionUseCaseInput([input.project], tag))
             .pipe(
               flatMap(() =>
                 this.jiraTicketTagger.tag(

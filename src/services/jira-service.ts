@@ -4,7 +4,7 @@ import { flatMap, map, mapTo } from 'rxjs/operators';
 
 export interface JiraService {
   createVersion(name: string, projectId: number): Observable<void>;
-  projectId(project: string): Observable<number>;
+  projectIdFromKey(project: string): Observable<number>;
   hasVersion(name: string, project: string): Observable<boolean>;
   hasFixVersion(issueNumber: string): Observable<boolean>;
   updateFixVersion(

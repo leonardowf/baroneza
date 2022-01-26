@@ -13,12 +13,12 @@ describe('the create version use case', () => {
     when(jiraServiceMock.hasVersion(anything(), anything())).thenReturn(
       of(true)
     );
-    when(jiraServiceMock.projectId(anything())).thenReturn(of(123));
+    when(jiraServiceMock.projectIdFromKey(anything())).thenReturn(of(123));
 
     const jiraService = instance(jiraServiceMock);
     const sut = new JiraCreateVersionUseCase(jiraService);
 
-    sut.execute(new CreateVersionUseCaseInput('project', 'version')).subscribe({
+    sut.execute(new CreateVersionUseCaseInput(['project', 'otherProject'], 'version')).subscribe({
       next: () => {
         verify(jiraServiceMock.createVersion(anything(), anything())).never();
       },
@@ -32,7 +32,7 @@ describe('the create version use case', () => {
     when(jiraServiceMock.hasVersion(anything(), anything())).thenReturn(
       of(false)
     );
-    when(jiraServiceMock.projectId(anything())).thenReturn(of(123));
+    when(jiraServiceMock.projectIdFromKey(anything())).thenReturn(of(123));
     when(jiraServiceMock.createVersion(anything(), anything())).thenReturn(
       of(void 0)
     );
@@ -40,9 +40,9 @@ describe('the create version use case', () => {
     const jiraService = instance(jiraServiceMock);
     const sut = new JiraCreateVersionUseCase(jiraService);
 
-    sut.execute(new CreateVersionUseCaseInput('project', 'version')).subscribe({
+    sut.execute(new CreateVersionUseCaseInput(['project', 'otherProject'], 'version')).subscribe({
       next: () => {
-        verify(jiraServiceMock.createVersion(anything(), anything())).once();
+        verify(jiraServiceMock.createVersion(anything(), anything())).twice();
       },
       complete: done
     });
