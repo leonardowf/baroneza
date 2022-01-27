@@ -10,7 +10,7 @@ export interface JiraService {
   updateFixVersion(
     fromVersion: string,
     toVersion: string,
-    project: string[]
+    projectKeys: string[]
   ): Observable<void>;
 }
 
@@ -59,10 +59,10 @@ export class ConcreteJiraService implements JiraService {
   updateFixVersion(
     fromVersion: string,
     toVersion: string,
-    project: string[]
+    projectKeys: string[]
   ): Observable<void> {
-    const fixObservables = project.map((project) =>
-      from(this.jiraAPI.getVersions(project)).pipe(
+    const fixObservables = projectKeys.map((projectKey) =>
+      from(this.jiraAPI.getVersions(projectKey)).pipe(
         flatMap((x) => {
           const versions = x as JiraVersion[];
           const match = versions.find(
