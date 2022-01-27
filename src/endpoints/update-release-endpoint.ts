@@ -10,7 +10,7 @@ export type UpdateReleaseEndpointInput = {
   readonly channel: string;
   readonly fromVersion: string;
   readonly jiraSuffix: string;
-  readonly project: string | string[];
+  readonly projectKeys: string[];
   readonly pullRequestNumber: number;
   readonly repository: string;
   readonly title: string;
@@ -29,12 +29,6 @@ export class UpdateReleaseEndpoint {
   execute(
     input: UpdateReleaseEndpointInput
   ): Observable<UpdateReleaseEndpointOutput> {
-    return this.updateReleaseUseCase
-      .execute({
-        ...input,
-        project:
-          typeof input.project === 'string' ? [input.project] : input.project
-      })
-      .pipe(mapTo({}));
+    return this.updateReleaseUseCase.execute(input).pipe(mapTo({}));
   }
 }

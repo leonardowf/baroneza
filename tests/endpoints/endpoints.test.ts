@@ -37,7 +37,7 @@ class TestCreateReleaseInput implements CreateReleaseEndpointInput {
   branchName = 'branchName';
   channel = 'channel';
   jiraTagSuffix = ' suffix';
-  project = 'project';
+  projectKeys = ['project'];
   projectTag = 'projectTag';
   referenceBranch = 'referenceBranch';
   repository = 'repository';
@@ -65,7 +65,7 @@ describe('The start traint endpoint', () => {
         baseBranch: 'baseBranch',
         branchPrefix: 'branchPrefix',
         channel: 'channel',
-        project: ['jiraProjectName'],
+        projectKeys: ['jiraProjectName'],
         jiraTagSuffix: ' suffix',
         pullRequestTitlePrefix: 'pullRequestTitlePrefix',
         releaseType: 'patch',
@@ -116,7 +116,7 @@ describe('The tag endpoint', () => {
       .execute({
         jiraTagSuffix: 'jiraTagSuffix',
         number: 123,
-        project: 'project',
+        projectKeys: ['project'],
         repository: 'repository',
         tag: 'tag'
       })

@@ -8,7 +8,7 @@ export interface CreateReleaseEndpointInput {
   readonly title: string;
   readonly targetBranch: string;
   readonly projectTag: string;
-  readonly project: string | string[];
+  readonly projectKeys: string[];
   readonly repository: string;
   readonly channel: string;
   readonly jiraTagSuffix: string;
@@ -37,8 +37,7 @@ export class CreateReleaseEndpoint {
         title: input.title,
         targetBranch: input.targetBranch,
         projectTag: input.projectTag,
-        project:
-          typeof input.project === 'string' ? [input.project] : input.project,
+        projectKeys: input.projectKeys,
         repository: input.repository,
         channel: input.channel,
         jiraTagSuffix: input.jiraTagSuffix

@@ -11,7 +11,7 @@ export type StartTrainEndpointInput = {
   baseBranch: string;
   branchPrefix: string;
   channel: string;
-  project: string | string[];
+  projectKeys: string[];
   jiraTagSuffix: string;
   pullRequestTitlePrefix: string;
   releaseType: ReleaseType;
@@ -32,11 +32,7 @@ export class StartTrainEndpoint {
     input: StartTrainEndpointInput
   ): Observable<StartTrainEndpointOutput> {
     return this.startTrainUseCase
-      .execute({
-        ...input,
-        project:
-          typeof input.project === 'string' ? [input.project] : input.project
-      })
+      .execute(input)
       .pipe(map(() => new StartTrainEndpointOutput()));
   }
 }
