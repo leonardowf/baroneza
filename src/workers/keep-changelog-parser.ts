@@ -74,7 +74,7 @@ export class ConcreteKeepChangelogParser {
       } else if (line.toLowerCase().includes('---')) {
         mode = KeepChangelogType.None;
       } else {
-        if (line.trim().length > 0 && line.trim().startsWith("-")) {
+        if (line.trim().length > 0 && line.trim().startsWith('-')) {
           map[mode].push(line.trim());
         }
       }

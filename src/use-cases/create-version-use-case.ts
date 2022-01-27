@@ -1,7 +1,7 @@
 import { Observable, of } from 'rxjs';
 import { JiraService } from '../services/jira-service';
 import { flatMap, mapTo } from 'rxjs/operators';
-import { forkJoin } from 'rxjs'
+import { forkJoin } from 'rxjs';
 
 export interface CreateVersionUseCase {
   execute(
@@ -31,13 +31,16 @@ export class JiraCreateVersionUseCase implements CreateVersionUseCase {
   execute(
     input: CreateVersionUseCaseInput
   ): Observable<CreateVersionUseCaseOutput[]> {
-     const createdVersions = input.projectKeys.map((projectKey) => {
-      return this.createVersion(projectKey, input.version)
-     });
-     return forkJoin(createdVersions)
+    const createdVersions = input.projectKeys.map((projectKey) => {
+      return this.createVersion(projectKey, input.version);
+    });
+    return forkJoin(createdVersions);
   }
 
-  private createVersion(projectKey: string, version: string): Observable<CreateVersionUseCaseOutput> {
+  private createVersion(
+    projectKey: string,
+    version: string
+  ): Observable<CreateVersionUseCaseOutput> {
     const createVersion = this.jiraService
       .projectIdFromKey(projectKey)
       .pipe(

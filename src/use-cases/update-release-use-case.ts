@@ -180,11 +180,13 @@ export class ConcreteUpdateReleaseUseCase implements UpdateReleaseUseCase {
 
     const streams = ticketIdCommits.map((ticketIdCommit) => {
       return this.jiraService.hasFixVersion(ticketIdCommit.ticketId).pipe(
-        map((hasFixVersion): TicketFixVersionData => {
-          return hasFixVersion
-            ? { ...ticketIdCommit, fixVersionStatus: 'PRESENT' }
-            : { ...ticketIdCommit, fixVersionStatus: 'ABSENT' };
-        }),
+        map(
+          (hasFixVersion): TicketFixVersionData => {
+            return hasFixVersion
+              ? { ...ticketIdCommit, fixVersionStatus: 'PRESENT' }
+              : { ...ticketIdCommit, fixVersionStatus: 'ABSENT' };
+          }
+        ),
         catchError(
           (): Observable<TicketFixVersionData> =>
             of({ ...ticketIdCommit, fixVersionStatus: 'UNKNOWN' })

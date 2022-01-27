@@ -1,4 +1,4 @@
-import { Observable, from, throwError, forkJoin, of } from 'rxjs';
+import { Observable, from, throwError, forkJoin } from 'rxjs';
 import JiraAPI from 'jira-client';
 import { flatMap, map, mapTo } from 'rxjs/operators';
 

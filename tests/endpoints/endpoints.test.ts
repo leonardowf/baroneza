@@ -27,8 +27,7 @@ class TestStartTrainEndpointDependencies implements StartTrainDependencies {
 }
 
 class TestCreateReleaseDependencies
-  implements CreateReleaseEndpointDependencies
-{
+  implements CreateReleaseEndpointDependencies {
   createReleaseUseCaseMock = mock<CreateReleaseUseCase>();
   createReleaseUseCase = instance(this.createReleaseUseCaseMock);
 }

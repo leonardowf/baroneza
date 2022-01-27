@@ -25,8 +25,9 @@ describe('The tag use case', () => {
     const commitExtractorMock: CommitExtractor = mock<CommitExtractor>();
     const jiraTicketParserMock: JiraTicketParser = mock<JiraTicketParser>();
     const jiraTicketTaggerMock: JiraTicketTagger = mock<JiraTicketTagger>();
-    const createVersionUseCaseMock: CreateVersionUseCase =
-      mock<CreateVersionUseCase>();
+    const createVersionUseCaseMock: CreateVersionUseCase = mock<
+      CreateVersionUseCase
+    >();
 
     when(commitExtractorMock.commits(anything(), 'repository')).thenReturn(
       of(['A commit message'])

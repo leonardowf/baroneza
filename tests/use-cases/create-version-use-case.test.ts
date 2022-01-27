@@ -18,12 +18,16 @@ describe('the create version use case', () => {
     const jiraService = instance(jiraServiceMock);
     const sut = new JiraCreateVersionUseCase(jiraService);
 
-    sut.execute(new CreateVersionUseCaseInput(['project', 'otherProject'], 'version')).subscribe({
-      next: () => {
-        verify(jiraServiceMock.createVersion(anything(), anything())).never();
-      },
-      complete: done
-    });
+    sut
+      .execute(
+        new CreateVersionUseCaseInput(['project', 'otherProject'], 'version')
+      )
+      .subscribe({
+        next: () => {
+          verify(jiraServiceMock.createVersion(anything(), anything())).never();
+        },
+        complete: done
+      });
   });
 
   it('calls the service if version does not exist', (done) => {
@@ -40,11 +44,15 @@ describe('the create version use case', () => {
     const jiraService = instance(jiraServiceMock);
     const sut = new JiraCreateVersionUseCase(jiraService);
 
-    sut.execute(new CreateVersionUseCaseInput(['project', 'otherProject'], 'version')).subscribe({
-      next: () => {
-        verify(jiraServiceMock.createVersion(anything(), anything())).twice();
-      },
-      complete: done
-    });
+    sut
+      .execute(
+        new CreateVersionUseCaseInput(['project', 'otherProject'], 'version')
+      )
+      .subscribe({
+        next: () => {
+          verify(jiraServiceMock.createVersion(anything(), anything())).twice();
+        },
+        complete: done
+      });
   });
 });

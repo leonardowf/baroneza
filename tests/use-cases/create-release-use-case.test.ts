@@ -44,8 +44,9 @@ describe('the create release use case', () => {
     const tagUseCaseMock = mock<TagUseCase>();
     const createChangelogUseCaseMock = mock<CreateChangelogUseCase>();
     const releasePageCreatorMock = mock<ReleasePageCreator>();
-    const pullRequestDescriptionWriterMock =
-      mock<PullRequestDescriptionWriter>();
+    const pullRequestDescriptionWriterMock = mock<
+      PullRequestDescriptionWriter
+    >();
     const createMilestoneUseCaseMock = mock<CreateMilestoneUseCase>();
 
     const messageSenderMock = mock<MessageSender<Block[]>>();
