@@ -27,7 +27,8 @@ class TestStartTrainEndpointDependencies implements StartTrainDependencies {
 }
 
 class TestCreateReleaseDependencies
-  implements CreateReleaseEndpointDependencies {
+  implements CreateReleaseEndpointDependencies
+{
   createReleaseUseCaseMock = mock<CreateReleaseUseCase>();
   createReleaseUseCase = instance(this.createReleaseUseCaseMock);
 }
@@ -64,7 +65,7 @@ describe('The start traint endpoint', () => {
         baseBranch: 'baseBranch',
         branchPrefix: 'branchPrefix',
         channel: 'channel',
-        jiraProjectName: 'jiraProjectName',
+        project: ['jiraProjectName'],
         jiraTagSuffix: ' suffix',
         pullRequestTitlePrefix: 'pullRequestTitlePrefix',
         releaseType: 'patch',

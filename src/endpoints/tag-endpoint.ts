@@ -39,7 +39,7 @@ export class TagEndpoint {
     const useCaseInput = new TagUseCaseInput(
       input.number,
       input.tag,
-      input.project,
+      typeof input.project === 'string' ? [input.project] : input.project,
       input.repository,
       input.jiraTagSuffix
     );

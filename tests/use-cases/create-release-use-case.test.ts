@@ -44,9 +44,8 @@ describe('the create release use case', () => {
     const tagUseCaseMock = mock<TagUseCase>();
     const createChangelogUseCaseMock = mock<CreateChangelogUseCase>();
     const releasePageCreatorMock = mock<ReleasePageCreator>();
-    const pullRequestDescriptionWriterMock = mock<
-      PullRequestDescriptionWriter
-    >();
+    const pullRequestDescriptionWriterMock =
+      mock<PullRequestDescriptionWriter>();
     const createMilestoneUseCaseMock = mock<CreateMilestoneUseCase>();
 
     const messageSenderMock = mock<MessageSender<Block[]>>();
@@ -82,7 +81,7 @@ describe('the create release use case', () => {
           new TagUseCaseInput(
             123,
             'projectTag',
-            'project',
+            ['project'],
             'repository',
             ' suffix'
           )
@@ -155,7 +154,7 @@ describe('the create release use case', () => {
           'targetBranch',
           'title',
           'projectTag',
-          'project',
+          ['project'],
           'repository',
           'channel',
           ' suffix'

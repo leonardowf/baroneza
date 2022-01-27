@@ -42,7 +42,8 @@ export class Dependencies
   implements
     TagEndpointDependencies,
     CreateReleaseEndpointDependencies,
-    StartTrainDependencies {
+    StartTrainDependencies
+{
   keychain = new Keychain(process.env);
   config = new Config();
 

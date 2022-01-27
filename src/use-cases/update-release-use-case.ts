@@ -21,7 +21,7 @@ export type UpdateReleaseInput = {
   readonly channel: string;
   readonly fromVersion: string;
   readonly jiraSuffix: string;
-  readonly project: string;
+  readonly project: string[];
   readonly pullRequestNumber: number;
   readonly repository: string;
   readonly title: string;
@@ -180,13 +180,11 @@ export class ConcreteUpdateReleaseUseCase implements UpdateReleaseUseCase {
 
     const streams = ticketIdCommits.map((ticketIdCommit) => {
       return this.jiraService.hasFixVersion(ticketIdCommit.ticketId).pipe(
-        map(
-          (hasFixVersion): TicketFixVersionData => {
-            return hasFixVersion
-              ? { ...ticketIdCommit, fixVersionStatus: 'PRESENT' }
-              : { ...ticketIdCommit, fixVersionStatus: 'ABSENT' };
-          }
-        ),
+        map((hasFixVersion): TicketFixVersionData => {
+          return hasFixVersion
+            ? { ...ticketIdCommit, fixVersionStatus: 'PRESENT' }
+            : { ...ticketIdCommit, fixVersionStatus: 'ABSENT' };
+        }),
         catchError(
           (): Observable<TicketFixVersionData> =>
             of({ ...ticketIdCommit, fixVersionStatus: 'UNKNOWN' })
@@ -216,7 +214,7 @@ export class ConcreteUpdateReleaseUseCase implements UpdateReleaseUseCase {
     fromVersion: string,
     toVersion: string,
     jiraSuffix: string,
-    project: string
+    project: string[]
   ): Observable<void> {
     return this.jiraService.updateFixVersion(
       `${fromVersion}${jiraSuffix}`,
@@ -295,7 +293,7 @@ export class ConcreteUpdateReleaseUseCase implements UpdateReleaseUseCase {
     pullRequestNumber: number,
     toVersion: string,
     jiraSuffix: string,
-    project: string,
+    project: string[],
     repository: string
   ): Observable<void> {
     return this.tagUseCase

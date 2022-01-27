@@ -17,7 +17,7 @@ export type StartTrainUseCaseInput = {
   baseBranch: string;
   branchPrefix: string;
   channel: string;
-  jiraProjectName: string;
+  project: string[];
   jiraTagSuffix: string;
   pullRequestTitlePrefix: string;
   releaseType: ReleaseType;
@@ -60,7 +60,7 @@ export class StartTrainUseCase {
                       input.targetBranch,
                       `${input.pullRequestTitlePrefix} ${version}`,
                       version,
-                      input.jiraProjectName,
+                      input.project,
                       input.repository,
                       input.channel,
                       input.jiraTagSuffix

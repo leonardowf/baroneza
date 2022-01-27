@@ -75,7 +75,11 @@ const happyCaseNoChangelogNoCommits = (): {
   );
 
   when(
-    mocks.jiraService.updateFixVersion('fromVersion', 'toVersion', 'project')
+    mocks.jiraService.updateFixVersion(
+      'fromVersion',
+      'toVersion',
+      deepEqual(['project'])
+    )
   ).thenReturn(of(void 0));
 
   when(
@@ -167,7 +171,11 @@ const jiraServiceFailing = (): {
   when(mocks.jiraService.hasFixVersion('ABC-123')).thenReturn(throwError({}));
 
   when(
-    mocks.jiraService.updateFixVersion('fromVersion', 'toVersion', 'project')
+    mocks.jiraService.updateFixVersion(
+      'fromVersion',
+      'toVersion',
+      deepEqual(['project'])
+    )
   ).thenReturn(of(void 0));
 
   when(
@@ -228,7 +236,7 @@ describe('the update release use case', () => {
         channel: 'channel',
         fromVersion: 'fromVersion',
         jiraSuffix: '',
-        project: 'project',
+        project: ['project'],
         pullRequestNumber: 123,
         repository: 'repository',
         title: 'title',
@@ -252,7 +260,7 @@ describe('the update release use case', () => {
         channel: 'channel',
         fromVersion: 'fromVersion',
         jiraSuffix: '',
-        project: 'project',
+        project: ['project'],
         pullRequestNumber: 123,
         repository: 'repository',
         title: 'title',

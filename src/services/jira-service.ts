@@ -1,4 +1,4 @@
-import { Observable, from, throwError } from 'rxjs';
+import { Observable, from, throwError, forkJoin, of } from 'rxjs';
 import JiraAPI from 'jira-client';
 import { flatMap, map, mapTo } from 'rxjs/operators';
 
@@ -10,11 +10,11 @@ export interface JiraService {
   updateFixVersion(
     fromVersion: string,
     toVersion: string,
-    project: string
+    project: string[]
   ): Observable<void>;
 }
 
-export class ConcreteJiraService {
+export class ConcreteJiraService implements JiraService {
   private readonly jiraAPI: JiraAPI;
 
   constructor(jiraAPI: JiraAPI) {
@@ -30,7 +30,7 @@ export class ConcreteJiraService {
     ).pipe(mapTo(void 0));
   }
 
-  projectId(project: string): Observable<number> {
+  projectIdFromKey(project: string): Observable<number> {
     return from(this.jiraAPI.getProject(project)).pipe(
       map((x) => {
         return x.id;
@@ -59,28 +59,31 @@ export class ConcreteJiraService {
   updateFixVersion(
     fromVersion: string,
     toVersion: string,
-    project: string
+    project: string[]
   ): Observable<void> {
-    return from(this.jiraAPI.getVersions(project)).pipe(
-      flatMap((x) => {
-        const versions = x as JiraVersion[];
-        const match = versions.find(
-          (version) => version.name.toLowerCase() === fromVersion.toLowerCase()
-        );
-        if (match) {
-          return this.jiraAPI.updateVersion({
-            id: match.id,
-            name: toVersion,
-            projectId: match.projectId
-          });
-        }
+    const fixObservables = project.map((project) =>
+      from(this.jiraAPI.getVersions(project)).pipe(
+        flatMap((x) => {
+          const versions = x as JiraVersion[];
+          const match = versions.find(
+            (version) =>
+              version.name.toLowerCase() === fromVersion.toLowerCase()
+          );
+          if (match) {
+            return this.jiraAPI.updateVersion({
+              id: match.id,
+              name: toVersion,
+              projectId: match.projectId
+            });
+          }
 
-        return throwError({
-          message: `Unable to find JIRA release named ${fromVersion}`
-        });
-      }),
-      mapTo(void 0)
+          return throwError({
+            message: `Unable to find JIRA release named ${fromVersion}`
+          });
+        })
+      )
     );
+    return forkJoin(fixObservables).pipe(mapTo(void 0));
   }
 }
 

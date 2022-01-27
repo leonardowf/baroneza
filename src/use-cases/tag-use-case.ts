@@ -14,14 +14,14 @@ export interface TagUseCase {
 export class TagUseCaseInput {
   readonly identifier: number;
   readonly tag: string;
-  readonly project: string;
+  readonly project: string[];
   readonly repository: string;
   readonly jiraTagSuffix: string;
 
   constructor(
     identifier: number,
     tag: string,
-    project: string,
+    project: string[],
     repository: string,
     jiraTagSuffix: string
   ) {
@@ -32,6 +32,7 @@ export class TagUseCaseInput {
     this.jiraTagSuffix = jiraTagSuffix;
   }
 }
+
 export class TagUseCaseOutput {
   successes: string[];
   failures: string[];
@@ -66,7 +67,7 @@ export class JiraTagUseCase implements TagUseCase {
         flatMap((extractTicketsOutput) => {
           const tag = `${input.tag}${input.jiraTagSuffix}`;
           return this.createVersionUseCase
-            .execute(new CreateVersionUseCaseInput([input.project], tag))
+            .execute(new CreateVersionUseCaseInput(input.project, tag))
             .pipe(
               flatMap(() =>
                 this.jiraTicketTagger.tag(

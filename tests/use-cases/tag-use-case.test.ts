@@ -25,9 +25,8 @@ describe('The tag use case', () => {
     const commitExtractorMock: CommitExtractor = mock<CommitExtractor>();
     const jiraTicketParserMock: JiraTicketParser = mock<JiraTicketParser>();
     const jiraTicketTaggerMock: JiraTicketTagger = mock<JiraTicketTagger>();
-    const createVersionUseCaseMock: CreateVersionUseCase = mock<
-      CreateVersionUseCase
-    >();
+    const createVersionUseCaseMock: CreateVersionUseCase =
+      mock<CreateVersionUseCase>();
 
     when(commitExtractorMock.commits(anything(), 'repository')).thenReturn(
       of(['A commit message'])
@@ -63,7 +62,7 @@ describe('The tag use case', () => {
     );
 
     jiraTagUseCase
-      .execute(new TagUseCaseInput(1, 'v1.0', 'PSF', 'repository', ' suffix'))
+      .execute(new TagUseCaseInput(1, 'v1.0', ['PSF'], 'repository', ' suffix'))
       .subscribe({
         next: (x) => {
           verify(commitExtractorMock.commits(anything(), 'repository')).once();
