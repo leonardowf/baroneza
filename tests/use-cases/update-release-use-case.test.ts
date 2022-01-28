@@ -75,11 +75,7 @@ const happyCaseNoChangelogNoCommits = (): {
   );
 
   when(
-    mocks.jiraService.updateFixVersion(
-      'fromVersion',
-      'toVersion',
-      deepEqual(['project'])
-    )
+    mocks.jiraService.updateFixVersion('fromVersion', 'toVersion', 'project')
   ).thenReturn(of(void 0));
 
   when(
@@ -171,11 +167,7 @@ const jiraServiceFailing = (): {
   when(mocks.jiraService.hasFixVersion('ABC-123')).thenReturn(throwError({}));
 
   when(
-    mocks.jiraService.updateFixVersion(
-      'fromVersion',
-      'toVersion',
-      deepEqual(['project'])
-    )
+    mocks.jiraService.updateFixVersion('fromVersion', 'toVersion', 'project')
   ).thenReturn(of(void 0));
 
   when(

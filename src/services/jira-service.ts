@@ -1,16 +1,16 @@
-import { Observable, from, throwError, forkJoin } from 'rxjs';
+import { Observable, from, throwError } from 'rxjs';
 import JiraAPI from 'jira-client';
 import { flatMap, map, mapTo } from 'rxjs/operators';
 
 export interface JiraService {
   createVersion(name: string, projectId: number): Observable<void>;
-  projectIdFromKey(project: string): Observable<number>;
-  hasVersion(name: string, project: string): Observable<boolean>;
+  projectIdFromKey(projectKey: string): Observable<number>;
+  hasVersion(name: string, projectKey: string): Observable<boolean>;
   hasFixVersion(issueNumber: string): Observable<boolean>;
   updateFixVersion(
     fromVersion: string,
     toVersion: string,
-    projectKeys: string[]
+    projectKey: string
   ): Observable<void>;
 }
 
@@ -30,16 +30,16 @@ export class ConcreteJiraService implements JiraService {
     ).pipe(mapTo(void 0));
   }
 
-  projectIdFromKey(project: string): Observable<number> {
-    return from(this.jiraAPI.getProject(project)).pipe(
+  projectIdFromKey(projectKey: string): Observable<number> {
+    return from(this.jiraAPI.getProject(projectKey)).pipe(
       map((x) => {
         return x.id;
       })
     );
   }
 
-  hasVersion(name: string, project: string): Observable<boolean> {
-    return from(this.jiraAPI.getVersions(project)).pipe(
+  hasVersion(name: string, projectKey: string): Observable<boolean> {
+    return from(this.jiraAPI.getVersions(projectKey)).pipe(
       map((x) => {
         const versions = x as Array<JiraVersion>;
         return versions.filter((version) => version.name === name).length > 0;
@@ -59,10 +59,10 @@ export class ConcreteJiraService implements JiraService {
   updateFixVersion(
     fromVersion: string,
     toVersion: string,
-    projectKeys: string[]
+    projectKey: string
   ): Observable<void> {
-    const fixObservables = projectKeys.map((projectKey) =>
-      from(this.jiraAPI.getVersions(projectKey)).pipe(
+    return from(this.jiraAPI.getVersions(projectKey))
+      .pipe(
         flatMap((x) => {
           const versions = x as JiraVersion[];
           const match = versions.find(
@@ -82,8 +82,7 @@ export class ConcreteJiraService implements JiraService {
           });
         })
       )
-    );
-    return forkJoin(fixObservables).pipe(mapTo(void 0));
+      .pipe(mapTo(void 0));
   }
 }
 

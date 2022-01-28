@@ -218,11 +218,14 @@ export class ConcreteUpdateReleaseUseCase implements UpdateReleaseUseCase {
     jiraSuffix: string,
     projectKeys: string[]
   ): Observable<void> {
-    return this.jiraService.updateFixVersion(
-      `${fromVersion}${jiraSuffix}`,
-      `${toVersion}${jiraSuffix}`,
-      projectKeys
+    const fixObservables = projectKeys.map((projectKey) =>
+      this.jiraService.updateFixVersion(
+        `${fromVersion}${jiraSuffix}`,
+        `${toVersion}${jiraSuffix}`,
+        projectKey
+      )
     );
+    return forkJoin(fixObservables).pipe(mapTo(void 0));
   }
 
   private updateMilestone(
