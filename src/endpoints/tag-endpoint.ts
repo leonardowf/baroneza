@@ -6,6 +6,14 @@ import {
   TagUseCaseOutput
 } from '../use-cases/tag-use-case';
 
+export interface TagEndpointInput {
+  readonly jiraTagSuffix: string;
+  readonly number: number;
+  readonly projectKeys: string[];
+  readonly repository: string;
+  readonly tag: string;
+}
+
 export interface TagEndpointDependencies {
   readonly tagUseCase: TagUseCase;
 }
@@ -39,7 +47,7 @@ export class TagEndpoint {
     const useCaseInput = new TagUseCaseInput(
       input.number,
       input.tag,
-      input.project,
+      input.projectKeys,
       input.repository,
       input.jiraTagSuffix
     );
@@ -48,12 +56,4 @@ export class TagEndpoint {
       .execute(useCaseInput)
       .pipe(map((x) => new TagEndpointResponse(x.successes, x.failures)));
   }
-}
-
-export interface TagEndpointInput {
-  readonly jiraTagSuffix: string;
-  readonly number: number;
-  readonly project: string;
-  readonly repository: string;
-  readonly tag: string;
 }

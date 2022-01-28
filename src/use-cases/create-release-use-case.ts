@@ -24,7 +24,7 @@ export class CreateReleaseUseCaseInput {
   targetBranch: string;
   title: string;
   projectTag: string; // this is the tag, better naming please, example 1.0.0
-  project: string;
+  projectKeys: string[];
   repository: string;
   channel: string;
   jiraTagSuffix: string;
@@ -35,7 +35,7 @@ export class CreateReleaseUseCaseInput {
     targetBranch: string,
     title: string,
     projectTag: string,
-    project: string,
+    projectKeys: string[],
     repository: string,
     channel: string,
     jiraTagSuffix: string
@@ -45,7 +45,7 @@ export class CreateReleaseUseCaseInput {
     this.targetBranch = targetBranch;
     this.title = title;
     this.projectTag = projectTag;
-    this.project = project;
+    this.projectKeys = projectKeys;
     this.repository = repository;
     this.channel = channel;
     this.jiraTagSuffix = jiraTagSuffix;
@@ -119,7 +119,7 @@ export class CreateReleaseUseCase {
               new TagUseCaseInput(
                 x.pullRequestNumber,
                 input.projectTag,
-                input.project,
+                input.projectKeys,
                 input.repository,
                 input.jiraTagSuffix
               )

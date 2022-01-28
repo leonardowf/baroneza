@@ -47,7 +47,7 @@ describe('The Start Train Use Case', () => {
       channel: 'channel',
       jiraTagSuffix: ' suffix',
       releaseType: 'patch',
-      jiraProjectName: 'jiraProjectName',
+      projectKeys: ['jiraProjectName'],
       branchPrefix: 'branchPrefix',
       pullRequestTitlePrefix: 'pullRequestTitlePrefix'
     };
@@ -104,7 +104,7 @@ describe('The Start Train Use Case', () => {
       channel: 'channel',
       jiraTagSuffix: ' suffix',
       releaseType: 'patch',
-      jiraProjectName: 'jiraProjectName',
+      projectKeys: ['jiraProjectName'],
       branchPrefix: 'branchPrefix',
       pullRequestTitlePrefix: 'pullRequestTitlePrefix'
     };

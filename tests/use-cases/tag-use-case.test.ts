@@ -63,7 +63,7 @@ describe('The tag use case', () => {
     );
 
     jiraTagUseCase
-      .execute(new TagUseCaseInput(1, 'v1.0', 'PSF', 'repository', ' suffix'))
+      .execute(new TagUseCaseInput(1, 'v1.0', ['PSF'], 'repository', ' suffix'))
       .subscribe({
         next: (x) => {
           verify(commitExtractorMock.commits(anything(), 'repository')).once();
@@ -71,7 +71,7 @@ describe('The tag use case', () => {
           verify(jiraTicketTaggerMock.tag(anything(), anything())).once();
           verify(
             createVersionUseCaseMock.execute(
-              deepEqual(new CreateVersionUseCaseInput('PSF', 'v1.0 suffix'))
+              deepEqual(new CreateVersionUseCaseInput(['PSF'], 'v1.0 suffix'))
             )
           ).once();
 

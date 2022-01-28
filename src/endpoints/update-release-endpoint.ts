@@ -10,7 +10,7 @@ export type UpdateReleaseEndpointInput = {
   readonly channel: string;
   readonly fromVersion: string;
   readonly jiraSuffix: string;
-  readonly project: string;
+  readonly projectKeys: string[];
   readonly pullRequestNumber: number;
   readonly repository: string;
   readonly title: string;

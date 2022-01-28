@@ -21,7 +21,7 @@ export type UpdateReleaseInput = {
   readonly channel: string;
   readonly fromVersion: string;
   readonly jiraSuffix: string;
-  readonly project: string;
+  readonly projectKeys: string[];
   readonly pullRequestNumber: number;
   readonly repository: string;
   readonly title: string;
@@ -91,7 +91,7 @@ export class ConcreteUpdateReleaseUseCase implements UpdateReleaseUseCase {
               input.fromVersion,
               input.toVersion,
               input.jiraSuffix,
-              input.project
+              input.projectKeys
             ),
             this.updateMilestone(
               input.fromVersion,
@@ -111,7 +111,7 @@ export class ConcreteUpdateReleaseUseCase implements UpdateReleaseUseCase {
               input.pullRequestNumber,
               input.toVersion,
               input.jiraSuffix,
-              input.project,
+              input.projectKeys,
               input.repository
             ),
             this.setMilestoneToPrs(
@@ -216,13 +216,16 @@ export class ConcreteUpdateReleaseUseCase implements UpdateReleaseUseCase {
     fromVersion: string,
     toVersion: string,
     jiraSuffix: string,
-    project: string
+    projectKeys: string[]
   ): Observable<void> {
-    return this.jiraService.updateFixVersion(
-      `${fromVersion}${jiraSuffix}`,
-      `${toVersion}${jiraSuffix}`,
-      project
+    const fixObservables = projectKeys.map((projectKey) =>
+      this.jiraService.updateFixVersion(
+        `${fromVersion}${jiraSuffix}`,
+        `${toVersion}${jiraSuffix}`,
+        projectKey
+      )
     );
+    return forkJoin(fixObservables).pipe(mapTo(void 0));
   }
 
   private updateMilestone(
@@ -295,7 +298,7 @@ export class ConcreteUpdateReleaseUseCase implements UpdateReleaseUseCase {
     pullRequestNumber: number,
     toVersion: string,
     jiraSuffix: string,
-    project: string,
+    projectKeys: string[],
     repository: string
   ): Observable<void> {
     return this.tagUseCase
@@ -303,7 +306,7 @@ export class ConcreteUpdateReleaseUseCase implements UpdateReleaseUseCase {
         new TagUseCaseInput(
           pullRequestNumber,
           toVersion,
-          project,
+          projectKeys,
           repository,
           jiraSuffix
         )
