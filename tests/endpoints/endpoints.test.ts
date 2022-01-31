@@ -114,7 +114,7 @@ describe('The tag endpoint', () => {
     sut
       .execute({
         jiraTagSuffix: 'jiraTagSuffix',
-        number: 123,
+        reference: 123,
         projectKeys: ['project'],
         repository: 'repository',
         tag: 'tag'
