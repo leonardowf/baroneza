@@ -1,7 +1,6 @@
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
-  CommitExtractor,
   GithubPullRequestExtractor,
   GithubShaExtractor
 } from '../workers/commit-extractor';
