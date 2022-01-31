@@ -2,7 +2,11 @@ import {
   JiraTagUseCase,
   TagUseCaseInput
 } from '../../src/use-cases/tag-use-case';
-import { CommitExtractor } from '../../src/workers/commit-extractor';
+import {
+  CommitExtractor,
+  GithubPullRequestExtractor,
+  GithubShaExtractor
+} from '../../src/workers/commit-extractor';
 import { mock, instance, when, anything, verify, deepEqual } from 'ts-mockito';
 import { of } from 'rxjs';
 import {
@@ -22,14 +26,22 @@ import { ConcreteExtractTicketsUseCase } from '../../src/use-cases/extract-ticke
 
 describe('The tag use case', () => {
   it('calls the workers', (done) => {
-    const commitExtractorMock: CommitExtractor = mock<CommitExtractor>();
+    const pullRequestCommitExtractorMock: GithubPullRequestExtractor = mock<
+      GithubPullRequestExtractor
+    >();
+    const shaCommitExtractorMock: GithubShaExtractor = mock<
+      GithubShaExtractor
+    >();
     const jiraTicketParserMock: JiraTicketParser = mock<JiraTicketParser>();
     const jiraTicketTaggerMock: JiraTicketTagger = mock<JiraTicketTagger>();
     const createVersionUseCaseMock: CreateVersionUseCase = mock<
       CreateVersionUseCase
     >();
 
-    when(commitExtractorMock.commits(anything(), 'repository')).thenReturn(
+    when(
+      pullRequestCommitExtractorMock.commits(anything(), 'repository')
+    ).thenReturn(of(['A commit message']));
+    when(shaCommitExtractorMock.commits(anything(), 'repository')).thenReturn(
       of(['A commit message'])
     );
     const jiraTicketParserOutput: JiraTicketParserOutput = {
@@ -46,13 +58,15 @@ describe('The tag use case', () => {
       of(new CreateVersionUseCaseOutput())
     );
 
-    const commitExtractor = instance(commitExtractorMock);
+    const pullRequestCommitExtractor = instance(pullRequestCommitExtractorMock);
+    const shaCommitExtractor = instance(shaCommitExtractorMock);
     const jiraTickerParser = instance(jiraTicketParserMock);
     const jiraTicketTagger = instance(jiraTicketTaggerMock);
     const createVersionUseCase = instance(createVersionUseCaseMock);
 
     const extractTicketsUseCase = new ConcreteExtractTicketsUseCase(
-      commitExtractor,
+      pullRequestCommitExtractor,
+      shaCommitExtractor,
       jiraTickerParser
     );
 
@@ -66,7 +80,9 @@ describe('The tag use case', () => {
       .execute(new TagUseCaseInput(1, 'v1.0', ['PSF'], 'repository', ' suffix'))
       .subscribe({
         next: (x) => {
-          verify(commitExtractorMock.commits(anything(), 'repository')).once();
+          verify(
+            pullRequestCommitExtractorMock.commits(anything(), 'repository')
+          ).once();
           verify(jiraTicketParserMock.parse(anything())).once();
           verify(jiraTicketTaggerMock.tag(anything(), anything())).once();
           verify(

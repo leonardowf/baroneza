@@ -1,6 +1,9 @@
 import { TagEndpointDependencies } from './endpoints/tag-endpoint';
 import { JiraTagUseCase } from './use-cases/tag-use-case';
-import { GithubPullRequestExtractor } from './workers/commit-extractor';
+import {
+  GithubPullRequestExtractor,
+  GithubShaExtractor
+} from './workers/commit-extractor';
 import { Keychain } from './keys';
 import { Octokit } from '@octokit/rest';
 import JiraAPI from 'jira-client';
@@ -63,7 +66,11 @@ export class Dependencies
   jiraService = new ConcreteJiraService(this.jiraAPI());
   slackWebClient = new WebClient(this.keychain.slackAuthToken);
 
-  commitExtractor = new GithubPullRequestExtractor(
+  pullRequestCommitExtractor = new GithubPullRequestExtractor(
+    this.octokit(),
+    this.config.githubOwner
+  );
+  shaCommitExtractor = new GithubShaExtractor(
     this.octokit(),
     this.config.githubOwner
   );
@@ -71,7 +78,8 @@ export class Dependencies
   jiraTicketTagger = new ConcreteJiraTickerTagger(this.jiraAPI());
   createVersionUseCase = new JiraCreateVersionUseCase(this.jiraService);
   extractTicketsUseCase = new ConcreteExtractTicketsUseCase(
-    this.commitExtractor,
+    this.pullRequestCommitExtractor,
+    this.shaCommitExtractor,
     this.jiraTicketParser
   );
   tagUseCase = new JiraTagUseCase(
@@ -98,7 +106,7 @@ export class Dependencies
   commitPRNumberParser = new ConcreteCommitPRNumberParser();
 
   pullRequestNumberExtractor = new GithubPullRequestNumberExtractor(
-    this.commitExtractor,
+    this.pullRequestCommitExtractor,
     this.commitPRNumberParser
   );
 

@@ -12,14 +12,14 @@ export interface TagUseCase {
 }
 
 export class TagUseCaseInput {
-  readonly identifier: number;
+  readonly identifier: number | string;
   readonly tag: string;
   readonly projectKeys: string[];
   readonly repository: string;
   readonly jiraTagSuffix: string;
 
   constructor(
-    identifier: number,
+    identifier: number | string,
     tag: string,
     projectKeys: string[],
     repository: string,
@@ -60,7 +60,7 @@ export class JiraTagUseCase implements TagUseCase {
   execute(input: TagUseCaseInput): Observable<TagUseCaseOutput> {
     return this.extractTicketsUseCase
       .execute({
-        pullRequestNumber: input.identifier,
+        reference: input.identifier,
         repository: input.repository
       })
       .pipe(

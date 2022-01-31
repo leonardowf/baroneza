@@ -68,7 +68,7 @@ export class ConcreteUpdateReleaseUseCase implements UpdateReleaseUseCase {
   execute(input: UpdateReleaseInput): Observable<UpdateReleaseOutput> {
     return this.extractTicketsUseCase
       .execute({
-        pullRequestNumber: input.pullRequestNumber,
+        reference: input.pullRequestNumber,
         repository: input.repository
       })
       .pipe(

@@ -59,24 +59,31 @@
         }
       }
     },
-    "/tagPullRequest": {
+    "/tagRelease": {
       "post": {
-        "description": "This endpoint reads an open pull request, parses the commit messages for Jira tickets and then add-version on then.",
+        "description": "This endpoint reads an open pull request or git's history based on a commit's SHA, parses the commit messages for Jira tickets and then add-version on then.",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "number": {
-                    "type": "integer",
-                    "description": "The number of the Pull Request",
+                  "reference": {
+                    "type": "integer | string",
+                    "description": "The number of the Pull Request or the SHA of the commit to read from",
                     "example": 1
                   },
                   "tag": {
                     "type": "string",
                     "description": "The tag on Jira that you want to add to the tickets",
                     "example": "1.0.0"
+                  },
+                  "projectKeys": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": ["ABC"]
                   },
                   "repository": {
                     "type": "string",
