@@ -1,10 +1,11 @@
 import { Observable, from } from 'rxjs';
 import { Octokit } from '@octokit/rest';
 import { flatMap, map } from 'rxjs/operators';
+import { OctokitResponse, ReposGetCommitResponseData } from '@octokit/types';
 
 export type ShaWindow = {
-  start: string;
-  end: string;
+  readonly start: string;
+  readonly end: string;
 };
 
 export interface CommitExtractor {
@@ -49,18 +50,7 @@ export class GithubShaExtractor implements CommitExtractor {
   }
 
   commits(shaWindow: ShaWindow, repository: string): Observable<string[]> {
-    const startPromise = this.octokit.repos.getCommit({
-      owner: this.owner,
-      repo: repository,
-      ref: shaWindow.start
-    });
-    const endPromise = this.octokit.repos.getCommit({
-      owner: this.owner,
-      repo: repository,
-      ref: shaWindow.end
-    });
-
-    const stream = from(Promise.all([startPromise, endPromise]))
+    const stream = from(this.getCommitBounds(shaWindow, repository))
       .pipe(
         flatMap((x) =>
           this.octokit.repos.listCommits({
@@ -76,5 +66,28 @@ export class GithubShaExtractor implements CommitExtractor {
       .pipe(map((x) => x.map((y) => y.commit.message)));
 
     return stream;
+  }
+
+  private getCommitBounds(
+    shaWindow: ShaWindow,
+    repository: string
+  ): Promise<
+    [
+      OctokitResponse<ReposGetCommitResponseData>,
+      OctokitResponse<ReposGetCommitResponseData>
+    ]
+  > {
+    return Promise.all([
+      this.octokit.repos.getCommit({
+        owner: this.owner,
+        repo: repository,
+        ref: shaWindow.start
+      }),
+      this.octokit.repos.getCommit({
+        owner: this.owner,
+        repo: repository,
+        ref: shaWindow.end
+      })
+    ]);
   }
 }
