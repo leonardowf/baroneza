@@ -8,7 +8,7 @@ import {
 
 export interface TagEndpointInput {
   readonly jiraTagSuffix: string;
-  readonly number: number;
+  readonly reference: number | string;
   readonly projectKeys: string[];
   readonly repository: string;
   readonly tag: string;
@@ -45,7 +45,7 @@ export class TagEndpoint {
 
   execute(input: TagEndpointInput): Observable<TagEndpointResponse> {
     const useCaseInput = new TagUseCaseInput(
-      input.number,
+      input.reference,
       input.tag,
       input.projectKeys,
       input.repository,

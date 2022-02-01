@@ -64,7 +64,7 @@ const happyCaseNoChangelogNoCommits = (): {
   when(
     mocks.extractTicketsUseCase.execute(
       deepEqual({
-        pullRequestNumber: 123,
+        reference: 123,
         repository: 'repository'
       })
     )
@@ -149,7 +149,7 @@ const jiraServiceFailing = (): {
   when(
     mocks.extractTicketsUseCase.execute(
       deepEqual({
-        pullRequestNumber: 123,
+        reference: 123,
         repository: 'repository'
       })
     )

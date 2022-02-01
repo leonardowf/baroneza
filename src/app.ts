@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 const port = 3000;
 const dependencies = new Dependencies();
 
-app.post('/tagPullRequest', (req, res) => {
+app.post('/tagRelease', (req, res) => {
   new TagEndpoint(dependencies).execute(req.body).subscribe(
     (x) => res.send(x),
     (error) => {

@@ -1,5 +1,5 @@
 {
-    "jira_host": "baroneza-test.atlassian.net",
+    "jira_host": "baroneza-test-2.atlassian.net",
     "github_owner": "leonardowf",
     "confirmation_emoji": ":x:",
     "seconds_to_confirmation_timeout": 1800
