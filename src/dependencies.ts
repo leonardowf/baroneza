@@ -67,11 +67,11 @@ export class Dependencies
   slackWebClient = new WebClient(this.keychain.slackAuthToken);
 
   pullRequestCommitExtractor = new GithubPullRequestExtractor(
-    this.octokit(),
+    this.githubService,
     this.config.githubOwner
   );
   shaCommitExtractor = new GithubShaExtractor(
-    this.octokit(),
+    this.githubService,
     this.config.githubOwner
   );
   jiraTicketParser = new ConcreteJiraTickerParser();
