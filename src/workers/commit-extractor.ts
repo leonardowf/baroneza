@@ -2,8 +2,16 @@ import { Observable, from } from 'rxjs';
 import { Octokit } from '@octokit/rest';
 import { flatMap, map } from 'rxjs/operators';
 
+export type ShaWindow = {
+  start: string;
+  end: string;
+};
+
 export interface CommitExtractor {
-  commits(reference: number | string, repository: string): Observable<string[]>;
+  commits(
+    reference: number | ShaWindow,
+    repository: string
+  ): Observable<string[]>;
 }
 
 export class GithubPullRequestExtractor implements CommitExtractor {
@@ -40,21 +48,27 @@ export class GithubShaExtractor implements CommitExtractor {
     this.owner = owner;
   }
 
-  commits(sha: string, repository: string): Observable<string[]> {
-    const promise = this.octokit.repos.getCommit({
+  commits(shaWindow: ShaWindow, repository: string): Observable<string[]> {
+    const startPromise = this.octokit.repos.getCommit({
       owner: this.owner,
       repo: repository,
-      ref: sha
+      ref: shaWindow.start
+    });
+    const endPromise = this.octokit.repos.getCommit({
+      owner: this.owner,
+      repo: repository,
+      ref: shaWindow.end
     });
 
-    const stream = from(promise)
+    const stream = from(Promise.all([startPromise, endPromise]))
       .pipe(
         flatMap((x) =>
           this.octokit.repos.listCommits({
             owner: this.owner,
             repo: repository,
             // eslint-disable-next-line @typescript-eslint/camelcase
-            since: x.data.commit.author.date
+            since: x[0].data.commit.author.date,
+            until: x[1].data.commit.author.date
           })
         )
       )

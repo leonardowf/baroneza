@@ -117,7 +117,7 @@ describe('The tag use case with SHA', () => {
     when(
       pullRequestCommitExtractorMock.commits(anything(), 'repository')
     ).thenReturn(of(['A commit message']));
-    when(shaCommitExtractorMock.commits('sha', 'repository')).thenReturn(
+    when(shaCommitExtractorMock.commits(anything(), 'repository')).thenReturn(
       of(['A commit message'])
     );
     const jiraTicketParserOutput: JiraTicketParserOutput = {
@@ -154,14 +154,22 @@ describe('The tag use case with SHA', () => {
 
     jiraTagUseCase
       .execute(
-        new TagUseCaseInput('sha', 'v1.0', ['PSF'], 'repository', ' suffix')
+        new TagUseCaseInput(
+          anything(),
+          'v1.0',
+          ['PSF'],
+          'repository',
+          ' suffix'
+        )
       )
       .subscribe({
         next: (x) => {
           verify(
             pullRequestCommitExtractorMock.commits(anything(), 'repository')
           ).never();
-          verify(shaCommitExtractorMock.commits('sha', 'repository')).once();
+          verify(
+            shaCommitExtractorMock.commits(anything(), 'repository')
+          ).once();
           verify(jiraTicketParserMock.parse(anything())).once();
           verify(jiraTicketTaggerMock.tag(anything(), anything())).once();
           verify(

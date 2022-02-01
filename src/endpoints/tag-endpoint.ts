@@ -5,10 +5,11 @@ import {
   TagUseCaseInput,
   TagUseCaseOutput
 } from '../use-cases/tag-use-case';
+import { ShaWindow } from '../workers/commit-extractor';
 
 export interface TagEndpointInput {
   readonly jiraTagSuffix: string;
-  readonly reference: number | string;
+  readonly reference: number | ShaWindow;
   readonly projectKeys: string[];
   readonly repository: string;
   readonly tag: string;
