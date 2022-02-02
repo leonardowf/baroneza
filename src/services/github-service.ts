@@ -3,6 +3,11 @@ import { Octokit } from '@octokit/rest';
 import { flatMap, map, mapTo } from 'rxjs/operators';
 import { PullsMergeResponseData } from '@octokit/types';
 
+export type TimeWidow = {
+  readonly since?: string;
+  readonly until?: string;
+};
+
 export interface PullRequestData {
   readonly number: number;
   readonly login: string;
@@ -118,8 +123,7 @@ export interface GithubService {
   listCommitMessagesFromDate(
     owner: string,
     repo: string,
-    since?: string,
-    until?: string
+    timeWidow: TimeWidow
   ): Observable<string[]>;
 
   getCommit(
@@ -433,15 +437,14 @@ export class ConcreteGithubService implements GithubService {
   listCommitMessagesFromDate(
     owner: string,
     repo: string,
-    since?: string,
-    until?: string
+    timeWindow: TimeWidow
   ): Observable<string[]> {
     return from(
       this.octokit.repos.listCommits({
         owner,
         repo,
-        since,
-        until
+        since: timeWindow.since,
+        until: timeWindow.until
       })
     ).pipe(
       map((response) => response.data),
