@@ -3,6 +3,11 @@ import { Octokit } from '@octokit/rest';
 import { flatMap, map, mapTo } from 'rxjs/operators';
 import { PullsMergeResponseData } from '@octokit/types';
 
+export type TimeWidow = {
+  readonly since?: string;
+  readonly until?: string;
+};
+
 export interface PullRequestData {
   readonly number: number;
   readonly login: string;
@@ -108,6 +113,24 @@ export interface GithubService {
   ): Observable<void>;
 
   releases(owner: string, repo: string): Observable<string[]>;
+
+  listCommitMessagesFromPullNumber(
+    owner: string,
+    repo: string,
+    pullNumber: number
+  ): Observable<string[]>;
+
+  listCommitMessagesFromDate(
+    owner: string,
+    repo: string,
+    timeWidow: TimeWidow
+  ): Observable<string[]>;
+
+  getCommit(
+    owner: string,
+    repo: string,
+    ref: string
+  ): Observable<{ date: string }>;
 }
 
 export class ConcreteGithubService implements GithubService {
@@ -408,6 +431,60 @@ export class ConcreteGithubService implements GithubService {
   releases(owner: string, repo: string): Observable<string[]> {
     return from(this.octokit.repos.listReleases({ owner, repo })).pipe(
       map((response) => response.data.map((release) => release.name))
+    );
+  }
+
+  listCommitMessagesFromDate(
+    owner: string,
+    repo: string,
+    timeWindow: TimeWidow
+  ): Observable<string[]> {
+    return from(
+      this.octokit.repos.listCommits({
+        owner,
+        repo,
+        since: timeWindow.since,
+        until: timeWindow.until
+      })
+    ).pipe(
+      map((response) => response.data),
+      map((response) => response.map((commitData) => commitData.commit.message))
+    );
+  }
+
+  listCommitMessagesFromPullNumber(
+    owner: string,
+    repo: string,
+    pullNumber: number
+  ): Observable<string[]> {
+    return from(
+      this.octokit.pulls.listCommits({
+        owner,
+        repo,
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        pull_number: pullNumber
+      })
+    ).pipe(
+      map((response) => response.data),
+      map((data) => data.map((commitData) => commitData.commit.message))
+    );
+  }
+
+  getCommit(
+    owner: string,
+    repo: string,
+    ref: string
+  ): Observable<{ date: string }> {
+    return from(
+      this.octokit.repos.getCommit({
+        owner,
+        repo,
+        ref
+      })
+    ).pipe(
+      map((response) => response.data),
+      map((data) => data.commit.author.date),
+      map((date) => ({ date }))
     );
   }
 }

@@ -1,66 +1,64 @@
-import { Observable, from } from 'rxjs';
-import { Octokit } from '@octokit/rest';
-import { flatMap, map } from 'rxjs/operators';
+import { Observable, forkJoin } from 'rxjs';
+import { flatMap } from 'rxjs/operators';
+import { GithubService } from '../services/github-service';
+
+export type ShaWindow = {
+  readonly start: string;
+  readonly end: string;
+};
 
 export interface CommitExtractor {
-  commits(reference: number | string, repository: string): Observable<string[]>;
+  commits(
+    reference: number | ShaWindow,
+    repository: string
+  ): Observable<string[]>;
 }
 
 export class GithubPullRequestExtractor implements CommitExtractor {
-  octokit: Octokit;
-  owner: string;
+  readonly githubService: GithubService;
+  readonly owner: string;
 
-  constructor(octokit: Octokit, owner: string) {
-    this.octokit = octokit;
+  constructor(githubService: GithubService, owner: string) {
+    this.githubService = githubService;
     this.owner = owner;
   }
 
   commits(pullNumber: number, repository: string): Observable<string[]> {
-    const stream = from(
-      this.octokit.pulls.listCommits({
-        owner: this.owner,
-        repo: repository,
-        // eslint-disable-next-line @typescript-eslint/camelcase
-        pull_number: pullNumber
-      })
-    )
-      .pipe(map((x) => x.data))
-      .pipe(map((x) => x.map((y) => y.commit.message)));
-
-    return stream;
+    return this.githubService.listCommitMessagesFromPullNumber(
+      this.owner,
+      repository,
+      pullNumber
+    );
   }
 }
 
 export class GithubShaExtractor implements CommitExtractor {
-  octokit: Octokit;
-  owner: string;
+  readonly githubService: GithubService;
+  readonly owner: string;
 
-  constructor(octokit: Octokit, owner: string) {
-    this.octokit = octokit;
+  constructor(githubService: GithubService, owner: string) {
+    this.githubService = githubService;
     this.owner = owner;
   }
 
-  commits(sha: string, repository: string): Observable<string[]> {
-    const promise = this.octokit.repos.getCommit({
-      owner: this.owner,
-      repo: repository,
-      ref: sha
-    });
-
-    const stream = from(promise)
-      .pipe(
-        flatMap((x) =>
-          this.octokit.repos.listCommits({
-            owner: this.owner,
-            repo: repository,
-            // eslint-disable-next-line @typescript-eslint/camelcase
-            since: x.data.commit.author.date
-          })
-        )
+  commits(shaWindow: ShaWindow, repository: string): Observable<string[]> {
+    return this.getCommitBounds(shaWindow, repository).pipe(
+      flatMap((x) =>
+        this.githubService.listCommitMessagesFromDate(this.owner, repository, {
+          since: x[0].date,
+          until: x[1].date
+        })
       )
-      .pipe(map((x) => x.data))
-      .pipe(map((x) => x.map((y) => y.commit.message)));
+    );
+  }
 
-    return stream;
+  private getCommitBounds(
+    shaWindow: ShaWindow,
+    repository: string
+  ): Observable<[{ date: string }, { date: string }]> {
+    return forkJoin([
+      this.githubService.getCommit(this.owner, repository, shaWindow.start),
+      this.githubService.getCommit(this.owner, repository, shaWindow.end)
+    ]);
   }
 }

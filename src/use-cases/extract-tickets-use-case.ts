@@ -2,12 +2,13 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import {
   GithubPullRequestExtractor,
-  GithubShaExtractor
+  GithubShaExtractor,
+  ShaWindow
 } from '../workers/commit-extractor';
 import { JiraTicketParser } from '../workers/jira-ticket-parser';
 
 export type ExtractTicketsInput = {
-  readonly reference: number | string;
+  readonly reference: number | ShaWindow;
   readonly repository: string;
 };
 

@@ -1,5 +1,6 @@
 import { Observable } from 'rxjs';
 import { map, flatMap } from 'rxjs/operators';
+import { ShaWindow } from '../workers/commit-extractor';
 import { JiraTicketTagger } from '../workers/jira-tagger';
 import {
   CreateVersionUseCase,
@@ -12,14 +13,14 @@ export interface TagUseCase {
 }
 
 export class TagUseCaseInput {
-  readonly identifier: number | string;
+  readonly identifier: number | ShaWindow;
   readonly tag: string;
   readonly projectKeys: string[];
   readonly repository: string;
   readonly jiraTagSuffix: string;
 
   constructor(
-    identifier: number | string,
+    identifier: number | ShaWindow,
     tag: string,
     projectKeys: string[],
     repository: string,
