@@ -7,6 +7,7 @@ import { StartTrainEndpoint } from './endpoints/start-train-endpoint';
 import swagger from 'swagger-ui-express';
 import * as swaggerDocument from '../swagger.json';
 import { UpdateReleaseEndpoint } from './endpoints/update-release-endpoint';
+import { ReleaseVersionEndpoint } from './endpoints/release-version-endpoint';
 
 const app = express();
 app.use(bodyParser.json());
@@ -49,6 +50,16 @@ app.post('/startTrain', (req, res) => {
 
 app.post('/updateRelease', (req, res) => {
   new UpdateReleaseEndpoint(dependencies).execute(req.body).subscribe(
+    (x) => res.send(x),
+    (error) => {
+      console.log(error);
+      res.send(error);
+    }
+  );
+});
+
+app.post('/releaseVersion', (req, res) => {
+  new ReleaseVersionEndpoint(dependencies).execute(req.body).subscribe(
     (x) => res.send(x),
     (error) => {
       console.log(error);

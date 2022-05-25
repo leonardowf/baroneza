@@ -436,6 +436,8 @@ declare module 'jira-client' {
       id: string;
       name: string;
       projectId: number;
+      released?: boolean;
+      releaseDate?: string;
     }
 
     interface SearchQuery {

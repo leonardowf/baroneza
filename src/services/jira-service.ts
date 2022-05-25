@@ -1,4 +1,4 @@
-import { Observable, from, throwError } from 'rxjs';
+import { Observable, from, throwError, of } from 'rxjs';
 import JiraAPI from 'jira-client';
 import { flatMap, map, mapTo } from 'rxjs/operators';
 
@@ -11,6 +11,11 @@ export interface JiraService {
     fromVersion: string,
     toVersion: string,
     projectKey: string
+  ): Observable<void>;
+  releaseVersion(
+    name: string,
+    projectKey: string,
+    releaseDate?: string
   ): Observable<void>;
 }
 
@@ -28,6 +33,25 @@ export class ConcreteJiraService implements JiraService {
         name
       })
     ).pipe(mapTo(void 0));
+  }
+
+  releaseVersion(
+    name: string,
+    projectKey: string,
+    releaseDate?: string
+  ): Observable<void> {
+    return this.findVersion(name, projectKey).pipe(
+      flatMap((match) =>
+        this.jiraAPI.updateVersion({
+          id: match.id,
+          name: name,
+          projectId: match.projectId,
+          released: true,
+          releaseDate: releaseDate
+        })
+      ),
+      mapTo(void 0)
+    );
   }
 
   projectIdFromKey(projectKey: string): Observable<number> {
@@ -61,28 +85,37 @@ export class ConcreteJiraService implements JiraService {
     toVersion: string,
     projectKey: string
   ): Observable<void> {
-    return from(this.jiraAPI.getVersions(projectKey))
-      .pipe(
-        flatMap((x) => {
-          const versions = x as JiraVersion[];
-          const match = versions.find(
-            (version) =>
-              version.name.toLowerCase() === fromVersion.toLowerCase()
-          );
-          if (match) {
-            return this.jiraAPI.updateVersion({
-              id: match.id,
-              name: toVersion,
-              projectId: match.projectId
-            });
-          }
-
-          return throwError({
-            message: `Unable to find JIRA release named ${fromVersion}`
-          });
+    return this.findVersion(fromVersion, projectKey).pipe(
+      flatMap((match) =>
+        this.jiraAPI.updateVersion({
+          id: match.id,
+          name: toVersion,
+          projectId: match.projectId
         })
-      )
-      .pipe(mapTo(void 0));
+      ),
+      mapTo(void 0)
+    );
+  }
+
+  private findVersion(
+    name: string,
+    projectKey: string
+  ): Observable<JiraVersion> {
+    return from(this.jiraAPI.getVersions(projectKey)).pipe(
+      flatMap((x) => {
+        const versions = x as JiraVersion[];
+        const match = versions.find(
+          (version) => version.name.toLowerCase() === name.toLowerCase()
+        );
+
+        if (!match) {
+          return throwError({
+            message: `Unable to find JIRA release named ${name}`
+          });
+        }
+        return of(match);
+      })
+    );
   }
 }
 
