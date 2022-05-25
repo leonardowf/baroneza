@@ -233,7 +233,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "projectTag": {
+                  "tag": {
                     "type": "string",
                     "example": "1.0.0"
                   },
