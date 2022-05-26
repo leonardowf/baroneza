@@ -265,7 +265,8 @@ export class ConcreteGithubService implements GithubService {
     return from(
       this.octokit.issues.listMilestones({
         owner,
-        repo
+        repo,
+        direction: 'desc'
       })
     ).pipe(
       map((response) => {
