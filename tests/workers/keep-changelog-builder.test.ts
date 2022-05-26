@@ -86,23 +86,23 @@ describe('the keep changelog builder', () => {
 
     const expected = `## 1.0.0
 ### Added
-- Amazing feature, by Bruno - (#12)
+- Amazing feature, by @Bruno - (#12)
 
 ### Changed
-- Feature flag name, by Giorno - (#32)
+- Feature flag name, by @Giorno - (#32)
 
 ### Deprecated
-- Deprecated API call, by Dio - (#43)
+- Deprecated API call, by @Dio - (#43)
 
 ### Removed
-- Removed support of old feature, by Joseph - (#66)
+- Removed support of old feature, by @Joseph - (#66)
 
 ### Fixed
-- NPE, by Narancia - (#123)
-- Memory leak, by Abacchio - (#67)
+- NPE, by @Narancia - (#123)
+- Memory leak, by @Abacchio - (#67)
 
 ### Security
-- Secures token with BASE32, by Mista - (#98)`;
+- Secures token with BASE32, by @Mista - (#98)`;
     expect(result).toEqual(expected);
   });
 });

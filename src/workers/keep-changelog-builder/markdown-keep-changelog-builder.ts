@@ -69,7 +69,7 @@ export class MarkdownKeepChangelogBuilder
   }
 
   private itemToMarkdownString(item: KeepChangelogItem): string {
-    let result = `${item.text}, by ${item.author} - (#${item.identifier})`;
+    let result = `${item.text}, by @${item.author} - (#${item.identifier})`;
     if (!item.text.trim().includes('- ')) {
       result = `- ${result}`;
     }
