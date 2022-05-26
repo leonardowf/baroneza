@@ -3,7 +3,7 @@ import { StartTrainUseCase } from '../use-cases/start-train-use-case';
 import { map } from 'rxjs/operators';
 import { ReleaseType } from '../workers/next-release-guesser';
 
-export interface StartTrainDependencies {
+export interface StartTrainEndpointDependencies {
   readonly startTrainUseCase: StartTrainUseCase;
 }
 
@@ -24,7 +24,7 @@ export class StartTrainEndpointOutput {}
 export class StartTrainEndpoint {
   private startTrainUseCase: StartTrainUseCase;
 
-  constructor(dependencies: StartTrainDependencies) {
+  constructor(dependencies: StartTrainEndpointDependencies) {
     this.startTrainUseCase = dependencies.startTrainUseCase;
   }
 

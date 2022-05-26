@@ -1,6 +1,6 @@
 import {
   StartTrainEndpoint,
-  StartTrainDependencies
+  StartTrainEndpointDependencies
 } from '../../src/endpoints/start-train-endpoint';
 import { mock, instance, when, anything, verify } from 'ts-mockito';
 import {
@@ -21,7 +21,8 @@ import {
 } from '../../src/endpoints/tag-endpoint';
 import { TagUseCase, TagUseCaseOutput } from '../../src/use-cases/tag-use-case';
 
-class TestStartTrainEndpointDependencies implements StartTrainDependencies {
+class TestStartTrainEndpointDependencies
+  implements StartTrainEndpointDependencies {
   startTrainUseCaseMock = mock<StartTrainUseCase>();
   startTrainUseCase = instance(this.startTrainUseCaseMock);
 }

@@ -15,7 +15,7 @@ import { GithubCreateBranchUseCase } from './use-cases/create-branch-use-case';
 import { GithubSHAFinder } from './workers/sha-finder';
 import { GithubBranchCreator } from './workers/branch-creator';
 import { GithubPullRequestCreator } from './workers/pull-request-creator';
-import { StartTrainDependencies } from './endpoints/start-train-endpoint';
+import { StartTrainEndpointDependencies } from './endpoints/start-train-endpoint';
 import { StartTrainUseCase } from './use-cases/start-train-use-case';
 import { SlackMessageSender } from './workers/message-sender';
 import { WebClient } from '@slack/web-api';
@@ -40,12 +40,15 @@ import { ConcreteExtractTicketsUseCase } from './use-cases/extract-tickets-use-c
 import { ConcreteCommitPRNumberParser } from './workers/keep-changelog-builder/commits-pr-number-parser';
 import { ConcreteUpdateReleaseUseCase } from './use-cases/update-release-use-case';
 import { GithubDraftReleaseGuesser } from './workers/github-draft-release-guesser';
+import { ReleaseVersionEndpointDependencies } from './endpoints/release-version-endpoint';
+import { ReleaseVersionUseCase } from './use-cases/release-version-use-case';
 
 export class Dependencies
   implements
     TagEndpointDependencies,
     CreateReleaseEndpointDependencies,
-    StartTrainDependencies {
+    ReleaseVersionEndpointDependencies,
+    StartTrainEndpointDependencies {
   keychain = new Keychain(process.env);
   config = new Config();
 
@@ -161,6 +164,8 @@ export class Dependencies
     this.messageSender,
     this.createMilestoneUseCase
   );
+
+  releaseVersionUseCase = new ReleaseVersionUseCase(this.jiraService);
 
   reactionsReader = new SlackReactionsReader(this.slackWebClient);
   nextReleaseGuesser = new GithubDraftReleaseGuesser(

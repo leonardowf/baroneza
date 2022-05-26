@@ -1,4 +1,5 @@
 import { GithubServiceMock } from './github-service-mock';
+import { JiraServiceMock } from './jira-service-mock';
 import { PullRequestCreatorMock } from './pull-request-creator-mock';
 
 export class Mocks {
@@ -8,5 +9,9 @@ export class Mocks {
 
   static githubPullRequestCreator(): PullRequestCreatorMock {
     return new PullRequestCreatorMock();
+  }
+
+  static jiraService(): JiraServiceMock {
+    return new JiraServiceMock();
   }
 }

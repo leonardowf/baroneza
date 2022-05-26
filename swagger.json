@@ -223,6 +223,47 @@
           }
         }
       }
+    },
+    "/releaseVersion": {
+      "post": {
+        "description": "This endpoint releases a version in JIRA",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "tag": {
+                    "type": "string",
+                    "example": "1.0.0"
+                  },
+                  "projectKeys": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": ["ABC"]
+                  },
+                  "jiraTagSuffix": {
+                    "type": "string",
+                    "example": "-backend",
+                    "description": "This field will be concatenated as a suffix of the guessed next release"
+                  },
+                  "releaseDate": {
+                    "type": "string",
+                    "example": "(Optional) Date of the release, expressed in ISO 8601 format (yyyy-mm-dd). Defaults to current date."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
     }
   }
 }
