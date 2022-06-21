@@ -69,4 +69,20 @@ describe('The jira ticket parser', () => {
       }
     ]);
   });
+
+  it('ignores tickets in subsequent lines of commit', () => {
+    const commit1 =
+      '[PSF-123][PSF-123] [PSF-78910] Bla Bla\n [PSF-4848] Bla\n[PSF-41233]BLA';
+
+    expect(sut.parse([commit1]).parsedTickets).toStrictEqual([
+      {
+        value: commit1,
+        ticket: 'PSF-123'
+      },
+      {
+        value: commit1,
+        ticket: 'PSF-78910'
+      }
+    ]);
+  });
 });

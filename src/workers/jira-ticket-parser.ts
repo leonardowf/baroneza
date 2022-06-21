@@ -15,7 +15,7 @@ export class ConcreteJiraTickerParser implements JiraTicketParser {
     const regex = /((?!([A-Z0-9a-z]{1,10})-?$)[A-Z]{1}[A-Z0-9]+-\d+)/g;
 
     const parsedTickets = values.map((value) => {
-      const match = value.match(regex) ?? [];
+      const match = value.split('\n')[0]?.match(regex) ?? [];
       return match.map((match): ParsedTicket => ({ value, ticket: match }));
     });
 
