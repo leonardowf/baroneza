@@ -54,7 +54,9 @@ describe('The tag use case with PR', () => {
       of(new ConcreteJiraTicketTaggetOutput(['123'], []))
     );
     when(createVersionUseCaseMock.execute(anything())).thenReturn(
-      of(new CreateVersionUseCaseOutput())
+      of([
+        new CreateVersionUseCaseOutput({ projectKey: 'COM', result: 'CREATED' })
+      ])
     );
 
     const pullRequestCommitExtractor = instance(pullRequestCommitExtractorMock);
@@ -134,7 +136,12 @@ describe('The tag use case with SHA', () => {
       of(new ConcreteJiraTicketTaggetOutput(['123'], []))
     );
     when(createVersionUseCaseMock.execute(anything())).thenReturn(
-      of(new CreateVersionUseCaseOutput())
+      of([
+        new CreateVersionUseCaseOutput({
+          projectKey: 'COM',
+          result: 'CREATED'
+        })
+      ])
     );
 
     const pullRequestCommitExtractor = instance(pullRequestCommitExtractorMock);

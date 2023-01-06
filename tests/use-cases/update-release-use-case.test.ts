@@ -108,7 +108,8 @@ const happyCaseNoChangelogNoCommits = (): {
   when(mocks.tagUseCase.execute(anything())).thenReturn(
     of({
       successes: [],
-      failures: []
+      failures: [],
+      failuresOnProjectKeys: []
     })
   );
 
@@ -200,7 +201,8 @@ const jiraServiceFailing = (): {
   when(mocks.tagUseCase.execute(anything())).thenReturn(
     of({
       successes: [],
-      failures: []
+      failures: [],
+      failuresOnProjectKeys: []
     })
   );
 

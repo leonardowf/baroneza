@@ -1,4 +1,4 @@
-import { Observable, from, throwError, of } from 'rxjs';
+import { Observable, from, throwError, of, defer } from 'rxjs';
 import JiraAPI from 'jira-client';
 import { flatMap, map, mapTo } from 'rxjs/operators';
 
@@ -27,12 +27,14 @@ export class ConcreteJiraService implements JiraService {
   }
 
   createVersion(name: string, projectId: number): Observable<void> {
-    return from(
-      this.jiraAPI.createVersion({
-        projectId: projectId,
-        name
-      })
-    ).pipe(mapTo(void 0));
+    return defer(() =>
+      from(
+        this.jiraAPI.createVersion({
+          projectId: projectId,
+          name
+        })
+      ).pipe(mapTo(void 0))
+    );
   }
 
   releaseVersion(
@@ -55,28 +57,34 @@ export class ConcreteJiraService implements JiraService {
   }
 
   projectIdFromKey(projectKey: string): Observable<number> {
-    return from(this.jiraAPI.getProject(projectKey)).pipe(
-      map((x) => {
-        return x.id;
-      })
+    return defer(() =>
+      from(this.jiraAPI.getProject(projectKey)).pipe(
+        map((x) => {
+          return x.id;
+        })
+      )
     );
   }
 
   hasVersion(name: string, projectKey: string): Observable<boolean> {
-    return from(this.jiraAPI.getVersions(projectKey)).pipe(
-      map((x) => {
-        const versions = x as Array<JiraVersion>;
-        return versions.filter((version) => version.name === name).length > 0;
-      })
+    return defer(() =>
+      from(this.jiraAPI.getVersions(projectKey)).pipe(
+        map((x) => {
+          const versions = x as Array<JiraVersion>;
+          return versions.filter((version) => version.name === name).length > 0;
+        })
+      )
     );
   }
 
   hasFixVersion(issueNumber: string): Observable<boolean> {
-    return from(this.jiraAPI.findIssue(issueNumber)).pipe(
-      map((jsonResponse) => {
-        const jiraIssue = jsonResponse as Issue;
-        return jiraIssue.fields.fixVersions.length > 0;
-      })
+    return defer(() =>
+      from(this.jiraAPI.findIssue(issueNumber)).pipe(
+        map((jsonResponse) => {
+          const jiraIssue = jsonResponse as Issue;
+          return jiraIssue.fields.fixVersions.length > 0;
+        })
+      )
     );
   }
 
@@ -101,20 +109,22 @@ export class ConcreteJiraService implements JiraService {
     name: string,
     projectKey: string
   ): Observable<JiraVersion> {
-    return from(this.jiraAPI.getVersions(projectKey)).pipe(
-      flatMap((x) => {
-        const versions = x as JiraVersion[];
-        const match = versions.find(
-          (version) => version.name.toLowerCase() === name.toLowerCase()
-        );
+    return defer(() =>
+      from(this.jiraAPI.getVersions(projectKey)).pipe(
+        flatMap((x) => {
+          const versions = x as JiraVersion[];
+          const match = versions.find(
+            (version) => version.name.toLowerCase() === name.toLowerCase()
+          );
 
-        if (!match) {
-          return throwError({
-            message: `Unable to find JIRA release named ${name}`
-          });
-        }
-        return of(match);
-      })
+          if (!match) {
+            return throwError({
+              message: `Unable to find JIRA release named ${name}`
+            });
+          }
+          return of(match);
+        })
+      )
     );
   }
 }

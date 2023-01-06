@@ -26,10 +26,16 @@ export interface TagEndpointInputMapper {
 export class TagEndpointResponse {
   successes: string[];
   failures: string[];
+  failuresOnProjectKeys: string[];
 
-  constructor(successes: string[], failures: string[]) {
+  constructor(
+    successes: string[],
+    failures: string[],
+    failuresOnProjectKeys: string[]
+  ) {
     this.successes = successes;
     this.failures = failures;
+    this.failuresOnProjectKeys = failuresOnProjectKeys;
   }
 }
 
@@ -55,6 +61,15 @@ export class TagEndpoint {
 
     return this.tagUseCase
       .execute(useCaseInput)
-      .pipe(map((x) => new TagEndpointResponse(x.successes, x.failures)));
+      .pipe(
+        map(
+          (x) =>
+            new TagEndpointResponse(
+              x.successes,
+              x.failures,
+              x.failuresOnProjectKeys
+            )
+        )
+      );
   }
 }
