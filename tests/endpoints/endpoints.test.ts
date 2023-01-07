@@ -107,7 +107,7 @@ describe('The tag endpoint', () => {
     const dependencies = new TestTagEndpointDependencies();
 
     when(dependencies.tagUseCaseMock.execute(anything())).thenReturn(
-      of(new TagUseCaseOutput([], []))
+      of(new TagUseCaseOutput([], [], []))
     );
 
     const sut = new TagEndpoint(dependencies);

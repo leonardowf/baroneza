@@ -1,12 +1,12 @@
 import { Observable, of } from 'rxjs';
 import { JiraService } from '../services/jira-service';
-import { flatMap, mapTo } from 'rxjs/operators';
+import { catchError, flatMap, mapTo } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
 
 export interface CreateVersionUseCase {
   execute(
     input: CreateVersionUseCaseInput
-  ): Observable<CreateVersionUseCaseOutput>;
+  ): Observable<CreateVersionUseCaseOutput[]>;
 }
 
 export class CreateVersionUseCaseInput {
@@ -19,7 +19,18 @@ export class CreateVersionUseCaseInput {
   }
 }
 
-export class CreateVersionUseCaseOutput {}
+export type ResultPerProjectKey = {
+  readonly projectKey: string;
+  readonly result: 'CREATED' | 'EXISTED' | 'FAILED';
+};
+
+export class CreateVersionUseCaseOutput {
+  readonly resultPerProjectKey: ResultPerProjectKey;
+
+  constructor(resultPerProjectKey: ResultPerProjectKey) {
+    this.resultPerProjectKey = resultPerProjectKey;
+  }
+}
 
 export class JiraCreateVersionUseCase implements CreateVersionUseCase {
   private readonly jiraService: JiraService;
@@ -48,15 +59,30 @@ export class JiraCreateVersionUseCase implements CreateVersionUseCase {
           this.jiraService.createVersion(version, projectId)
         )
       )
-      .pipe(mapTo(new CreateVersionUseCaseOutput()));
+      .pipe(
+        mapTo(new CreateVersionUseCaseOutput({ projectKey, result: 'CREATED' }))
+      );
 
     return this.jiraService.hasVersion(version, projectKey).pipe(
+      catchError((err) => {
+        return of(err);
+      }),
+
       flatMap((x) => {
-        if (!x) {
+        if (x instanceof Error) {
+          return of(
+            new CreateVersionUseCaseOutput({
+              projectKey: projectKey,
+              result: 'FAILED'
+            })
+          );
+        } else if (!x) {
           return createVersion;
         }
 
-        return of(new CreateVersionUseCaseOutput());
+        return of(
+          new CreateVersionUseCaseOutput({ projectKey, result: 'EXISTED' })
+        );
       })
     );
   }

@@ -37,10 +37,16 @@ export class TagUseCaseInput {
 export class TagUseCaseOutput {
   successes: string[];
   failures: string[];
+  failuresOnProjectKeys: string[];
 
-  constructor(successes: string[], failures: string[]) {
+  constructor(
+    successes: string[],
+    failures: string[],
+    failuresOnProjectKeys: string[]
+  ) {
     this.successes = successes;
     this.failures = failures;
+    this.failuresOnProjectKeys = failuresOnProjectKeys;
   }
 }
 export class JiraTagUseCase implements TagUseCase {
@@ -70,17 +76,37 @@ export class JiraTagUseCase implements TagUseCase {
           return this.createVersionUseCase
             .execute(new CreateVersionUseCaseInput(input.projectKeys, tag))
             .pipe(
-              flatMap(() =>
-                this.jiraTicketTagger.tag(
-                  extractTicketsOutput.ticketIdsCommits.map((x) => x.ticketId),
-                  tag
-                )
+              flatMap((createVersionUseCaseOutput) =>
+                this.jiraTicketTagger
+                  .tag(
+                    extractTicketsOutput.ticketIdsCommits.map(
+                      (x) => x.ticketId
+                    ),
+                    tag
+                  )
+                  .pipe(
+                    map((jiraTicketTaggetOutput) => {
+                      return {
+                        createVersionUseCaseOutput,
+                        jiraTicketTaggetOutput
+                      };
+                    })
+                  )
               )
             );
         })
       )
       .pipe(
-        map((output) => new TagUseCaseOutput(output.successes, output.failures))
+        map(
+          (output) =>
+            new TagUseCaseOutput(
+              output.jiraTicketTaggetOutput.successes,
+              output.jiraTicketTaggetOutput.failures,
+              output.createVersionUseCaseOutput
+                .filter((x) => x.resultPerProjectKey.result === 'FAILED')
+                .map((x) => x.resultPerProjectKey.projectKey)
+            )
+        )
       );
   }
 }

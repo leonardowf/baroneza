@@ -88,7 +88,7 @@ describe('the create release use case', () => {
           )
         )
       )
-    ).thenReturn(of(new TagUseCaseOutput([], [])));
+    ).thenReturn(of(new TagUseCaseOutput([], [], [])));
     when(
       createChangelogUseCaseMock.execute(
         deepEqual(
