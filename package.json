@@ -10,7 +10,12 @@
         "coverage": "jest --coverage",
         "lint": "eslint . --ext .ts",
         "lint-and-fix": "eslint . --ext .ts --fix",
-        "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write"
+        "prettier-format": "prettier --config .prettierrc 'src/**/*.ts' --write",
+        "build": "tsc -p tsconfig.json",
+        "pm2:delete-baroneza": "pm2 delete baroneza 2> /dev/null || true",
+        "pm2:dashboard": "pm2 dashboard",
+        "pm2:save": "pm2 save",
+        "start:pm2": "rm -rf dist/ && npm run build && npm run pm2:delete-baroneza && pm2 start dist/src/app.js --name baroneza --force && npm run pm2:dashboard"
     },
     "author": "",
     "license": "ISC",
@@ -44,6 +49,7 @@
         "dotenv": "^8.2.0",
         "express": "^4.17.3",
         "jira-client": "^6.18.0",
+        "pm2": "^5.2.2",
         "rxjs": "^6.5.5",
         "semver": "^7.2.2",
         "swagger-ui-express": "^4.6.0"
