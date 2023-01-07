@@ -46,7 +46,7 @@
         "jira-client": "^6.18.0",
         "rxjs": "^6.5.5",
         "semver": "^7.2.2",
-        "swagger-ui-express": "^4.1.4"
+        "swagger-ui-express": "^4.6.0"
     },
     "nodemonConfig": {
         "ignore": [
