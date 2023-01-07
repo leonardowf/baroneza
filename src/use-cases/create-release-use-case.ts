@@ -3,7 +3,7 @@ import {
   CreateBranchUseCase,
   CreateBranchUseCaseInput
 } from './create-branch-use-case';
-import { mapTo, flatMap } from 'rxjs/operators';
+import { mapTo, flatMap, catchError } from 'rxjs/operators';
 import { PullRequestCreator } from '../workers/pull-request-creator';
 import { TagUseCase, TagUseCaseInput } from './tag-use-case';
 import {
@@ -133,6 +133,11 @@ export class CreateReleaseUseCase {
                     input.repository,
                     input.projectTag
                   )
+                )
+                .pipe(
+                  catchError(() => {
+                    return of(undefined);
+                  })
                 )
                 .pipe(
                   flatMap((changelog) => {

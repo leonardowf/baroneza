@@ -1,4 +1,4 @@
-import { Observable, of } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { PullRequestNumberExtractor } from '../workers/pr-number-extractor';
 import { ReadPullRequestInfoUseCase } from './read-pull-request-info-use-case';
 import { flatMap, map } from 'rxjs/operators';
@@ -92,6 +92,11 @@ export class GithubCreateChangelogUseCase implements CreateChangelogUseCase {
     return this.pullRequestNumbers(input.origin, input.repository)
       .pipe(
         flatMap((numbers) => {
+          if (numbers.length === 0) {
+            return throwError(
+              new Error('No pull requests to build a changelog')
+            );
+          }
           return this.pullRequestInfoUseCase.execute(numbers, input.repository);
         })
       )

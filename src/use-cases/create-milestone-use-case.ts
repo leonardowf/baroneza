@@ -1,4 +1,4 @@
-import { Observable, forkJoin } from 'rxjs';
+import { Observable, forkJoin, of } from 'rxjs';
 import { PullRequestNumberExtractor } from '../workers/pr-number-extractor';
 import { flatMap, mapTo } from 'rxjs/operators';
 import { MilestoneCreator } from '../workers/milestone-creator';
@@ -53,6 +53,9 @@ export class GithubCreateMilestoneUseCase implements CreateMilestoneUseCase {
             .create(input.title, input.repository)
             .pipe(
               flatMap((milestoneId) => {
+                if (numbers.length === 0) {
+                  return of(void 0);
+                }
                 const setMilestoneToPrs = numbers.map((prNumber) => {
                   return this.githubService.setMilestoneToPR(
                     this.owner,

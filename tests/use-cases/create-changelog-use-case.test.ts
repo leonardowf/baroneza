@@ -291,4 +291,64 @@ describe('the create changelog use case', () => {
         complete: done
       });
   });
+
+  it('when no pull request then throws error', (done) => {
+    const pullRequestNumberExtractorMock = mock<PullRequestNumberExtractor>();
+    const pullRequestInfoUseCaseMock = mock<ReadPullRequestInfoUseCase>();
+    const keepChangelogParserMock = mock<KeepChangelogParser>();
+    const keepChangelogBuilderMock = mock<KeepChangelogBuilder<string>>();
+    const blockKeepChangelogBuilderMock = mock<KeepChangelogBuilder<Block[]>>();
+    const commitPRNumberParserMock = mock<CommitPRNumberParser>();
+
+    when(pullRequestNumberExtractorMock.extract(123, 'repository')).thenReturn(
+      of([])
+    );
+
+    when(keepChangelogParserMock.parse('hello')).thenReturn(null);
+    when(
+      keepChangelogBuilderMock.build(
+        '1.0.0',
+        deepEqual([]),
+        deepEqual([]),
+        deepEqual([]),
+        deepEqual([]),
+        deepEqual([]),
+        deepEqual([])
+      )
+    ).thenReturn(undefined);
+
+    const pullRequestNumberExtractor = instance(pullRequestNumberExtractorMock);
+    const pullRequestInfoUseCase = instance(pullRequestInfoUseCaseMock);
+    const keepChangelogParser = instance(keepChangelogParserMock);
+    const keepChangelogBuilder = instance(keepChangelogBuilderMock);
+    const blockKeepChangelogBuilder = instance(blockKeepChangelogBuilderMock);
+    const commitPRNumberParser = instance(commitPRNumberParserMock);
+
+    const sut = new GithubCreateChangelogUseCase(
+      blockKeepChangelogBuilder,
+      commitPRNumberParser,
+      keepChangelogBuilder,
+      keepChangelogParser,
+      pullRequestInfoUseCase,
+      pullRequestNumberExtractor
+    );
+
+    sut
+      .execute(
+        new CreateChangelogInput(
+          { type: 'pullRequestNumber', number: 123 },
+          'repository',
+          '1.0.0'
+        )
+      )
+      .subscribe({
+        next: () => {
+          fail();
+        },
+        error: () => {
+          done();
+        },
+        complete: done
+      });
+  });
 });

@@ -1,4 +1,4 @@
-import { Observable, of, from, forkJoin } from 'rxjs';
+import { Observable, of, from, forkJoin, defer } from 'rxjs';
 import JiraAPI from 'jira-client';
 import { catchError, map } from 'rxjs/operators';
 
@@ -44,7 +44,7 @@ export class ConcreteJiraTickerTagger implements JiraTicketTagger {
         }
       });
 
-      return from(updateIssuePromise)
+      return defer(() => from(updateIssuePromise))
         .pipe(
           map(() => {
             return { success: true, ticketId: ticketId };
