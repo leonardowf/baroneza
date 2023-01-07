@@ -93,7 +93,9 @@ export class GithubCreateChangelogUseCase implements CreateChangelogUseCase {
       .pipe(
         flatMap((numbers) => {
           if (numbers.length === 0) {
-            return throwError(Error('No pull requests to build a changelog'));
+            return throwError(
+              new Error('No pull requests to build a changelog')
+            );
           }
           return this.pullRequestInfoUseCase.execute(numbers, input.repository);
         })
