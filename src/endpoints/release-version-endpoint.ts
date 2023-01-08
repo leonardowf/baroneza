@@ -1,5 +1,5 @@
 import { ReleaseVersionUseCase } from '../use-cases/release-version-use-case';
-import { mapTo } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 export interface ReleaseVersionEndpointInput {
@@ -9,7 +9,10 @@ export interface ReleaseVersionEndpointInput {
   readonly releaseDate?: string;
 }
 
-export class ReleaseVersionEndpointOutput {}
+export type ReleaseVersionEndpointOutput = {
+  failures: string[];
+  successes: string[];
+};
 
 export interface ReleaseVersionEndpointDependencies {
   releaseVersionUseCase: ReleaseVersionUseCase;
@@ -31,6 +34,16 @@ export class ReleaseVersionEndpoint {
         version: `${input.tag}${input.jiraTagSuffix}`,
         releaseDate: input.releaseDate
       })
-      .pipe(mapTo(new ReleaseVersionEndpointOutput()));
+      .pipe(
+        map((x) => {
+          const failures = x.result
+            .filter((x) => x.result === 'FAILED')
+            .map((x) => x.projectKey);
+          const successes = x.result
+            .filter((x) => x.result === 'RELEASED')
+            .map((x) => x.projectKey);
+          return { failures, successes };
+        })
+      );
   }
 }

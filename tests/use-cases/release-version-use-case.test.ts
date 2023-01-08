@@ -54,7 +54,7 @@ describe('the release version use case', () => {
         .build();
     });
 
-    it('fails the use case', (done) => {
+    it('does not fail the use case', (done) => {
       const sut = new ReleaseVersionUseCase(jiraService);
       sut
         .execute(
@@ -65,11 +65,13 @@ describe('the release version use case', () => {
           )
         )
         .subscribe({
-          next: () => {
-            fail();
+          next: (x) => {
+            expect(x.result[0].projectKey).toBe('projectKey');
+            expect(x.result[0].result).toBe('FAILED');
+            done();
           },
           error: () => {
-            done();
+            fail();
           }
         });
     });
@@ -92,17 +94,19 @@ describe('the release version use case', () => {
         .build();
     });
 
-    it('fails the use case', (done) => {
+    it('does not fail the use case', (done) => {
       const sut = new ReleaseVersionUseCase(jiraService);
       sut
         .execute(
           new ReleaseVersionUseCaseInput(['fail', 'pass'], '1.0.0', undefined)
         )
         .subscribe({
-          next: () => {
-            fail();
-          },
-          error: () => {
+          next: (x) => {
+            expect(x.result[0].projectKey).toBe('fail');
+            expect(x.result[0].result).toBe('FAILED');
+            expect(x.result[1].projectKey).toBe('pass');
+            expect(x.result[1].result).toBe('RELEASED');
+
             verify(
               jiraServiceMock.mock.releaseVersion(
                 anything(),
@@ -111,6 +115,9 @@ describe('the release version use case', () => {
               )
             ).twice();
             done();
+          },
+          error: () => {
+            fail();
           }
         });
     });
