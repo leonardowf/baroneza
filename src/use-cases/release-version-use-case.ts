@@ -2,13 +2,11 @@ import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, map, mapTo } from 'rxjs/operators';
 import { JiraService } from '../services/jira-service';
 
-export class ReleaseVersionUseCaseInput {
-  constructor(
-    readonly projectKeys: string[],
-    readonly version: string,
-    readonly releaseDate?: string
-  ) {}
-}
+export type ReleaseVersionUseCaseInput = {
+  readonly projectKeys: string[];
+  readonly version: string;
+  readonly releaseDate?: string;
+};
 
 export class ReleaseVersionUseCaseOutput {
   readonly result: ResultPerProjectKey[];
@@ -22,7 +20,13 @@ type ResultPerProjectKey = {
   readonly result: 'RELEASED' | 'FAILED';
 };
 
-export class ReleaseVersionUseCase {
+export interface ReleaseVersionUseCase {
+  execute(
+    input: ReleaseVersionUseCaseInput
+  ): Observable<ReleaseVersionUseCaseOutput>;
+}
+
+export class ConcreteReleaseVersionUseCase {
   constructor(readonly jiraService: JiraService) {}
 
   execute(

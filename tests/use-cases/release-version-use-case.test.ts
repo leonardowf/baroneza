@@ -1,7 +1,7 @@
 import { anything, verify } from 'ts-mockito';
 import { JiraService } from '../../src/services/jira-service';
 import {
-  ReleaseVersionUseCase,
+  ConcreteReleaseVersionUseCase,
   ReleaseVersionUseCaseInput
 } from '../../src/use-cases/release-version-use-case';
 import { JiraServiceMock } from '../mocks/jira-service-mock';
@@ -28,7 +28,7 @@ describe('the release version use case', () => {
     });
 
     it('does not fail the use case', (done) => {
-      const sut = new ReleaseVersionUseCase(jiraService);
+      const sut = new ConcreteReleaseVersionUseCase(jiraService);
       sut
         .execute(new ReleaseVersionUseCaseInput(['pass'], '1.0.0', undefined))
         .subscribe({
@@ -55,7 +55,7 @@ describe('the release version use case', () => {
     });
 
     it('does not fail the use case', (done) => {
-      const sut = new ReleaseVersionUseCase(jiraService);
+      const sut = new ConcreteReleaseVersionUseCase(jiraService);
       sut
         .execute(
           new ReleaseVersionUseCaseInput(
@@ -95,7 +95,7 @@ describe('the release version use case', () => {
     });
 
     it('does not fail the use case', (done) => {
-      const sut = new ReleaseVersionUseCase(jiraService);
+      const sut = new ConcreteReleaseVersionUseCase(jiraService);
       sut
         .execute(
           new ReleaseVersionUseCaseInput(['fail', 'pass'], '1.0.0', undefined)

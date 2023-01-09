@@ -1,6 +1,7 @@
 import { GithubServiceMock } from './github-service-mock';
 import { JiraServiceMock } from './jira-service-mock';
 import { PullRequestCreatorMock } from './pull-request-creator-mock';
+import { ReleaseVersionUseCaseMock } from './release-version-use-case-mock';
 
 export class Mocks {
   static githubService(owner: string, repo: string): GithubServiceMock {
@@ -13,5 +14,9 @@ export class Mocks {
 
   static jiraService(): JiraServiceMock {
     return new JiraServiceMock();
+  }
+
+  static releaseVersionUseCase(): ReleaseVersionUseCaseMock {
+    return new ReleaseVersionUseCaseMock();
   }
 }

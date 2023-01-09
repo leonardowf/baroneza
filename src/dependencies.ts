@@ -41,7 +41,7 @@ import { ConcreteCommitPRNumberParser } from './workers/keep-changelog-builder/c
 import { ConcreteUpdateReleaseUseCase } from './use-cases/update-release-use-case';
 import { GithubDraftReleaseGuesser } from './workers/github-draft-release-guesser';
 import { ReleaseVersionEndpointDependencies } from './endpoints/release-version-endpoint';
-import { ReleaseVersionUseCase } from './use-cases/release-version-use-case';
+import { ConcreteReleaseVersionUseCase } from './use-cases/release-version-use-case';
 
 export class Dependencies
   implements
@@ -165,7 +165,7 @@ export class Dependencies
     this.createMilestoneUseCase
   );
 
-  releaseVersionUseCase = new ReleaseVersionUseCase(this.jiraService);
+  releaseVersionUseCase = new ConcreteReleaseVersionUseCase(this.jiraService);
 
   reactionsReader = new SlackReactionsReader(this.slackWebClient);
   nextReleaseGuesser = new GithubDraftReleaseGuesser(

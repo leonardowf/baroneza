@@ -20,6 +20,8 @@ import {
   TagEndpointDependencies
 } from '../../src/endpoints/tag-endpoint';
 import { TagUseCase, TagUseCaseOutput } from '../../src/use-cases/tag-use-case';
+import { ReleaseVersionEndpoint } from '../../src/endpoints/release-version-endpoint';
+import { Mocks } from '../mocks/mocks';
 
 class TestStartTrainEndpointDependencies
   implements StartTrainEndpointDependencies {
@@ -125,6 +127,76 @@ describe('The tag endpoint', () => {
           verify(dependencies.tagUseCaseMock.execute(anything())).once();
           done();
         }
+      });
+  });
+});
+
+describe('the release version endpoint', () => {
+  it('calls the correct use case then errors out', (done) => {
+    const releaseVersionUseCase = Mocks.releaseVersionUseCase()
+      .withError({
+        projectKeys: ['FAI'],
+        version: '1.0.0',
+        releaseDate: undefined
+      })
+      .build();
+
+    const sut = new ReleaseVersionEndpoint({
+      releaseVersionUseCase: releaseVersionUseCase
+    });
+
+    sut
+      .execute({
+        tag: '1.0.0',
+        projectKeys: ['FAI'],
+        jiraTagSuffix: ''
+      })
+      .subscribe({
+        next: () => {
+          fail();
+        },
+        error: () => {
+          done();
+        }
+      });
+  });
+
+  it('maps the use case response', (done) => {
+    const releaseVersionUseCase = Mocks.releaseVersionUseCase()
+      .withInputOutput({
+        input: {
+          projectKeys: ['FAI', 'PAS'],
+          version: '1.0.0',
+          releaseDate: undefined
+        },
+        output: {
+          result: [
+            { projectKey: 'FAI', result: 'FAILED' },
+            { projectKey: 'PAS', result: 'RELEASED' }
+          ]
+        }
+      })
+      .build();
+
+    const sut = new ReleaseVersionEndpoint({
+      releaseVersionUseCase: releaseVersionUseCase
+    });
+
+    sut
+      .execute({
+        tag: '1.0.0',
+        projectKeys: ['FAI', 'PAS'],
+        jiraTagSuffix: ''
+      })
+      .subscribe({
+        next: (response) => {
+          expect(response.failures[0]).toBe('FAI');
+          expect(response.successes[0]).toBe('PAS');
+        },
+        error: () => {
+          fail();
+        },
+        complete: done
       });
   });
 });
