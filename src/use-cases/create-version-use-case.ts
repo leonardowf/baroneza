@@ -19,7 +19,7 @@ export class CreateVersionUseCaseInput {
   }
 }
 
-export type ResultPerProjectKey = {
+type ResultPerProjectKey = {
   readonly projectKey: string;
   readonly result: 'CREATED' | 'EXISTED' | 'FAILED';
 };

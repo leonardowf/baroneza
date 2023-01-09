@@ -1,36 +1,57 @@
-import { forkJoin, Observable } from 'rxjs';
-import { mapTo } from 'rxjs/operators';
+import { forkJoin, Observable, of } from 'rxjs';
+import { catchError, map, mapTo } from 'rxjs/operators';
 import { JiraService } from '../services/jira-service';
 
-export class ReleaseVersionUseCaseInput {
-  constructor(
-    readonly projectKeys: string[],
-    readonly version: string,
-    readonly releaseDate?: string
-  ) {}
+export type ReleaseVersionUseCaseInput = {
+  readonly projectKeys: string[];
+  readonly version: string;
+  readonly releaseDate?: string;
+};
+
+export class ReleaseVersionUseCaseOutput {
+  readonly result: ResultPerProjectKey[];
+  constructor(result: ResultPerProjectKey[]) {
+    this.result = result;
+  }
 }
 
-export class ReleaseVersionUseCaseOutput {}
+type ResultPerProjectKey = {
+  readonly projectKey: string;
+  readonly result: 'RELEASED' | 'FAILED';
+};
 
-export class ReleaseVersionUseCase {
+export interface ReleaseVersionUseCase {
+  execute(
+    input: ReleaseVersionUseCaseInput
+  ): Observable<ReleaseVersionUseCaseOutput>;
+}
+
+export class ConcreteReleaseVersionUseCase {
   constructor(readonly jiraService: JiraService) {}
 
   execute(
     input: ReleaseVersionUseCaseInput
-  ): Observable<ReleaseVersionUseCaseOutput[]> {
+  ): Observable<ReleaseVersionUseCaseOutput> {
     const releaseVersions = input.projectKeys.map((projectKey) => {
       return this.releaseVersion(projectKey, input.version, input.releaseDate);
     });
-    return forkJoin(releaseVersions);
+    return forkJoin(releaseVersions).pipe(
+      map((x) => new ReleaseVersionUseCaseOutput(x))
+    );
   }
 
   private releaseVersion(
     projectKey: string,
     version: string,
     releaseDate?: string
-  ): Observable<ReleaseVersionUseCaseOutput> {
+  ): Observable<ResultPerProjectKey> {
     return this.jiraService
       .releaseVersion(version, projectKey, releaseDate)
-      .pipe(mapTo(new ReleaseVersionUseCaseOutput()));
+      .pipe(mapTo({ projectKey, result: 'RELEASED' } as ResultPerProjectKey))
+      .pipe(
+        catchError(() =>
+          of<ResultPerProjectKey>({ projectKey, result: 'FAILED' })
+        )
+      );
   }
 }

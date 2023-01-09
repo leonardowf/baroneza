@@ -119,7 +119,7 @@ export class ConcreteJiraService implements JiraService {
 
           if (!match) {
             return throwError({
-              message: `Unable to find JIRA release named ${name}`
+              message: `Unable to find JIRA release named ${name} for projectKey ${projectKey}`
             });
           }
           return of(match);
