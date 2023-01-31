@@ -431,6 +431,7 @@ declare module 'jira-client' {
     interface CreateVersionOptions {
       name: string;
       projectId: number;
+      description?: string;
     }
     interface UpdateVersionOptions {
       id: string;

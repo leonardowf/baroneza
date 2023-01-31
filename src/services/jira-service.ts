@@ -3,7 +3,11 @@ import JiraAPI from 'jira-client';
 import { flatMap, map, mapTo } from 'rxjs/operators';
 
 export interface JiraService {
-  createVersion(name: string, projectId: number): Observable<void>;
+  createVersion(
+    name: string,
+    projectId: number,
+    description?: string
+  ): Observable<void>;
   projectIdFromKey(projectKey: string): Observable<number>;
   hasVersion(name: string, projectKey: string): Observable<boolean>;
   hasFixVersion(issueNumber: string): Observable<boolean>;
@@ -26,11 +30,16 @@ export class ConcreteJiraService implements JiraService {
     this.jiraAPI = jiraAPI;
   }
 
-  createVersion(name: string, projectId: number): Observable<void> {
+  createVersion(
+    name: string,
+    projectId: number,
+    description?: string
+  ): Observable<void> {
     return defer(() =>
       from(
         this.jiraAPI.createVersion({
           projectId: projectId,
+          description,
           name
         })
       ).pipe(mapTo(void 0))

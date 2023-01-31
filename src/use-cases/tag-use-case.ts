@@ -18,19 +18,22 @@ export class TagUseCaseInput {
   readonly projectKeys: string[];
   readonly repository: string;
   readonly jiraTagSuffix: string;
+  readonly jiraTagDescription?: string;
 
   constructor(
     identifier: number | ShaWindow,
     tag: string,
     projectKeys: string[],
     repository: string,
-    jiraTagSuffix: string
+    jiraTagSuffix: string,
+    jiraTagDescription?: string
   ) {
     this.identifier = identifier;
     this.tag = tag;
     this.projectKeys = projectKeys;
     this.repository = repository;
     this.jiraTagSuffix = jiraTagSuffix;
+    this.jiraTagDescription = jiraTagDescription;
   }
 }
 
@@ -74,7 +77,13 @@ export class JiraTagUseCase implements TagUseCase {
         flatMap((extractTicketsOutput) => {
           const tag = `${input.tag}${input.jiraTagSuffix}`;
           return this.createVersionUseCase
-            .execute(new CreateVersionUseCaseInput(input.projectKeys, tag))
+            .execute(
+              new CreateVersionUseCaseInput(
+                input.projectKeys,
+                tag,
+                input.jiraTagDescription
+              )
+            )
             .pipe(
               flatMap((createVersionUseCaseOutput) =>
                 this.jiraTicketTagger
