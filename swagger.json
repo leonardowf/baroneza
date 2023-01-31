@@ -155,6 +155,11 @@
                     "type": "string",
                     "example": "-backend",
                     "description": "This field will be concatenated as a suffix of the guessed next release"
+                  },
+                  "jiraTagDescription": {
+                    "type": "string",
+                    "example": "A hotfix release",
+                    "description": "This field will be used as the description of the Jira version"
                   }
                 }
               }

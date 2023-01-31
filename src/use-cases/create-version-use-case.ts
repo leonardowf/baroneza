@@ -12,10 +12,12 @@ export interface CreateVersionUseCase {
 export class CreateVersionUseCaseInput {
   readonly projectKeys: string[];
   readonly version: string;
+  readonly description?: string;
 
-  constructor(projectKeys: string[], version: string) {
+  constructor(projectKeys: string[], version: string, description?: string) {
     this.projectKeys = projectKeys;
     this.version = version;
+    this.description = description;
   }
 }
 
@@ -43,14 +45,15 @@ export class JiraCreateVersionUseCase implements CreateVersionUseCase {
     input: CreateVersionUseCaseInput
   ): Observable<CreateVersionUseCaseOutput[]> {
     const createdVersions = input.projectKeys.map((projectKey) => {
-      return this.createVersion(projectKey, input.version);
+      return this.createVersion(projectKey, input.version, input.description);
     });
     return forkJoin(createdVersions);
   }
 
   private createVersion(
     projectKey: string,
-    version: string
+    version: string,
+    description?: string
   ): Observable<CreateVersionUseCaseOutput> {
     const createVersion = this.jiraService
       .projectIdFromKey(projectKey)

@@ -28,6 +28,7 @@ export class CreateReleaseUseCaseInput {
   repository: string;
   channel: string;
   jiraTagSuffix: string;
+  jiraTagDescription?: string;
 
   constructor(
     branchName: string,
@@ -38,7 +39,8 @@ export class CreateReleaseUseCaseInput {
     projectKeys: string[],
     repository: string,
     channel: string,
-    jiraTagSuffix: string
+    jiraTagSuffix: string,
+    jiraTagDescription?: string
   ) {
     this.branchName = branchName;
     this.referenceBranch = referenceBranch;
@@ -49,6 +51,7 @@ export class CreateReleaseUseCaseInput {
     this.repository = repository;
     this.channel = channel;
     this.jiraTagSuffix = jiraTagSuffix;
+    this.jiraTagDescription = jiraTagDescription;
   }
 }
 
@@ -121,7 +124,8 @@ export class CreateReleaseUseCase {
                 input.projectTag,
                 input.projectKeys,
                 input.repository,
-                input.jiraTagSuffix
+                input.jiraTagSuffix,
+                input.jiraTagDescription
               )
             )
           ).pipe(
