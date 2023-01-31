@@ -37,20 +37,26 @@ describe('the create version use case', () => {
       of(false)
     );
     when(jiraServiceMock.projectIdFromKey(anything())).thenReturn(of(123));
-    when(jiraServiceMock.createVersion(anything(), anything())).thenReturn(
-      of(void 0)
-    );
+    when(
+      jiraServiceMock.createVersion(anything(), anything(), anything())
+    ).thenReturn(of(void 0));
 
     const jiraService = instance(jiraServiceMock);
     const sut = new JiraCreateVersionUseCase(jiraService);
 
     sut
       .execute(
-        new CreateVersionUseCaseInput(['project', 'otherProject'], 'version')
+        new CreateVersionUseCaseInput(
+          ['project', 'otherProject'],
+          'version',
+          'description'
+        )
       )
       .subscribe({
         next: () => {
-          verify(jiraServiceMock.createVersion(anything(), anything())).twice();
+          verify(
+            jiraServiceMock.createVersion(anything(), anything(), 'description')
+          ).twice();
         },
         complete: done
       });
@@ -65,9 +71,9 @@ describe('the create version use case', () => {
     when(jiraServiceMock.hasVersion('1.1.0', 'PAS')).thenReturn(of(true));
     when(jiraServiceMock.hasVersion('1.1.0', 'CRE')).thenReturn(of(false));
     when(jiraServiceMock.projectIdFromKey(anything())).thenReturn(of(123));
-    when(jiraServiceMock.createVersion(anything(), anything())).thenReturn(
-      of(void 0)
-    );
+    when(
+      jiraServiceMock.createVersion(anything(), anything(), anything())
+    ).thenReturn(of(void 0));
 
     const jiraService = instance(jiraServiceMock);
     const sut = new JiraCreateVersionUseCase(jiraService);
@@ -79,7 +85,9 @@ describe('the create version use case', () => {
           expect(output[0].resultPerProjectKey.result).toBe('FAILED');
           expect(output[1].resultPerProjectKey.result).toBe('EXISTED');
           expect(output[2].resultPerProjectKey.result).toBe('CREATED');
-          verify(jiraServiceMock.createVersion(anything(), anything())).once();
+          verify(
+            jiraServiceMock.createVersion(anything(), anything(), anything())
+          ).once();
         },
         complete: done
       });

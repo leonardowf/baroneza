@@ -59,7 +59,7 @@ export class JiraCreateVersionUseCase implements CreateVersionUseCase {
       .projectIdFromKey(projectKey)
       .pipe(
         flatMap((projectId) =>
-          this.jiraService.createVersion(version, projectId)
+          this.jiraService.createVersion(version, projectId, description)
         )
       )
       .pipe(
