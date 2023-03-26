@@ -1,9 +1,9 @@
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { ShaWindow } from '../shared/sha-window';
 import {
   GithubPullRequestExtractor,
-  GithubShaExtractor,
-  ShaWindow
+  GithubShaExtractor
 } from '../workers/commit-extractor';
 import { JiraTicketParser } from '../workers/jira-ticket-parser';
 

@@ -8,6 +8,7 @@ import swagger from 'swagger-ui-express';
 import * as swaggerDocument from '../swagger.json';
 import { UpdateReleaseEndpoint } from './endpoints/update-release-endpoint';
 import { ReleaseVersionEndpoint } from './endpoints/release-version-endpoint';
+import { NotifyReleaseStatusEndpoint } from './endpoints/notify-release-status-endpoint';
 
 const app = express();
 app.use(bodyParser.json());
@@ -66,6 +67,20 @@ app.post('/releaseVersion', (req, res) => {
       res.send(error);
     }
   );
+});
+
+app.post('/notifyReleaseStatus', (req, res) => {
+  new NotifyReleaseStatusEndpoint(dependencies).execute(req.body).subscribe(
+    (x) => res.send(x),
+    (error) => {
+      console.log(error);
+      res.send(error);
+    }
+  );
+});
+
+app.get('/health', (req, res) => {
+  res.send('ok');
 });
 
 app.use('/swagger', swagger.serve, swagger.setup(swaggerDocument));

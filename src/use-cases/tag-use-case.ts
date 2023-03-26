@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 import { map, flatMap } from 'rxjs/operators';
-import { ShaWindow } from '../workers/commit-extractor';
+import { ShaWindow } from '../shared/sha-window';
 import { JiraTicketTagger } from '../workers/jira-tagger';
 import {
   CreateVersionUseCase,

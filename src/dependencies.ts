@@ -42,13 +42,19 @@ import { ConcreteUpdateReleaseUseCase } from './use-cases/update-release-use-cas
 import { GithubDraftReleaseGuesser } from './workers/github-draft-release-guesser';
 import { ReleaseVersionEndpointDependencies } from './endpoints/release-version-endpoint';
 import { ConcreteReleaseVersionUseCase } from './use-cases/release-version-use-case';
+import { NotifyReleaseStatusEndpointDependencies } from './endpoints/notify-release-status-endpoint';
+import { ConcreteNotifyReleaseStatusUseCase } from './use-cases/notify-release-status-use-case';
+import { JiraIssuesReader } from './workers/issues-reader';
+import { ConcreteIssuesOrganizer } from './workers/issues-organizer';
+import { ConcreteIssuesStatusMessageBuilder } from './workers/issues-status-message-builder';
 
 export class Dependencies
   implements
     TagEndpointDependencies,
     CreateReleaseEndpointDependencies,
     ReleaseVersionEndpointDependencies,
-    StartTrainEndpointDependencies {
+    StartTrainEndpointDependencies,
+    NotifyReleaseStatusEndpointDependencies {
   keychain = new Keychain(process.env);
   config = new Config();
 
@@ -203,5 +209,21 @@ export class Dependencies
     this.config.githubOwner,
     this.pullRequestCreator,
     this.githubService
+  );
+
+  jiraIssueReader = new JiraIssuesReader(this.jiraService);
+
+  issuesOrganizer = new ConcreteIssuesOrganizer();
+
+  issuesStatusMessageBuilder = new ConcreteIssuesStatusMessageBuilder(
+    this.config.jiraHost
+  );
+
+  notifyReleaseStatusUseCase = new ConcreteNotifyReleaseStatusUseCase(
+    this.extractTicketsUseCase,
+    this.jiraIssueReader,
+    this.issuesOrganizer,
+    this.issuesStatusMessageBuilder,
+    this.messageSender
   );
 }

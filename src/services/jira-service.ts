@@ -1,6 +1,6 @@
 import { Observable, from, throwError, of, defer } from 'rxjs';
 import JiraAPI from 'jira-client';
-import { flatMap, map, mapTo } from 'rxjs/operators';
+import { catchError, flatMap, map, mapTo } from 'rxjs/operators';
 
 export interface JiraService {
   createVersion(
@@ -21,7 +21,13 @@ export interface JiraService {
     projectKey: string,
     releaseDate?: string
   ): Observable<void>;
+
+  getIssue(issueNumber: string): Observable<Issue>;
 }
+
+export type TicketDetails = {
+  readonly issueNumber: string;
+};
 
 export class ConcreteJiraService implements JiraService {
   private readonly jiraAPI: JiraAPI;
@@ -114,6 +120,22 @@ export class ConcreteJiraService implements JiraService {
     );
   }
 
+  getIssue(ticket: string): Observable<Issue> {
+    return defer(() =>
+      from(this.jiraAPI.findIssue(ticket)).pipe(
+        map((jsonResponse) => {
+          const jiraIssue = jsonResponse as Issue;
+          return jiraIssue;
+        }),
+        catchError((error) => {
+          return throwError({
+            message: `Unable to find JIRA issue ${ticket}`
+          });
+        })
+      )
+    );
+  }
+
   private findVersion(
     name: string,
     projectKey: string
@@ -144,14 +166,27 @@ interface JiraVersion {
   readonly projectId: number;
 }
 
-interface Issue {
+export interface Project {
+  readonly key: string;
+  readonly name: string;
+}
+
+export interface Status {
+  readonly name: string;
+}
+
+export interface Issue {
+  readonly key: string;
   readonly fields: Fields;
 }
 
-interface Fields {
+export interface Fields {
   readonly fixVersions: FixVersion[];
+  readonly project: Project;
+  readonly status: Status;
+  readonly summary: string;
 }
 
-interface FixVersion {
+export interface FixVersion {
   readonly name: string;
 }

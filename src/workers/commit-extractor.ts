@@ -1,11 +1,7 @@
 import { Observable, forkJoin } from 'rxjs';
 import { flatMap } from 'rxjs/operators';
 import { GithubService } from '../services/github-service';
-
-export type ShaWindow = {
-  readonly start: string;
-  readonly end: string;
-};
+import { ShaWindow } from '../shared/sha-window';
 
 export interface CommitExtractor {
   commits(

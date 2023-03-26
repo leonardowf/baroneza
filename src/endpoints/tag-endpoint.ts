@@ -1,11 +1,11 @@
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { ShaWindow } from '../shared/sha-window';
 import {
   TagUseCase,
   TagUseCaseInput,
   TagUseCaseOutput
 } from '../use-cases/tag-use-case';
-import { ShaWindow } from '../workers/commit-extractor';
 
 export interface TagEndpointInput {
   readonly jiraTagSuffix: string;
