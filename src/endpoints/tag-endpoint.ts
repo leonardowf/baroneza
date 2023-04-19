@@ -1,5 +1,5 @@
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
 import {
   TagUseCase,
   TagUseCaseInput,
@@ -59,17 +59,21 @@ export class TagEndpoint {
       input.jiraTagSuffix
     );
 
-    return this.tagUseCase
-      .execute(useCaseInput)
-      .pipe(
-        map(
-          (x) =>
-            new TagEndpointResponse(
-              x.successes,
-              x.failures,
-              x.failuresOnProjectKeys
-            )
-        )
-      );
+    return this.tagUseCase.execute(useCaseInput).pipe(
+      map(
+        (x) =>
+          new TagEndpointResponse(
+            x.successes,
+            x.failures,
+            x.failuresOnProjectKeys
+          )
+      ),
+      catchError((error) => {
+        console.log(error);
+        return throwError({
+          message: error.message ?? 'Unable to tag release'
+        });
+      })
+    );
   }
 }

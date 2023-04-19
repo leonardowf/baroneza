@@ -1,6 +1,6 @@
 import { ReleaseVersionUseCase } from '../use-cases/release-version-use-case';
-import { map } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { catchError, map } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
 
 export interface ReleaseVersionEndpointInput {
   readonly tag: string;
@@ -43,6 +43,12 @@ export class ReleaseVersionEndpoint {
             .filter((x) => x.result === 'RELEASED')
             .map((x) => x.projectKey);
           return { failures, successes };
+        }),
+        catchError((error) => {
+          console.log(error);
+          return throwError({
+            message: error.message ?? 'Unable to release version'
+          });
         })
       );
   }

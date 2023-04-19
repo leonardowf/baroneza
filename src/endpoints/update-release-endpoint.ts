@@ -1,6 +1,7 @@
-import { Observable } from 'rxjs';
-import { mapTo } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
+import { catchError, mapTo } from 'rxjs/operators';
 import { UpdateReleaseUseCase } from '../use-cases/update-release-use-case';
+import { error } from 'console';
 
 export interface UpdateReleaseEndpointDependencies {
   readonly updateReleaseUseCase: UpdateReleaseUseCase;
@@ -29,6 +30,12 @@ export class UpdateReleaseEndpoint {
   execute(
     input: UpdateReleaseEndpointInput
   ): Observable<UpdateReleaseEndpointOutput> {
-    return this.updateReleaseUseCase.execute(input).pipe(mapTo({}));
+    return this.updateReleaseUseCase.execute(input).pipe(
+      mapTo({}),
+      catchError((error) => {
+        console.log(error);
+        return throwError(error.message ?? 'Unable to update release');
+      })
+    );
   }
 }
