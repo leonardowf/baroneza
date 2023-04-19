@@ -1,6 +1,6 @@
 import { CreateReleaseUseCase } from '../use-cases/create-release-use-case';
-import { mapTo } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { catchError, mapTo } from 'rxjs/operators';
+import { Observable, throwError } from 'rxjs';
 
 export interface CreateReleaseEndpointInput {
   readonly branchName: string;
@@ -44,6 +44,14 @@ export class CreateReleaseEndpoint {
         jiraTagSuffix: input.jiraTagSuffix,
         jiraTagDescription: input.jiraTagDescription
       })
-      .pipe(mapTo(new CreateReleaseEndpointOutput()));
+      .pipe(
+        mapTo(new CreateReleaseEndpointOutput()),
+        catchError((error) => {
+          console.log(error);
+          return throwError({
+            message: error.message ?? 'Unable to create release'
+          });
+        })
+      );
   }
 }

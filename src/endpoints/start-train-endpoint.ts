@@ -1,6 +1,6 @@
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { StartTrainUseCase } from '../use-cases/start-train-use-case';
-import { map } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { ReleaseType } from '../workers/next-release-guesser';
 
 export interface StartTrainEndpointDependencies {
@@ -31,8 +31,14 @@ export class StartTrainEndpoint {
   execute(
     input: StartTrainEndpointInput
   ): Observable<StartTrainEndpointOutput> {
-    return this.startTrainUseCase
-      .execute(input)
-      .pipe(map(() => new StartTrainEndpointOutput()));
+    return this.startTrainUseCase.execute(input).pipe(
+      map(() => new StartTrainEndpointOutput()),
+      catchError((error) => {
+        console.log(error);
+        return throwError({
+          message: error.message ?? 'Unable to start train'
+        });
+      })
+    );
   }
 }
