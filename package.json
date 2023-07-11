@@ -51,7 +51,7 @@
         "jira-client": "^8.2.2",
         "pm2": "^5.2.2",
         "rxjs": "^6.5.5",
-        "semver": "^7.5.2",
+        "semver": "^7.5.3",
         "swagger-ui-express": "^4.6.0"
     },
     "nodemonConfig": {
