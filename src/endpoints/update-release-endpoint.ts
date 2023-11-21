@@ -1,7 +1,6 @@
 import { Observable, throwError } from 'rxjs';
 import { catchError, mapTo } from 'rxjs/operators';
 import { UpdateReleaseUseCase } from '../use-cases/update-release-use-case';
-import { error } from 'console';
 
 export interface UpdateReleaseEndpointDependencies {
   readonly updateReleaseUseCase: UpdateReleaseUseCase;
