@@ -42,12 +42,14 @@ import { ConcreteUpdateReleaseUseCase } from './use-cases/update-release-use-cas
 import { GithubDraftReleaseGuesser } from './workers/github-draft-release-guesser';
 import { ReleaseVersionEndpointDependencies } from './endpoints/release-version-endpoint';
 import { ConcreteReleaseVersionUseCase } from './use-cases/release-version-use-case';
+import { GuessNextReleaseEndpointDependencies } from './endpoints/guess-next-release-endpoint';
 
 export class Dependencies
   implements
     TagEndpointDependencies,
     CreateReleaseEndpointDependencies,
     ReleaseVersionEndpointDependencies,
+    GuessNextReleaseEndpointDependencies,
     StartTrainEndpointDependencies {
   keychain = new Keychain(process.env);
   config = new Config();
