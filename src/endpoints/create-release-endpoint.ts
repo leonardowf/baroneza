@@ -47,7 +47,6 @@ export class CreateReleaseEndpoint {
       .pipe(
         mapTo(new CreateReleaseEndpointOutput()),
         catchError((error) => {
-          console.log(error);
           return throwError({
             message: error.message ?? 'Unable to create release'
           });

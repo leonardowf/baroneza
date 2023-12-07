@@ -36,7 +36,9 @@ describe('the github draft release guesser', () => {
     });
 
     it('returns 1 release with valid release', (done) => {
-      githubServiceMock = githubServiceMock.withReleases(['1.0.0']);
+      githubServiceMock = githubServiceMock
+        .withReleases(['1.0.0'])
+        .withLatestRelease('1.0.0');
       const sut = buildSut();
       sut.guess(repo, 'patch').subscribe({
         next: (version) => {
@@ -48,7 +50,9 @@ describe('the github draft release guesser', () => {
     });
 
     it('bumps correctly (minor)', (done) => {
-      githubServiceMock = githubServiceMock.withReleases(['1.0.0']);
+      githubServiceMock = githubServiceMock
+        .withReleases(['1.0.0'])
+        .withLatestRelease('1.0.0');
       const sut = buildSut();
       sut.guess(repo, 'minor').subscribe({
         next: (version) => {
@@ -60,7 +64,9 @@ describe('the github draft release guesser', () => {
     });
 
     it('bumps correctly (major)', (done) => {
-      githubServiceMock = githubServiceMock.withReleases(['1.0.0']);
+      githubServiceMock = githubServiceMock
+        .withReleases(['1.0.0'])
+        .withLatestRelease('1.0.0');
       const sut = buildSut();
       sut.guess(repo, 'major').subscribe({
         next: (version) => {
@@ -72,7 +78,9 @@ describe('the github draft release guesser', () => {
     });
 
     it('bumps correctly (prerelease)', (done) => {
-      githubServiceMock = githubServiceMock.withReleases(['1.0.0']);
+      githubServiceMock = githubServiceMock
+        .withReleases(['1.0.0'])
+        .withLatestRelease('1.0.0');
       const sut = buildSut();
       sut.guess(repo, 'prerelease').subscribe({
         next: (version) => {
@@ -83,12 +91,38 @@ describe('the github draft release guesser', () => {
       });
     });
 
+    it('increases the latest release', (done) => {
+      githubServiceMock = githubServiceMock
+        .withReleases(['0.5.0', '1.0.0', '0.3.0'])
+        .withLatestRelease('2.0.0');
+      const sut = buildSut();
+      sut.guess(repo, 'patch').subscribe({
+        next: (version) => {
+          expect(version).toBe('2.0.1');
+          done();
+        },
+        error: () => fail('Call should not have failed')
+      });
+    });
+
+    it('increases the latest release with lower latest release', (done) => {
+      githubServiceMock = githubServiceMock
+        .withReleases(['0.5.0', '1.0.0', '0.3.0'])
+        .withLatestRelease('0.9.9');
+      const sut = buildSut();
+      sut.guess(repo, 'patch').subscribe({
+        next: (version) => {
+          expect(version).toBe('1.0.1');
+          done();
+        },
+        error: () => fail('Call should not have failed')
+      });
+    });
+
     it('returns the most recent with valid release', (done) => {
-      githubServiceMock = githubServiceMock.withReleases([
-        '0.5.0',
-        '1.0.0',
-        '0.3.0'
-      ]);
+      githubServiceMock = githubServiceMock
+        .withReleases(['0.5.0', '1.0.0', '0.3.0'])
+        .withLatestRelease('1.0.0');
       const sut = buildSut();
       sut.guess(repo, 'patch').subscribe({
         next: (version) => {

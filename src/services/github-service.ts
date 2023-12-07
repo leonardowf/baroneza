@@ -114,6 +114,8 @@ export interface GithubService {
 
   releases(owner: string, repo: string): Observable<string[]>;
 
+  latestRelease(owner: string, repo: string): Observable<string>;
+
   listCommitMessagesFromPullNumber(
     owner: string,
     repo: string,
@@ -432,6 +434,12 @@ export class ConcreteGithubService implements GithubService {
   releases(owner: string, repo: string): Observable<string[]> {
     return from(this.octokit.repos.listReleases({ owner, repo })).pipe(
       map((response) => response.data.map((release) => release.name))
+    );
+  }
+
+  latestRelease(owner: string, repo: string): Observable<string> {
+    return from(this.octokit.repos.getLatestRelease({ owner, repo })).pipe(
+      map((response) => response.data.name)
     );
   }
 

@@ -37,7 +37,6 @@ export class GuessNextReleaseEndpoint {
           };
         }),
         catchError((error) => {
-          console.log(error);
           return throwError({
             message: error.message ?? 'Unable to guess the next release'
           });
