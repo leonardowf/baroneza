@@ -32,7 +32,6 @@ export class UpdateReleaseEndpoint {
     return this.updateReleaseUseCase.execute(input).pipe(
       mapTo({}),
       catchError((error) => {
-        console.log(error);
         return throwError(error.message ?? 'Unable to update release');
       })
     );

@@ -34,7 +34,6 @@ export class StartTrainEndpoint {
     return this.startTrainUseCase.execute(input).pipe(
       map(() => new StartTrainEndpointOutput()),
       catchError((error) => {
-        console.log(error);
         return throwError({
           message: error.message ?? 'Unable to start train'
         });

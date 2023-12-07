@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { Observable, zip } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { sort, inc } from 'semver';
 import { GithubService } from '../services/github-service';
@@ -14,21 +14,37 @@ export class GithubDraftReleaseGuesser implements NextReleaseGuesser {
   }
 
   guess(repository: string, releaseType: ReleaseType): Observable<string> {
-    return this.githubService.releases(this.owner, repository).pipe(
-      map((releases) => {
-        const filtered = releases.filter((release) => release);
-        const sorted = sort(filtered);
-        return sorted.length > 0 ? sorted[sorted.length - 1] : undefined;
-      }),
-      map((release) => {
-        if (release) {
-          return release;
-        }
+    const latestRelease = this.githubService.latestRelease(
+      this.owner,
+      repository
+    );
 
-        throw new Error(
-          'GithubDraftReleaseGuesser - Unable to find most recent release'
-        );
-      }),
+    const sortedReleases = this.githubService
+      .releases(this.owner, repository)
+      .pipe(
+        map((releases) => {
+          const filtered = releases.filter((release) => release);
+          const sorted = sort(filtered);
+          return sorted.length > 0 ? sorted[sorted.length - 1] : undefined;
+        }),
+        map((release) => {
+          if (release) {
+            return release;
+          }
+
+          throw new Error(
+            'GithubDraftReleaseGuesser - Unable to find most recent release'
+          );
+        })
+      );
+
+    const max = zip(latestRelease, sortedReleases).pipe(
+      map(([latest, sorted]) => {
+        return sort([latest, sorted])[1];
+      })
+    );
+
+    return max.pipe(
       map((release) => inc(release, releaseType)),
       map((semver) => {
         if (semver) {

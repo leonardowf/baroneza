@@ -69,7 +69,6 @@ export class TagEndpoint {
           )
       ),
       catchError((error) => {
-        console.log(error);
         return throwError({
           message: error.message ?? 'Unable to tag release'
         });

@@ -91,4 +91,11 @@ export class GithubServiceMock {
     );
     return this;
   }
+
+  withLatestRelease(release: string): GithubServiceMock {
+    when(this.githubService.latestRelease(this.owner, this.repo)).thenReturn(
+      of(release)
+    );
+    return this;
+  }
 }
