@@ -457,7 +457,13 @@ export class ConcreteGithubService implements GithubService {
       })
     ).pipe(
       map((response) => response.data),
-      map((response) => response.map((commitData) => commitData.commit.message))
+      map((response) =>
+        response.map((commitData) => commitData.commit.message)
+      ),
+      map((messages) => {
+        console.log('DEBUG: messages: ' + messages);
+        return messages;
+      })
     );
   }
 
