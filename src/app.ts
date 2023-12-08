@@ -9,6 +9,7 @@ import * as swaggerDocument from '../swagger.json';
 import { UpdateReleaseEndpoint } from './endpoints/update-release-endpoint';
 import { ReleaseVersionEndpoint } from './endpoints/release-version-endpoint';
 import { GuessNextReleaseEndpoint } from './endpoints/guess-next-release-endpoint';
+import { TagTicketEndpoint } from './endpoints/tag-ticket-endpoint';
 
 const app = express();
 app.use(bodyParser.json());
@@ -71,6 +72,16 @@ app.post('/releaseVersion', (req, res) => {
 
 app.post('/guessNextRelease', (req, res) => {
   new GuessNextReleaseEndpoint(dependencies).execute(req.body).subscribe(
+    (x) => res.send(x),
+    (error) => {
+      console.log(error);
+      res.send(error);
+    }
+  );
+});
+
+app.post('/tagTicket', (req, res) => {
+  new TagTicketEndpoint(dependencies).execute(req.body).subscribe(
     (x) => res.send(x),
     (error) => {
       console.log(error);
