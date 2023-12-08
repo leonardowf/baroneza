@@ -453,7 +453,9 @@ export class ConcreteGithubService implements GithubService {
         owner,
         repo,
         since: timeWindow.since,
-        until: timeWindow.until
+        until: timeWindow.until,
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        per_page: 100
       })
     ).pipe(
       map((response) => response.data),
@@ -471,7 +473,9 @@ export class ConcreteGithubService implements GithubService {
         owner,
         repo,
         // eslint-disable-next-line @typescript-eslint/camelcase
-        pull_number: pullNumber
+        pull_number: pullNumber,
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        per_page: 100
       })
     ).pipe(
       map((response) => response.data),
