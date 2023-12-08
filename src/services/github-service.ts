@@ -1,4 +1,4 @@
-import { Observable, from, pipe, throwError } from 'rxjs';
+import { Observable, from, throwError } from 'rxjs';
 import { Octokit } from '@octokit/rest';
 import { flatMap, map, mapTo } from 'rxjs/operators';
 import { PullsMergeResponseData } from '@octokit/types';
@@ -457,11 +457,6 @@ export class ConcreteGithubService implements GithubService {
       })
     ).pipe(
       map((response) => response.data),
-      map((data) => {
-        console.log('DEBUG: data: ' + JSON.stringify(data));
-        console.log(data);
-        return data;
-      }),
       map((response) => response.map((commitData) => commitData.commit.message))
     );
   }
