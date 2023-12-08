@@ -461,7 +461,10 @@ export class ConcreteGithubService implements GithubService {
         response.map((commitData) => commitData.commit.message)
       ),
       map((messages) => {
-        console.log('DEBUG: messages: ' + messages);
+        messages.forEach((message) => {
+          console.log('DEBUG: message: ' + message);
+        });
+
         return messages;
       })
     );
