@@ -43,12 +43,18 @@ export class GithubShaExtractor implements CommitExtractor {
 
   commits(shaWindow: ShaWindow, repository: string): Observable<string[]> {
     return this.getCommitBounds(shaWindow, repository).pipe(
-      flatMap((x) =>
-        this.githubService.listCommitMessagesFromDate(this.owner, repository, {
-          since: x[0].date,
-          until: x[1].date
-        })
-      )
+      flatMap((x) => {
+        console.log('DEBUG: x[0].date: ' + x[0].date);
+        console.log('DEBUG: x[1].date: ' + x[1].date);
+        return this.githubService.listCommitMessagesFromDate(
+          this.owner,
+          repository,
+          {
+            since: x[0].date,
+            until: x[1].date
+          }
+        );
+      })
     );
   }
 
