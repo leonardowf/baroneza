@@ -1,6 +1,5 @@
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { TagUseCaseInput, TagUseCaseOutput } from '../use-cases/tag-use-case';
 import { JiraTicketTagger } from '../workers/jira-tagger';
 
 export interface TagTicketEndpointInput {
@@ -13,15 +12,7 @@ export interface TagTicketEndpointDependencies {
   readonly jiraTicketTagger: JiraTicketTagger;
 }
 
-export interface TagTicketEndpointInputMapper {
-  mapToUseCase(input: TagTicketEndpointInput): TagUseCaseInput;
-}
-
 export type TagTicketEndpointResponse = {};
-
-export interface TagTicketEndpointOutputMapper {
-  map(useCaseOutput: TagUseCaseOutput): TagTicketEndpointResponse;
-}
 
 export class TagTicketEndpoint {
   private readonly jiraTicketTagger: JiraTicketTagger;

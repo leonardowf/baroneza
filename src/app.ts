@@ -10,6 +10,7 @@ import { UpdateReleaseEndpoint } from './endpoints/update-release-endpoint';
 import { ReleaseVersionEndpoint } from './endpoints/release-version-endpoint';
 import { GuessNextReleaseEndpoint } from './endpoints/guess-next-release-endpoint';
 import { TagTicketEndpoint } from './endpoints/tag-ticket-endpoint';
+import { ExtractTicketsEndpoint } from './endpoints/extract-tickets-endpoint';
 
 const app = express();
 app.use(bodyParser.json());
@@ -82,6 +83,16 @@ app.post('/guessNextRelease', (req, res) => {
 
 app.post('/tagTicket', (req, res) => {
   new TagTicketEndpoint(dependencies).execute(req.body).subscribe(
+    (x) => res.send(x),
+    (error) => {
+      console.log(error);
+      res.send(error);
+    }
+  );
+});
+
+app.post('/extractTickets', (req, res) => {
+  new ExtractTicketsEndpoint(dependencies).execute(req.body).subscribe(
     (x) => res.send(x),
     (error) => {
       console.log(error);
