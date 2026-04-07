@@ -43,6 +43,16 @@ import { GithubDraftReleaseGuesser } from './workers/github-draft-release-guesse
 import { ReleaseVersionEndpointDependencies } from './endpoints/release-version-endpoint';
 import { ConcreteReleaseVersionUseCase } from './use-cases/release-version-use-case';
 import { GuessNextReleaseEndpointDependencies } from './endpoints/guess-next-release-endpoint';
+import { ReleaseReadinessEndpointDependencies } from './endpoints/release-readiness-endpoint';
+import { ReleaseReadinessUseCase } from './use-cases/release-readiness-use-case';
+import { GithubUnmergedPRsFetcher } from './workers/unmerged-prs-fetcher';
+import { ReleaseReadinessBuilder } from './workers/release-readiness-builder';
+import { MentionListener } from './listeners/mention-listener';
+import { StartTrainCommand } from './commands/start-train-command';
+import { GithubMergedPRTicketExtractor } from './workers/merged-pr-ticket-extractor';
+import { ConcreteJiraQAPlanChecker } from './workers/qa-plan-checker';
+import { ConcreteQAPlanMessageBuilder } from './workers/qa-plan-message-builder';
+import { DeploymentContextStore } from './store/deployment-context-store';
 
 export class Dependencies
   implements
@@ -50,7 +60,8 @@ export class Dependencies
     CreateReleaseEndpointDependencies,
     ReleaseVersionEndpointDependencies,
     GuessNextReleaseEndpointDependencies,
-    StartTrainEndpointDependencies {
+    StartTrainEndpointDependencies,
+    ReleaseReadinessEndpointDependencies {
   keychain = new Keychain(process.env);
   config = new Config();
 
@@ -206,4 +217,49 @@ export class Dependencies
     this.pullRequestCreator,
     this.githubService
   );
+
+  deploymentContextStore = new DeploymentContextStore();
+
+  mergedPRTicketExtractor = new GithubMergedPRTicketExtractor(
+    this.githubService,
+    this.config.githubOwner,
+    this.jiraTicketParser
+  );
+
+  qaPlanChecker = new ConcreteJiraQAPlanChecker(this.jiraService);
+
+  qaPlanMessageBuilder = new ConcreteQAPlanMessageBuilder();
+
+  startTrainCommand = new StartTrainCommand({
+    startTrainUseCase: this.startTrainUseCase,
+    mergedPRTicketExtractor: this.mergedPRTicketExtractor,
+    qaPlanChecker: this.qaPlanChecker,
+    qaPlanMessageBuilder: this.qaPlanMessageBuilder,
+    config: this.config,
+    deploymentContextStore: this.deploymentContextStore
+  });
+
+  mentionListener = new MentionListener({
+    slackAppToken: this.keychain.slackAppToken,
+    webClient: this.slackWebClient,
+    commands: [this.startTrainCommand]
+  });
+
+  unmergedPRsFetcher = new GithubUnmergedPRsFetcher(
+    this.githubService,
+    this.config.githubOwner
+  );
+
+  releaseReadinessBuilder = new ReleaseReadinessBuilder();
+
+  releaseReadinessUseCase = new ReleaseReadinessUseCase({
+    unmergedPRsFetcher: this.unmergedPRsFetcher,
+    releaseReadinessBuilder: this.releaseReadinessBuilder,
+    messageSender: this.messageSender,
+    deploymentContextStore: this.deploymentContextStore,
+    mergedPRTicketExtractor: this.mergedPRTicketExtractor,
+    qaPlanChecker: this.qaPlanChecker,
+    qaPlanMessageBuilder: this.qaPlanMessageBuilder,
+    jiraHost: this.config.jiraHost
+  });
 }

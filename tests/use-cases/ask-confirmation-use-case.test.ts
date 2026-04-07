@@ -47,7 +47,8 @@ describe('The ask confirmation use case', () => {
     scheduler.run((helpers) => {
       const messageSenderInput: MessageSenderInput<string> = {
         destination: 'channel',
-        content: 'question'
+        content: 'question',
+        threadToReply: undefined
       };
       const messageSenderOutput = new MessageSenderOutput(
         'messageIdentifier',
@@ -97,7 +98,8 @@ describe('The ask confirmation use case', () => {
     scheduler.run((helpers) => {
       const messageSenderInput: MessageSenderInput<string> = {
         destination: 'channel',
-        content: 'question'
+        content: 'question',
+        threadToReply: undefined
       };
       const messageSenderOutput = new MessageSenderOutput(
         'messageIdentifier',

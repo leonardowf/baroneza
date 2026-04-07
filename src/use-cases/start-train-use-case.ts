@@ -23,6 +23,7 @@ export type StartTrainUseCaseInput = {
   releaseType: ReleaseType;
   repository: string;
   targetBranch: string;
+  threadToReply?: string;
 };
 
 export class StartTrainUseCaseOutput {}
@@ -49,7 +50,7 @@ export class StartTrainUseCase {
         flatMap((version) => {
           const copy = this.confirmationCopyMaker(version);
           return this.dependencies.askConfirmationUseCase
-            .execute(new AskConfirmationUseCaseInput(copy, input.channel))
+            .execute(new AskConfirmationUseCaseInput(copy, input.channel, input.threadToReply))
             .pipe(
               flatMap((confirmationRequest) => {
                 if (!confirmationRequest.reacted) {
