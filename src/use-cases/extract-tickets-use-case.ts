@@ -62,8 +62,20 @@ export class ConcreteExtractTicketsUseCase implements ExtractTicketsUseCase {
         input.reference,
         input.repository
       );
+    } else if (
+      input.reference != null &&
+      typeof input.reference === 'object' &&
+      typeof (input.reference as ShaWindow).start === 'string' &&
+      typeof (input.reference as ShaWindow).end === 'string'
+    ) {
+      return this.shaCommitExtractor.commits(
+        input.reference as ShaWindow,
+        input.repository
+      );
     } else {
-      return this.shaCommitExtractor.commits(input.reference, input.repository);
+      throw new Error(
+        `Invalid reference: expected a pull request number or a ShaWindow object with "start" and "end" SHA strings, got: ${JSON.stringify(input.reference)}`
+      );
     }
   }
 }

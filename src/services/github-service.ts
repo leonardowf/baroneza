@@ -496,7 +496,7 @@ export class ConcreteGithubService implements GithubService {
       })
     ).pipe(
       map((response) => response.data),
-      map((data) => data.commit.author.date),
+      map((data) => (data.commit.author ?? data.commit.committer).date),
       map((date) => ({ date }))
     );
   }

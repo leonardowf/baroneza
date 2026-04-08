@@ -68,11 +68,13 @@ export class JiraCreateVersionUseCase implements CreateVersionUseCase {
 
     return this.jiraService.hasVersion(version, projectKey).pipe(
       catchError((err) => {
+        console.error(`[Jira] hasVersion failed for projectKey=${projectKey} version="${version}":`, err?.message ?? err);
         return of(err);
       }),
 
       flatMap((x) => {
         if (x instanceof Error) {
+          console.error(`[Jira] createVersion FAILED for projectKey=${projectKey} version="${version}":`, x?.message ?? x);
           return of(
             new CreateVersionUseCaseOutput({
               projectKey: projectKey,
