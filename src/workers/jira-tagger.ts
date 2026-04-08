@@ -1,6 +1,7 @@
 import { Observable, of, from, forkJoin, defer } from 'rxjs';
 import JiraAPI from 'jira-client';
 import { catchError, map } from 'rxjs/operators';
+import { log, logError } from '../logger';
 
 export interface JiraTicketTaggetOutput {
   readonly successes: string[];
@@ -29,6 +30,7 @@ export class ConcreteJiraTickerTagger implements JiraTicketTagger {
   }
 
   tag(ticketIds: string[], tag: string): Observable<JiraTicketTaggetOutput> {
+    log(`[JiraTagger] tagging ${ticketIds.length} tickets with "${tag}"`);
     const streams = ticketIds.map((ticketId) => {
       const updateIssuePromise = this.jiraAPI.updateIssue(ticketId, {
         update: {
@@ -50,7 +52,10 @@ export class ConcreteJiraTickerTagger implements JiraTicketTagger {
             return { success: true, ticketId: ticketId };
           })
         )
-        .pipe(catchError(() => of({ success: false, ticketId: ticketId })));
+        .pipe(catchError((err) => {
+          logError(`[JiraTagger] failed to tag ticket ${ticketId} with "${tag}"`, err);
+          return of({ success: false, ticketId: ticketId });
+        }));
     });
 
     return forkJoin(streams)
@@ -58,6 +63,7 @@ export class ConcreteJiraTickerTagger implements JiraTicketTagger {
         map((x) => {
           const failures = x.filter((x) => !x.success).map((x) => x.ticketId);
           const successes = x.filter((x) => x.success).map((x) => x.ticketId);
+          log(`[JiraTagger] done — successes=${successes.length} failures=${failures.length}`);
           return { successes, failures };
         })
       )

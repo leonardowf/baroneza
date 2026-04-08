@@ -2,6 +2,7 @@ import { Observable, of } from 'rxjs';
 import { JiraService } from '../services/jira-service';
 import { catchError, flatMap, mapTo } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
+import { log, logError } from '../logger';
 
 export interface CreateVersionUseCase {
   execute(
@@ -58,21 +59,25 @@ export class JiraCreateVersionUseCase implements CreateVersionUseCase {
     const createVersion = this.jiraService
       .projectIdFromKey(projectKey)
       .pipe(
-        flatMap((projectId) =>
-          this.jiraService.createVersion(version, projectId, description)
-        )
+        flatMap((projectId) => {
+          log(`[CreateVersion] creating version "${version}" for projectKey=${projectKey} (id=${projectId})`);
+          return this.jiraService.createVersion(version, projectId, description);
+        })
       )
       .pipe(
         mapTo(new CreateVersionUseCaseOutput({ projectKey, result: 'CREATED' }))
       );
 
+    log(`[CreateVersion] checking if version "${version}" exists for projectKey=${projectKey}`);
     return this.jiraService.hasVersion(version, projectKey).pipe(
       catchError((err) => {
+        logError(`[CreateVersion] hasVersion failed for projectKey=${projectKey} version="${version}"`, err);
         return of(err);
       }),
 
       flatMap((x) => {
         if (x instanceof Error) {
+          logError(`[CreateVersion] FAILED for projectKey=${projectKey} version="${version}"`, x);
           return of(
             new CreateVersionUseCaseOutput({
               projectKey: projectKey,
@@ -83,6 +88,7 @@ export class JiraCreateVersionUseCase implements CreateVersionUseCase {
           return createVersion;
         }
 
+        log(`[CreateVersion] version "${version}" already exists for projectKey=${projectKey}`);
         return of(
           new CreateVersionUseCaseOutput({ projectKey, result: 'EXISTED' })
         );

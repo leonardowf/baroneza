@@ -1,5 +1,6 @@
 import { Observable } from 'rxjs';
 import { map, flatMap } from 'rxjs/operators';
+import { log } from '../logger';
 import { ShaWindow } from '../workers/commit-extractor';
 import { JiraTicketTagger } from '../workers/jira-tagger';
 import {
@@ -68,6 +69,7 @@ export class JiraTagUseCase implements TagUseCase {
   }
 
   execute(input: TagUseCaseInput): Observable<TagUseCaseOutput> {
+    log(`[TagUseCase] starting for tag="${input.tag}${input.jiraTagSuffix}" repository="${input.repository}" projectKeys=${JSON.stringify(input.projectKeys)}`);
     return this.extractTicketsUseCase
       .execute({
         reference: input.identifier,
@@ -76,6 +78,7 @@ export class JiraTagUseCase implements TagUseCase {
       .pipe(
         flatMap((extractTicketsOutput) => {
           const tag = `${input.tag}${input.jiraTagSuffix}`;
+          log(`[TagUseCase] creating Jira version "${tag}" for ${input.projectKeys.length} project keys`);
           return this.createVersionUseCase
             .execute(
               new CreateVersionUseCaseInput(
@@ -106,16 +109,15 @@ export class JiraTagUseCase implements TagUseCase {
         })
       )
       .pipe(
-        map(
-          (output) =>
-            new TagUseCaseOutput(
-              output.jiraTicketTaggetOutput.successes,
-              output.jiraTicketTaggetOutput.failures,
-              output.createVersionUseCaseOutput
-                .filter((x) => x.resultPerProjectKey.result === 'FAILED')
-                .map((x) => x.resultPerProjectKey.projectKey)
-            )
-        )
+        map((output) => {
+          const successes = output.jiraTicketTaggetOutput.successes;
+          const failures = output.jiraTicketTaggetOutput.failures;
+          const failuresOnProjectKeys = output.createVersionUseCaseOutput
+            .filter((x) => x.resultPerProjectKey.result === 'FAILED')
+            .map((x) => x.resultPerProjectKey.projectKey);
+          log(`[TagUseCase] done — successes=${successes.length} failures=${failures.length} failedProjectKeys=${JSON.stringify(failuresOnProjectKeys)}`);
+          return new TagUseCaseOutput(successes, failures, failuresOnProjectKeys);
+        })
       );
   }
 }
