@@ -1,5 +1,6 @@
 import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
+import { log } from '../logger';
 import {
   GithubPullRequestExtractor,
   GithubShaExtractor,
@@ -42,6 +43,7 @@ export class ConcreteExtractTicketsUseCase implements ExtractTicketsUseCase {
 
   execute(input: ExtractTicketsInput): Observable<ExtractTicketsOutput> {
     return this.extractCommits(input)
+      .pipe(tap((commits) => log(`[ExtractTickets] fetched ${commits.length} commits from repository "${input.repository}"`)))
       .pipe(map((commits) => this.jiraTickerParser.parse(commits)))
       .pipe(
         map((jiraTickerParsedOutput) =>
@@ -52,12 +54,14 @@ export class ConcreteExtractTicketsUseCase implements ExtractTicketsUseCase {
             })
           )
         ),
+        tap((ticketIdsCommits) => log(`[ExtractTickets] parsed ${ticketIdsCommits.length} Jira tickets: ${ticketIdsCommits.map((t) => t.ticketId).join(', ')}`)),
         map((ticketIdsCommits): ExtractTicketsOutput => ({ ticketIdsCommits }))
       );
   }
 
   private extractCommits(input: ExtractTicketsInput): Observable<string[]> {
     if (typeof input.reference === 'number') {
+      log(`[ExtractTickets] extracting commits from PR #${input.reference} in "${input.repository}"`);
       return this.pullRequestCommitExtractor.commits(
         input.reference,
         input.repository
@@ -68,10 +72,9 @@ export class ConcreteExtractTicketsUseCase implements ExtractTicketsUseCase {
       typeof (input.reference as ShaWindow).start === 'string' &&
       typeof (input.reference as ShaWindow).end === 'string'
     ) {
-      return this.shaCommitExtractor.commits(
-        input.reference as ShaWindow,
-        input.repository
-      );
+      const window = input.reference as ShaWindow;
+      log(`[ExtractTickets] extracting commits from SHA window ${window.start}..${window.end} in "${input.repository}"`);
+      return this.shaCommitExtractor.commits(window, input.repository);
     } else {
       throw new Error(
         `Invalid reference: expected a pull request number or a ShaWindow object with "start" and "end" SHA strings, got: ${JSON.stringify(input.reference)}`

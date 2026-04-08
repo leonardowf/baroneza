@@ -1,4 +1,5 @@
 import express from 'express';
+import { log, logError } from './logger';
 import { TagEndpoint } from './endpoints/tag-endpoint';
 import { Dependencies } from './dependencies';
 import bodyParser from 'body-parser';
@@ -17,10 +18,14 @@ const port = 3000;
 const dependencies = new Dependencies();
 
 app.post('/tagRelease', (req, res) => {
+  log(`[tagRelease] request received: ${JSON.stringify(req.body)}`);
   new TagEndpoint(dependencies).execute(req.body).subscribe(
-    (x) => res.send(x),
+    (x) => {
+      log(`[tagRelease] completed: ${JSON.stringify(x)}`);
+      res.send(x);
+    },
     (error) => {
-      console.log(error);
+      logError('[tagRelease] request failed', error);
       res.send(error);
     }
   );
