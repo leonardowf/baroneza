@@ -229,6 +229,66 @@
         }
       }
     },
+    "/releaseReadiness": {
+      "post": {
+        "description": "Fetches open PRs targeting the base branch and posts a release readiness summary to Slack",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "channel": {
+                    "type": "string",
+                    "example": "all-general",
+                    "description": "The Slack channel where all release communications are posted (readiness checks, changelog, updates)"
+                  },
+                  "baseBranch": {
+                    "type": "string",
+                    "example": "develop"
+                  },
+                  "repository": {
+                    "type": "string",
+                    "example": "ReleaseAutomation"
+                  },
+                  "targetBranch": {
+                    "type": "string",
+                    "example": "main"
+                  },
+                  "branchPrefix": {
+                    "type": "string",
+                    "example": "release/"
+                  },
+                  "projectKeys": {
+                    "type": "array",
+                    "items": { "type": "string" },
+                    "example": ["STO"]
+                  },
+                  "pullRequestTitlePrefix": {
+                    "type": "string",
+                    "example": "Release"
+                  },
+                  "releaseType": {
+                    "type": "string",
+                    "example": "patch"
+                  },
+                  "qaPlanFieldId": {
+                    "type": "string",
+                    "example": "customfield_10071"
+                  }
+                },
+                "required": ["channel", "baseBranch", "repository", "targetBranch", "branchPrefix", "projectKeys", "pullRequestTitlePrefix", "releaseType", "qaPlanFieldId"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/releaseVersion": {
       "post": {
         "description": "This endpoint releases a version in JIRA",

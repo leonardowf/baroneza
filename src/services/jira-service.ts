@@ -11,6 +11,7 @@ export interface JiraService {
   projectIdFromKey(projectKey: string): Observable<number>;
   hasVersion(name: string, projectKey: string): Observable<boolean>;
   hasFixVersion(issueNumber: string): Observable<boolean>;
+  hasQAPlan(ticketId: string, qaFieldId: string): Observable<boolean>;
   updateFixVersion(
     fromVersion: string,
     toVersion: string,
@@ -97,6 +98,20 @@ export class ConcreteJiraService implements JiraService {
     );
   }
 
+  hasQAPlan(ticketId: string, qaFieldId: string): Observable<boolean> {
+    return defer(() =>
+      from(this.jiraAPI.findIssue(ticketId, '', qaFieldId)).pipe(
+        map((jsonResponse) => {
+          const jiraIssue = jsonResponse as Issue;
+          const fieldValue = jiraIssue.fields[qaFieldId];
+          return (
+            fieldValue !== null && fieldValue !== undefined && fieldValue !== ''
+          );
+        })
+      )
+    );
+  }
+
   updateFixVersion(
     fromVersion: string,
     toVersion: string,
@@ -150,6 +165,7 @@ interface Issue {
 
 interface Fields {
   readonly fixVersions: FixVersion[];
+  readonly [key: string]: unknown;
 }
 
 interface FixVersion {

@@ -22,6 +22,8 @@ import {
 import { TagUseCase, TagUseCaseOutput } from '../../src/use-cases/tag-use-case';
 import { ReleaseVersionEndpoint } from '../../src/endpoints/release-version-endpoint';
 import { Mocks } from '../mocks/mocks';
+import { ReleaseReadinessEndpoint } from '../../src/endpoints/release-readiness-endpoint';
+import { ReleaseReadinessUseCase } from '../../src/use-cases/release-readiness-use-case';
 
 class TestStartTrainEndpointDependencies
   implements StartTrainEndpointDependencies {
@@ -197,6 +199,37 @@ describe('the release version endpoint', () => {
           fail();
         },
         complete: done
+      });
+  });
+});
+
+describe('The release readiness endpoint', () => {
+  it('maps to the correct use case', (done) => {
+    const releaseReadinessUseCaseMock = mock<ReleaseReadinessUseCase>();
+
+    when(releaseReadinessUseCaseMock.execute(anything())).thenReturn(of({}));
+
+    const sut = new ReleaseReadinessEndpoint({
+      releaseReadinessUseCase: instance(releaseReadinessUseCaseMock)
+    });
+
+    sut
+      .execute({
+        channel: 'channel',
+        baseBranch: 'develop',
+        repository: 'repo',
+        targetBranch: 'main',
+        branchPrefix: 'release/',
+        projectKeys: ['STO'],
+        pullRequestTitlePrefix: 'Release',
+        releaseType: 'patch',
+        qaPlanFieldId: 'customfield_10071'
+      })
+      .subscribe({
+        complete: () => {
+          verify(releaseReadinessUseCaseMock.execute(anything())).once();
+          done();
+        }
       });
   });
 });
