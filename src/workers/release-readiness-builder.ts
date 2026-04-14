@@ -2,7 +2,7 @@ import { Block, KnownBlock, SectionBlock } from '@slack/web-api';
 import { OpenPullRequestSummary } from '../services/github-service';
 
 export class ReleaseReadinessBuilder {
-  build(prs: OpenPullRequestSummary[]): Block[] {
+  buildUnmergedPRsMessage(prs: OpenPullRequestSummary[]): Block[] {
     const makeHeader = (text: string): KnownBlock => ({
       type: 'header',
       text: { type: 'plain_text', text, emoji: true }

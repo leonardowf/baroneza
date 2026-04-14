@@ -58,7 +58,9 @@ describe('The release readiness use case', () => {
     when(
       unmergedPRsFetcherMock.fetch(input.repository, input.baseBranch)
     ).thenReturn(of(prs));
-    when(releaseReadinessBuilderMock.build(prs)).thenReturn(blocks);
+    when(releaseReadinessBuilderMock.buildUnmergedPRsMessage(prs)).thenReturn(
+      blocks
+    );
     when(messageSenderMock.send(anything())).thenReturn(
       of(new MessageSenderOutput('ts', 'channel'))
     );
@@ -77,7 +79,7 @@ describe('The release readiness use case', () => {
 
     sut.execute(input).subscribe({
       next: () => {
-        verify(releaseReadinessBuilderMock.build(prs)).once();
+        verify(releaseReadinessBuilderMock.buildUnmergedPRsMessage(prs)).once();
         verify(messageSenderMock.send(anything())).once();
         verify(deploymentContextStoreMock.save(input)).once();
       },

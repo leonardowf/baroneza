@@ -126,7 +126,7 @@ export class ReleaseReadinessUseCase {
   ): Observable<MessageSenderOutput> {
     return this.messageSender.send({
       destination: input.channel,
-      content: this.releaseReadinessBuilder.build(prs)
+      content: this.releaseReadinessBuilder.buildUnmergedPRsMessage(prs)
     });
   }
 
