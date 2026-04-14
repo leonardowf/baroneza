@@ -66,6 +66,27 @@ export class ReleaseReadinessBuilder {
     return blocks;
   }
 
+  buildNoChangesMessage(): Block[] {
+    const makeHeader = (text: string): any => ({
+      type: 'header',
+      text: { type: 'plain_text', text, emoji: true }
+    });
+
+    const makeSection = (text: string): SectionBlock => ({
+      type: 'section',
+      text: { type: 'mrkdwn', text }
+    });
+
+    return [
+      makeHeader('🚆 BARONEZA CENTRAL: NO TRAIN TODAY'),
+      { type: 'divider' },
+      makeSection(
+        '🚉 The platform is quiet. No new commits since the last release.'
+      ),
+      makeSection('Nothing to release — the train stays in the station. 🛑')
+    ];
+  }
+
   buildReadyMessage(): Block[] {
     const makeHeader = (text: string): any => ({
       type: 'header',

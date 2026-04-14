@@ -47,6 +47,7 @@ import { ReleaseReadinessEndpointDependencies } from './endpoints/release-readin
 import { ReleaseReadinessUseCase } from './use-cases/release-readiness-use-case';
 import { GithubUnmergedPRsFetcher } from './workers/unmerged-prs-fetcher';
 import { ReleaseReadinessBuilder } from './workers/release-readiness-builder';
+import { GithubReleaseChangesChecker } from './workers/release-changes-checker';
 import { MentionListener } from './listeners/mention-listener';
 import { StartTrainCommand } from './commands/start-train-command';
 import { GithubMergedPRTicketExtractor } from './workers/merged-pr-ticket-extractor';
@@ -252,6 +253,11 @@ export class Dependencies
 
   releaseReadinessBuilder = new ReleaseReadinessBuilder();
 
+  releaseChangesChecker = new GithubReleaseChangesChecker(
+    this.githubService,
+    this.config.githubOwner
+  );
+
   releaseReadinessUseCase = new ReleaseReadinessUseCase({
     unmergedPRsFetcher: this.unmergedPRsFetcher,
     releaseReadinessBuilder: this.releaseReadinessBuilder,
@@ -260,6 +266,7 @@ export class Dependencies
     mergedPRTicketExtractor: this.mergedPRTicketExtractor,
     qaPlanChecker: this.qaPlanChecker,
     qaPlanMessageBuilder: this.qaPlanMessageBuilder,
-    jiraHost: this.config.jiraHost
+    jiraHost: this.config.jiraHost,
+    releaseChangesChecker: this.releaseChangesChecker
   });
 }
