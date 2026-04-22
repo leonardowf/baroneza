@@ -70,10 +70,14 @@ export class ConcreteJiraService implements JiraService {
       from(this.jiraAPI.getVersions(projectKey)).pipe(
         map((x) => {
           const versions = x as Array<JiraVersion>;
-          if (versions && versions.length > 0) {
-            return versions[0].projectId;
+          if (!versions || versions.length === 0) {
+            throw new Error(`Cannot extract ID: Project ${projectKey} has no existing versions.`);
           }
-          throw new Error(`Cannot extract ID: Project ${projectKey} has no existing versions.`);
+          const projectId = versions[0].projectId;
+          if (!projectId) {
+            throw new Error(`Cannot extract ID: projectId is missing for project ${projectKey}.`);
+          }
+          return projectId;
         })
       )
     );
