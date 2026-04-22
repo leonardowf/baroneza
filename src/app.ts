@@ -10,6 +10,7 @@ import * as swaggerDocument from '../swagger.json';
 import { UpdateReleaseEndpoint } from './endpoints/update-release-endpoint';
 import { ReleaseVersionEndpoint } from './endpoints/release-version-endpoint';
 import { GuessNextReleaseEndpoint } from './endpoints/guess-next-release-endpoint';
+import { checkJiraScopes } from './jira-scope-checker';
 
 const app = express();
 app.use(bodyParser.json());
@@ -85,6 +86,15 @@ app.post('/guessNextRelease', (req, res) => {
 });
 
 app.use('/swagger', swagger.serve, swagger.setup(swaggerDocument));
+
+const scopeCheckProjectKey = process.env.JIRA_SCOPE_CHECK_PROJECT_KEY;
+if (scopeCheckProjectKey) {
+  checkJiraScopes(dependencies.jiraAPI(), scopeCheckProjectKey).catch((err) =>
+    logError('[ScopeCheck] Unexpected error during Jira scope check', err)
+  );
+} else {
+  log('[ScopeCheck] Skipping Jira scope check — set JIRA_SCOPE_CHECK_PROJECT_KEY to enable it');
+}
 
 app.listen(port, (err) => {
   if (err) {
