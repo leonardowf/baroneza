@@ -7,6 +7,8 @@ declare global {
       SLACK_AUTH_TOKEN: string;
       JIRA_USER_NAME: string;
       JIRA_HOST: string;
+      JIRA_AUTH_TYPE?: 'regular' | 'service';
+      JIRA_CLOUD_ID?: string;
     }
   }
 }

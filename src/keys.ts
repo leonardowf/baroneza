@@ -6,6 +6,8 @@ export class Keychain {
   jiraAuthToken: string;
   jiraUserName: string;
   slackAuthToken: string;
+  jiraAuthType: string;
+  jiraCloudId: string | undefined;
 
   constructor(processEnv: NodeJS.ProcessEnv) {
     if (!isProd()) {
@@ -16,5 +18,7 @@ export class Keychain {
     this.jiraAuthToken = processEnv.JIRA_AUTH_TOKEN;
     this.slackAuthToken = processEnv.SLACK_AUTH_TOKEN;
     this.jiraUserName = processEnv.JIRA_USER_NAME;
+    this.jiraAuthType = processEnv.JIRA_AUTH_TYPE ?? 'regular';
+    this.jiraCloudId = processEnv.JIRA_CLOUD_ID;
   }
 }
