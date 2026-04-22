@@ -13,7 +13,7 @@ function isScopeError(err: unknown): boolean {
   return message.includes('401') && message.toLowerCase().includes('scope');
 }
 
-async function checkReadScopes(jiraAPI: JiraAPI, projectKey: string): Promise<string[]> {
+async function checkReadScopes(jiraAPI: JiraAPI, projectKey: string, issueKey: string): Promise<string[]> {
   const missing: string[] = [];
 
   try {
@@ -29,7 +29,7 @@ async function checkReadScopes(jiraAPI: JiraAPI, projectKey: string): Promise<st
   }
 
   try {
-    await jiraAPI.findIssue('');
+    await jiraAPI.findIssue(issueKey);
     log(`[ScopeCheck] read:issue:jira — OK`);
   } catch (err) {
     if (isScopeError(err)) {
@@ -43,8 +43,8 @@ async function checkReadScopes(jiraAPI: JiraAPI, projectKey: string): Promise<st
   return missing;
 }
 
-export async function checkJiraScopes(jiraAPI: JiraAPI, projectKey: string): Promise<void> {
-  const missingReadScopes = await checkReadScopes(jiraAPI, projectKey);
+export async function checkJiraScopes(jiraAPI: JiraAPI, projectKey: string, issueKey: string): Promise<void> {
+  const missingReadScopes = await checkReadScopes(jiraAPI, projectKey, issueKey);
 
   log(`[ScopeCheck] write:issue:jira — unverified (requires side effects)`);
   log(`[ScopeCheck] write:project-version:jira — unverified (requires side effects)`);

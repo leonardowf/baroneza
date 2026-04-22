@@ -88,12 +88,13 @@ app.post('/guessNextRelease', (req, res) => {
 app.use('/swagger', swagger.serve, swagger.setup(swaggerDocument));
 
 const scopeCheckProjectKey = process.env.JIRA_SCOPE_CHECK_PROJECT_KEY;
-if (scopeCheckProjectKey) {
-  checkJiraScopes(dependencies.jiraAPI(), scopeCheckProjectKey).catch((err) =>
+const scopeCheckIssueKey = process.env.JIRA_SCOPE_CHECK_ISSUE_KEY;
+if (scopeCheckProjectKey && scopeCheckIssueKey) {
+  checkJiraScopes(dependencies.jiraAPI(), scopeCheckProjectKey, scopeCheckIssueKey).catch((err) =>
     logError('[ScopeCheck] Unexpected error during Jira scope check', err)
   );
 } else {
-  log('[ScopeCheck] Skipping Jira scope check — set JIRA_SCOPE_CHECK_PROJECT_KEY to enable it');
+  log('[ScopeCheck] Skipping Jira scope check — set JIRA_SCOPE_CHECK_PROJECT_KEY and JIRA_SCOPE_CHECK_ISSUE_KEY to enable it');
 }
 
 app.listen(port, (err) => {
