@@ -24,7 +24,7 @@ describe('the create version use case', () => {
       )
       .subscribe({
         next: () => {
-          verify(jiraServiceMock.createVersion(anything(), anything())).never();
+          verify(jiraServiceMock.createVersion(anything(), anything(), anything())).never();
         },
         complete: done
       });
@@ -38,7 +38,7 @@ describe('the create version use case', () => {
     );
     when(jiraServiceMock.projectIdFromKey(anything())).thenReturn(of(123));
     when(
-      jiraServiceMock.createVersion(anything(), anything(), anything())
+      jiraServiceMock.createVersion(anything(), anything(), anything(), anything())
     ).thenReturn(of(void 0));
 
     const jiraService = instance(jiraServiceMock);
@@ -55,7 +55,7 @@ describe('the create version use case', () => {
       .subscribe({
         next: () => {
           verify(
-            jiraServiceMock.createVersion(anything(), anything(), 'description')
+            jiraServiceMock.createVersion(anything(), anything(), anything(), 'description')
           ).twice();
         },
         complete: done
@@ -72,7 +72,7 @@ describe('the create version use case', () => {
     when(jiraServiceMock.hasVersion('1.1.0', 'CRE')).thenReturn(of(false));
     when(jiraServiceMock.projectIdFromKey(anything())).thenReturn(of(123));
     when(
-      jiraServiceMock.createVersion(anything(), anything(), anything())
+      jiraServiceMock.createVersion(anything(), anything(), anything(), anything())
     ).thenReturn(of(void 0));
 
     const jiraService = instance(jiraServiceMock);
@@ -86,7 +86,7 @@ describe('the create version use case', () => {
           expect(output[1].resultPerProjectKey.result).toBe('EXISTED');
           expect(output[2].resultPerProjectKey.result).toBe('CREATED');
           verify(
-            jiraServiceMock.createVersion(anything(), anything(), anything())
+            jiraServiceMock.createVersion(anything(), anything(), anything(), anything())
           ).once();
         },
         complete: done
