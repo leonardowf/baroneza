@@ -26,10 +26,17 @@ You will need `npm` and then you can do `npm run start:watch`.
 To run tests you can use `jest`.
 You will also need a `.env` file with the following environment variables:
 ```
-JIRA_AUTH_TOKEN=
-JIRA_USER_NAME=
 GITHUB_AUTH_TOKEN=
 SLACK_AUTH_TOKEN=
+
+# Regular token auth (default):
+JIRA_AUTH_TOKEN=
+JIRA_USER_NAME=
+
+# Service token auth (Atlassian Global Gateway):
+# JIRA_AUTH_TYPE=service
+# JIRA_AUTH_TOKEN=
+# JIRA_CLOUD_ID=
 ```
 On slack, the app must be able to read reactions and write messages.
 You can configure many options in the `config.json` file.

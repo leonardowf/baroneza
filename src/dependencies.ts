@@ -59,13 +59,22 @@ export class Dependencies
       auth: this.keychain.githubAuthToken
     });
 
-  jiraAPI = (): JiraAPI =>
-    new JiraAPI({
+  jiraAPI = (): JiraAPI => {
+    if (this.keychain.jiraAuthType === 'service') {
+      return new JiraAPI({
+        host: 'api.atlassian.com',
+        protocol: 'https',
+        bearer: this.keychain.jiraAuthToken,
+        base: `ex/jira/${this.keychain.jiraCloudId}`
+      });
+    }
+    return new JiraAPI({
       host: this.config.jiraHost,
       protocol: 'https',
       username: this.keychain.jiraUserName,
       password: this.keychain.jiraAuthToken
     });
+  };
 
   githubService = new ConcreteGithubService(this.octokit());
   jiraService = new ConcreteJiraService(this.jiraAPI());
