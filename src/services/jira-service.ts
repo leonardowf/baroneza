@@ -5,7 +5,6 @@ import { flatMap, map, mapTo } from 'rxjs/operators';
 export interface JiraService {
   createVersion(
     name: string,
-    projectKey: string,
     projectId: number,
     description?: string
   ): Observable<void>;
@@ -33,7 +32,6 @@ export class ConcreteJiraService implements JiraService {
 
   createVersion(
     name: string,
-    projectKey: string,
     projectId: number,
     description?: string
   ): Observable<void> {
@@ -41,7 +39,6 @@ export class ConcreteJiraService implements JiraService {
       from(
         this.jiraAPI.createVersion({
           projectId: projectId,
-          project: projectKey,
           description,
           name
         })

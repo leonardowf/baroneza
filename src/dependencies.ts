@@ -64,6 +64,7 @@ export class Dependencies
       return new JiraAPI({
         host: 'api.atlassian.com',
         protocol: 'https',
+        apiVersion: '3',
         bearer: this.keychain.jiraAuthToken,
         base: `ex/jira/${this.keychain.jiraCloudId}`
       });

@@ -430,7 +430,6 @@ declare module 'jira-client' {
 
     interface CreateVersionOptions {
       name: string;
-      project?: string;
       projectId: number;
       description?: string;
     }

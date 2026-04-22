@@ -61,7 +61,7 @@ export class JiraCreateVersionUseCase implements CreateVersionUseCase {
       .pipe(
         flatMap((projectId) => {
           log(`[CreateVersion] creating version "${version}" for projectKey=${projectKey} (id=${projectId})`);
-          return this.jiraService.createVersion(version, projectKey, projectId, description);
+          return this.jiraService.createVersion(version, projectId, description);
         })
       )
       .pipe(
