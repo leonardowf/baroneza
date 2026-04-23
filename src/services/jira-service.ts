@@ -67,9 +67,14 @@ export class ConcreteJiraService implements JiraService {
 
   projectIdFromKey(projectKey: string): Observable<number> {
     return defer(() =>
-      from(this.jiraAPI.getProject(projectKey)).pipe(
+      from(this.jiraAPI.getVersions(projectKey)).pipe(
         map((x) => {
-          return x.id;
+          const versions = x as Array<JiraVersion>;
+          if (versions && versions.length > 0) {
+            // Every version object contains the projectId
+            return versions[0].projectId;
+          }
+          throw new Error(`Cannot extract ID: Project ${projectKey} has no existing versions.`);
         })
       )
     );
