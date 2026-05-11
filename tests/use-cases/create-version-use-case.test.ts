@@ -13,7 +13,6 @@ describe('the create version use case', () => {
     when(jiraServiceMock.hasVersion(anything(), anything())).thenReturn(
       of(true)
     );
-    when(jiraServiceMock.projectIdFromKey(anything())).thenReturn(of(123));
 
     const jiraService = instance(jiraServiceMock);
     const sut = new JiraCreateVersionUseCase(jiraService);
@@ -36,7 +35,6 @@ describe('the create version use case', () => {
     when(jiraServiceMock.hasVersion(anything(), anything())).thenReturn(
       of(false)
     );
-    when(jiraServiceMock.projectIdFromKey(anything())).thenReturn(of(123));
     when(
       jiraServiceMock.createVersion(anything(), anything(), anything())
     ).thenReturn(of(void 0));
@@ -70,7 +68,6 @@ describe('the create version use case', () => {
     );
     when(jiraServiceMock.hasVersion('1.1.0', 'PAS')).thenReturn(of(true));
     when(jiraServiceMock.hasVersion('1.1.0', 'CRE')).thenReturn(of(false));
-    when(jiraServiceMock.projectIdFromKey(anything())).thenReturn(of(123));
     when(
       jiraServiceMock.createVersion(anything(), anything(), anything())
     ).thenReturn(of(void 0));
