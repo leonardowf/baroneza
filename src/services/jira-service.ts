@@ -5,10 +5,9 @@ import { flatMap, map, mapTo } from 'rxjs/operators';
 export interface JiraService {
   createVersion(
     name: string,
-    projectId: number,
+    projectKey: string,
     description?: string
   ): Observable<void>;
-  projectIdFromKey(projectKey: string): Observable<number>;
   hasVersion(name: string, projectKey: string): Observable<boolean>;
   hasFixVersion(issueNumber: string): Observable<boolean>;
   updateFixVersion(
@@ -32,13 +31,13 @@ export class ConcreteJiraService implements JiraService {
 
   createVersion(
     name: string,
-    projectId: number,
+    projectKey: string,
     description?: string
   ): Observable<void> {
     return defer(() =>
       from(
         this.jiraAPI.createVersion({
-          projectId: projectId,
+          project: projectKey,
           description,
           name
         })
@@ -62,21 +61,6 @@ export class ConcreteJiraService implements JiraService {
         })
       ),
       mapTo(void 0)
-    );
-  }
-
-  projectIdFromKey(projectKey: string): Observable<number> {
-    return defer(() =>
-      from(this.jiraAPI.getVersions(projectKey)).pipe(
-        map((x) => {
-          const versions = x as Array<JiraVersion>;
-          if (versions && versions.length > 0) {
-            // Every version object contains the projectId
-            return versions[0].projectId;
-          }
-          throw new Error(`Cannot extract ID: Project ${projectKey} has no existing versions.`);
-        })
-      )
     );
   }
 
