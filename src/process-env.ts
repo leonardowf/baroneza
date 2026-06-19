@@ -8,6 +8,8 @@ declare global {
       JIRA_USER_NAME: string;
       JIRA_HOST: string;
       SLACK_APP_TOKEN: string;
+      JIRA_AUTH_TYPE?: 'regular' | 'service';
+      JIRA_CLOUD_ID?: string;
     }
   }
 }

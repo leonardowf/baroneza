@@ -1,4 +1,4 @@
-import { Observable, of } from 'rxjs';
+import { Observable, of, defer } from 'rxjs';
 import { JiraService } from '../services/jira-service';
 import { catchError, flatMap, mapTo } from 'rxjs/operators';
 import { forkJoin } from 'rxjs';
@@ -56,17 +56,11 @@ export class JiraCreateVersionUseCase implements CreateVersionUseCase {
     version: string,
     description?: string
   ): Observable<CreateVersionUseCaseOutput> {
-    const createVersion = this.jiraService
-      .projectIdFromKey(projectKey)
-      .pipe(
-        flatMap((projectId) => {
-          log(`[CreateVersion] creating version "${version}" for projectKey=${projectKey} (id=${projectId})`);
-          return this.jiraService.createVersion(version, projectId, description);
-        })
-      )
-      .pipe(
-        mapTo(new CreateVersionUseCaseOutput({ projectKey, result: 'CREATED' }))
-      );
+    const createVersion = defer(() =>
+      this.jiraService.createVersion(version, projectKey, description)
+    ).pipe(
+      mapTo(new CreateVersionUseCaseOutput({ projectKey, result: 'CREATED' }))
+    );
 
     log(`[CreateVersion] checking if version "${version}" exists for projectKey=${projectKey}`);
     return this.jiraService.hasVersion(version, projectKey).pipe(
