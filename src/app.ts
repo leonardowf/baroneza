@@ -10,6 +10,7 @@ import * as swaggerDocument from '../swagger.json';
 import { UpdateReleaseEndpoint } from './endpoints/update-release-endpoint';
 import { ReleaseVersionEndpoint } from './endpoints/release-version-endpoint';
 import { GuessNextReleaseEndpoint } from './endpoints/guess-next-release-endpoint';
+import { ReleaseReadinessEndpoint } from './endpoints/release-readiness-endpoint';
 
 const app = express();
 app.use(bodyParser.json());
@@ -84,14 +85,30 @@ app.post('/guessNextRelease', (req, res) => {
   );
 });
 
+app.post('/releaseReadiness', (req, res) => {
+  new ReleaseReadinessEndpoint(dependencies).execute(req.body).subscribe(
+    (x) => res.send(x),
+    (error) => {
+      console.log(error);
+      res.send(error);
+    }
+  );
+});
+
 app.use('/swagger', swagger.serve, swagger.setup(swaggerDocument));
 
-app.listen(port, (err) => {
-  if (err) {
-    return console.error(err);
-  }
-  return console.log(
-    `
+function startHttpServer(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const server = app.listen(port, () => resolve());
+    server.on('error', reject);
+  });
+}
+
+async function main(): Promise<void> {
+  await startHttpServer()
+    .then(() => {
+      console.log(
+        `
           . . . . o o o o o
                 _____      o
        ____====  ]OO|_n_n__][.
@@ -99,5 +116,15 @@ app.listen(port, (err) => {
        oo    oo  'oo OOOO-| oo\\_
    +--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+--+
     `
-  );
-});
+      );
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  await dependencies.mentionListener
+    .start()
+    .catch((err) => console.error('Failed to start Slack Socket:', err));
+}
+
+void main();

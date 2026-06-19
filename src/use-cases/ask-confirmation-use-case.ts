@@ -15,10 +15,12 @@ export interface AskConfirmationUseCase {
 export class AskConfirmationUseCaseInput {
   question: string;
   channel: string;
+  threadToReply?: string;
 
-  constructor(question: string, channel: string) {
+  constructor(question: string, channel: string, threadToReply?: string) {
     this.question = question;
     this.channel = channel;
+    this.threadToReply = threadToReply;
   }
 }
 
@@ -52,7 +54,11 @@ export class SlackAskConfirmationUseCase {
     input: AskConfirmationUseCaseInput
   ): Observable<AskConfirmationUseCaseOutput> {
     return this.messageSender
-      .send({ destination: input.channel, content: input.question })
+      .send({
+        destination: input.channel,
+        content: input.question,
+        threadToReply: input.threadToReply
+      })
       .pipe(delay(this.secondsTimeout * 1000))
       .pipe(
         flatMap((x) =>

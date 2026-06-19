@@ -1,6 +1,6 @@
-import { Observable, from, throwError } from 'rxjs';
+import { Observable, from, of, throwError } from 'rxjs';
 import { Octokit } from '@octokit/rest';
-import { flatMap, map, mapTo } from 'rxjs/operators';
+import { catchError, flatMap, map, mapTo } from 'rxjs/operators';
 import { PullsMergeResponseData } from '@octokit/types';
 
 export type TimeWidow = {
@@ -24,6 +24,14 @@ export interface MergeResponseData {
 
 export interface CompareResponseData {
   readonly aheadBy: number;
+}
+
+export interface OpenPullRequestSummary {
+  readonly number: number;
+  readonly title: string;
+  readonly author: string;
+  readonly url: string;
+  readonly createdAt: string;
 }
 
 export interface GithubService {
@@ -116,6 +124,11 @@ export interface GithubService {
 
   latestRelease(owner: string, repo: string): Observable<string>;
 
+  latestReleaseDate(
+    owner: string,
+    repo: string
+  ): Observable<string | undefined>;
+
   listCommitMessagesFromPullNumber(
     owner: string,
     repo: string,
@@ -126,6 +139,18 @@ export interface GithubService {
     owner: string,
     repo: string,
     timeWidow: TimeWidow
+  ): Observable<string[]>;
+
+  listOpenPullRequestsAgainstBranch(
+    owner: string,
+    repo: string,
+    base: string
+  ): Observable<OpenPullRequestSummary[]>;
+
+  listMergedPullRequestTitles(
+    owner: string,
+    repo: string,
+    base: string
   ): Observable<string[]>;
 
   getCommit(
@@ -443,6 +468,16 @@ export class ConcreteGithubService implements GithubService {
     );
   }
 
+  latestReleaseDate(
+    owner: string,
+    repo: string
+  ): Observable<string | undefined> {
+    return from(this.octokit.repos.getLatestRelease({ owner, repo })).pipe(
+      map((response) => response.data.published_at),
+      catchError(() => of(undefined))
+    );
+  }
+
   listCommitMessagesFromDate(
     owner: string,
     repo: string,
@@ -498,6 +533,58 @@ export class ConcreteGithubService implements GithubService {
       map((response) => response.data),
       map((data) => (data.commit.author ?? data.commit.committer).date),
       map((date) => ({ date }))
+    );
+  }
+
+  listOpenPullRequestsAgainstBranch(
+    owner: string,
+    repo: string,
+    base: string
+  ): Observable<OpenPullRequestSummary[]> {
+    return from(
+      this.octokit.pulls.list({
+        owner,
+        repo,
+        state: 'open',
+        base,
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        per_page: 100
+      })
+    ).pipe(
+      map((response) =>
+        response.data.map(
+          (pull): OpenPullRequestSummary => ({
+            number: pull.number,
+            title: pull.title,
+            author: pull.user.login,
+            url: pull.html_url,
+            createdAt: pull.created_at
+          })
+        )
+      )
+    );
+  }
+
+  listMergedPullRequestTitles(
+    owner: string,
+    repo: string,
+    base: string
+  ): Observable<string[]> {
+    return from(
+      this.octokit.pulls.list({
+        owner,
+        repo,
+        state: 'closed',
+        base,
+        // eslint-disable-next-line @typescript-eslint/camelcase
+        per_page: 100
+      })
+    ).pipe(
+      map((response) =>
+        response.data
+          .filter((pull) => pull.merged_at !== null)
+          .map((pull) => pull.title)
+      )
     );
   }
 }

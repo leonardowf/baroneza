@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 export interface MessageSenderInput<T> {
   destination: string;
   content: T;
+  threadToReply?: string;
 }
 
 export class MessageSenderOutput {
@@ -38,7 +39,9 @@ export class SlackMessageSender implements MessageSender<KnownMessageType> {
         return from(
           this.webClient.chat.postMessage({
             channel: message.destination,
-            text: message.content
+            text: message.content,
+            // eslint-disable-next-line @typescript-eslint/camelcase
+            thread_ts: message.threadToReply
           })
         ).pipe(
           map((response) => {
@@ -53,7 +56,9 @@ export class SlackMessageSender implements MessageSender<KnownMessageType> {
           this.webClient.chat.postMessage({
             blocks: message.content,
             channel: message.destination,
-            text: 'blocks'
+            text: 'blocks',
+            // eslint-disable-next-line @typescript-eslint/camelcase
+            thread_ts: message.threadToReply
           })
         ).pipe(
           map((response) => {
