@@ -11,12 +11,19 @@ import { UpdateReleaseEndpoint } from './endpoints/update-release-endpoint';
 import { ReleaseVersionEndpoint } from './endpoints/release-version-endpoint';
 import { GuessNextReleaseEndpoint } from './endpoints/guess-next-release-endpoint';
 import { ReleaseReadinessEndpoint } from './endpoints/release-readiness-endpoint';
+import { CheckKeysEndpoint } from './endpoints/check-keys-endpoint';
 
 const app = express();
 app.use(bodyParser.json());
 
 const port = 3000;
 const dependencies = new Dependencies();
+
+app.get('/checkKeys', (_req, res) => {
+  new CheckKeysEndpoint(dependencies).execute().subscribe((response) => {
+    res.status(response.ok ? 200 : 500).send(response);
+  });
+});
 
 app.post('/tagRelease', (req, res) => {
   log(`[tagRelease] request received: ${JSON.stringify(req.body)}`);

@@ -91,6 +91,7 @@ export class Dependencies
   githubService = new ConcreteGithubService(this.octokit());
   jiraService = new ConcreteJiraService(this.jiraAPI());
   slackWebClient = new WebClient(this.keychain.slackAuthToken);
+  slackAppWebClient = new WebClient(this.keychain.slackAppToken);
 
   pullRequestCommitExtractor = new GithubPullRequestExtractor(
     this.githubService,

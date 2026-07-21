@@ -16,8 +16,21 @@
     }
   ],
   "components": {},
-  "paths": {
-    "/startTrain": {
+    "paths": {
+        "/checkKeys": {
+            "get": {
+                "description": "Checks whether configured GitHub, Jira, Slack bot, and Slack app tokens can authenticate with their services. Token values are never returned.",
+                "responses": {
+                    "200": {
+                        "description": "All configured services responded successfully"
+                    },
+                    "500": {
+                        "description": "One or more services failed authentication or required keys are missing"
+                    }
+                }
+            }
+        },
+        "/startTrain": {
       "post": {
         "description": "This endpoint guesses the next release of the repository, creates a PR, reads the commits, parses the commit messages, tags the tickets and creates a changelog",
         "requestBody": {

@@ -6,6 +6,7 @@ const baseEnv: NodeJS.ProcessEnv = {
   JIRA_AUTH_TOKEN: 'jira-token',
   JIRA_USER_NAME: 'jira-user',
   SLACK_AUTH_TOKEN: 'slack-token',
+  SLACK_APP_TOKEN: 'slack-app-token',
   JIRA_HOST: 'example.atlassian.net'
 };
 
