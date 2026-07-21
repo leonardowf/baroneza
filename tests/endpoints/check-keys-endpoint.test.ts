@@ -25,7 +25,7 @@ const dependencies = (
     }
   }),
   jiraAPI: (): ReturnType<CheckKeysEndpointDependencies['jiraAPI']> => ({
-    getCurrentUser: jest.fn().mockResolvedValue({})
+    getVersions: jest.fn().mockResolvedValue([])
   }),
   slackWebClient: {
     auth: {
@@ -48,7 +48,7 @@ const buildEndpoint = (
 describe('The check keys endpoint', () => {
   it('returns ok when all services respond', (done) => {
     buildEndpoint(regularEnv)
-      .execute()
+      .execute({ jiraProjectKey: 'ABC' })
       .subscribe((response) => {
         expect(response.ok).toBe(true);
         expect(response.services.github.responding).toBe(true);
@@ -66,11 +66,32 @@ describe('The check keys endpoint', () => {
       JIRA_USER_NAME: '',
       JIRA_CLOUD_ID: 'cloud-id'
     })
-      .execute()
+      .execute({ jiraProjectKey: 'ABC' })
       .subscribe((response) => {
         expect(response.ok).toBe(true);
         expect(response.jiraAuthType).toBe('service');
         expect(response.services.jira.responding).toBe(true);
+        done();
+      });
+  });
+
+  it('requires a Jira project key for the Jira service check', (done) => {
+    const getVersions = jest.fn().mockResolvedValue([]);
+
+    buildEndpoint(regularEnv, {
+      jiraAPI: () => ({
+        getVersions
+      })
+    })
+      .execute()
+      .subscribe((response) => {
+        expect(response.ok).toBe(false);
+        expect(response.services.jira).toEqual({
+          configured: false,
+          responding: false,
+          error: 'Missing jiraProjectKey query parameter'
+        });
+        expect(getVersions).not.toHaveBeenCalled();
         done();
       });
   });
@@ -91,7 +112,7 @@ describe('The check keys endpoint', () => {
         }
       }
     )
-      .execute()
+      .execute({ jiraProjectKey: 'ABC' })
       .subscribe((response) => {
         expect(response.ok).toBe(false);
         expect(response.services.slackApp).toEqual({
@@ -114,7 +135,7 @@ describe('The check keys endpoint', () => {
         }
       })
     })
-      .execute()
+      .execute({ jiraProjectKey: 'ABC' })
       .subscribe((response) => {
         expect(response.ok).toBe(false);
         expect(response.services.github).toEqual({
@@ -136,7 +157,7 @@ describe('The check keys endpoint', () => {
         }
       }
     })
-      .execute()
+      .execute({ jiraProjectKey: 'ABC' })
       .subscribe((response) => {
         expect(response.ok).toBe(false);
         expect(response.services.slackBot).toEqual({

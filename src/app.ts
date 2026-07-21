@@ -19,10 +19,17 @@ app.use(bodyParser.json());
 const port = 3000;
 const dependencies = new Dependencies();
 
-app.get('/checkKeys', (_req, res) => {
-  new CheckKeysEndpoint(dependencies).execute().subscribe((response) => {
-    res.status(response.ok ? 200 : 500).send(response);
-  });
+app.get('/checkKeys', (req, res) => {
+  const jiraProjectKey =
+    typeof req.query.jiraProjectKey === 'string'
+      ? req.query.jiraProjectKey
+      : undefined;
+
+  new CheckKeysEndpoint(dependencies)
+    .execute({ jiraProjectKey })
+    .subscribe((response) => {
+      res.status(response.ok ? 200 : 500).send(response);
+    });
 });
 
 app.post('/tagRelease', (req, res) => {

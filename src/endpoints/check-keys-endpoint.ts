@@ -8,7 +8,7 @@ type GithubClient = {
 };
 
 type JiraClient = {
-  getCurrentUser(): Promise<unknown>;
+  getVersions(projectKey: string): Promise<unknown>;
 };
 
 type SlackClient = {
@@ -24,6 +24,10 @@ export interface CheckKeysEndpointDependencies {
   readonly slackWebClient: SlackClient;
   readonly slackAppWebClient: SlackClient;
 }
+
+export type CheckKeysEndpointInput = {
+  jiraProjectKey?: string;
+};
 
 export type ServiceCheck = {
   configured: boolean;
@@ -49,14 +53,18 @@ export class CheckKeysEndpoint {
     this.dependencies = dependencies;
   }
 
-  execute(): Observable<CheckKeysEndpointResponse> {
-    return from(this.checkServices());
+  execute(
+    input: CheckKeysEndpointInput = {}
+  ): Observable<CheckKeysEndpointResponse> {
+    return from(this.checkServices(input));
   }
 
-  private async checkServices(): Promise<CheckKeysEndpointResponse> {
+  private async checkServices(
+    input: CheckKeysEndpointInput
+  ): Promise<CheckKeysEndpointResponse> {
     const [github, jira, slackBot, slackApp] = await Promise.all([
       this.checkGithub(),
-      this.checkJira(),
+      this.checkJira(input),
       this.checkSlackBot(),
       this.checkSlackApp()
     ]);
@@ -87,7 +95,9 @@ export class CheckKeysEndpoint {
     );
   }
 
-  private async checkJira(): Promise<ServiceCheck> {
+  private async checkJira(
+    input: CheckKeysEndpointInput
+  ): Promise<ServiceCheck> {
     const missingKeys = this.missingJiraKeys();
     if (missingKeys.length > 0) {
       return this.missing(missingKeys.join(', '));
@@ -104,8 +114,12 @@ export class CheckKeysEndpoint {
       };
     }
 
+    if (!this.isConfigured(input.jiraProjectKey)) {
+      return this.missing('jiraProjectKey query parameter');
+    }
+
     return this.checkService(() =>
-      this.dependencies.jiraAPI().getCurrentUser()
+      this.dependencies.jiraAPI().getVersions(input.jiraProjectKey as string)
     );
   }
 
