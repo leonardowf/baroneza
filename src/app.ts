@@ -24,9 +24,13 @@ app.get('/checkKeys', (req, res) => {
     typeof req.query.jiraProjectKey === 'string'
       ? req.query.jiraProjectKey
       : undefined;
+  const slackChannel =
+    typeof req.query.slackChannel === 'string'
+      ? req.query.slackChannel
+      : undefined;
 
   new CheckKeysEndpoint(dependencies)
-    .execute({ jiraProjectKey })
+    .execute({ jiraProjectKey, slackChannel })
     .subscribe((response) => {
       res.status(response.ok ? 200 : 500).send(response);
     });

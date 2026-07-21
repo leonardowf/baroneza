@@ -17,16 +17,34 @@ type SlackClient = {
   };
 };
 
+type SlackAppClient = SlackClient & {
+  apps: {
+    connections: {
+      open(): Promise<{ ok?: boolean; error?: string; url?: string }>;
+    };
+  };
+};
+
+type SlackBotClient = SlackClient & {
+  chat: {
+    postMessage(message: {
+      channel: string;
+      text: string;
+    }): Promise<{ ok?: boolean; error?: string }>;
+  };
+};
+
 export interface CheckKeysEndpointDependencies {
   readonly keychain: Keychain;
   octokit(): GithubClient;
   jiraAPI(): JiraClient;
-  readonly slackWebClient: SlackClient;
-  readonly slackAppWebClient: SlackClient;
+  readonly slackWebClient: SlackBotClient;
+  readonly slackAppWebClient: SlackAppClient;
 }
 
 export type CheckKeysEndpointInput = {
   jiraProjectKey?: string;
+  slackChannel?: string;
 };
 
 export type ServiceCheck = {
@@ -43,7 +61,9 @@ export type CheckKeysEndpointResponse = {
     jira: ServiceCheck;
     slackBot: ServiceCheck;
     slackApp: ServiceCheck;
+    slackSocketMode: ServiceCheck;
   };
+  slackPing?: ServiceCheck;
 };
 
 export class CheckKeysEndpoint {
@@ -62,26 +82,41 @@ export class CheckKeysEndpoint {
   private async checkServices(
     input: CheckKeysEndpointInput
   ): Promise<CheckKeysEndpointResponse> {
-    const [github, jira, slackBot, slackApp] = await Promise.all([
+    const [
+      github,
+      jira,
+      slackBot,
+      slackApp,
+      slackSocketMode
+    ] = await Promise.all([
       this.checkGithub(),
       this.checkJira(input),
       this.checkSlackBot(),
-      this.checkSlackApp()
+      this.checkSlackApp(),
+      this.checkSlackSocketMode()
     ]);
+    const services = {
+      github,
+      jira,
+      slackBot,
+      slackApp,
+      slackSocketMode
+    };
+    const slackPing = this.isConfigured(input.slackChannel)
+      ? await this.sendSlackPing(input, services)
+      : undefined;
 
     return {
       ok:
         github.responding &&
         jira.responding &&
         slackBot.responding &&
-        slackApp.responding,
+        slackApp.responding &&
+        slackSocketMode.responding &&
+        (slackPing === undefined || slackPing.responding),
       jiraAuthType: this.dependencies.keychain.jiraAuthType,
-      services: {
-        github,
-        jira,
-        slackBot,
-        slackApp
-      }
+      services,
+      ...(slackPing === undefined ? {} : { slackPing })
     };
   }
 
@@ -143,6 +178,16 @@ export class CheckKeysEndpoint {
     );
   }
 
+  private async checkSlackSocketMode(): Promise<ServiceCheck> {
+    if (!this.isConfigured(this.dependencies.keychain.slackAppToken)) {
+      return this.missing('SLACK_APP_TOKEN');
+    }
+
+    return this.checkSlackAuth(() =>
+      this.dependencies.slackAppWebClient.apps.connections.open()
+    );
+  }
+
   private async checkService(
     check: () => Promise<unknown>
   ): Promise<ServiceCheck> {
@@ -170,6 +215,51 @@ export class CheckKeysEndpoint {
         throw new Error(response.error ?? 'Slack token rejected');
       }
     });
+  }
+
+  private async sendSlackPing(
+    input: CheckKeysEndpointInput,
+    services: CheckKeysEndpointResponse['services']
+  ): Promise<ServiceCheck> {
+    if (!services.slackBot.responding) {
+      return {
+        configured: true,
+        responding: false,
+        error: 'Slack bot check failed; ping was not sent'
+      };
+    }
+
+    return this.checkSlackAuth(() =>
+      this.dependencies.slackWebClient.chat.postMessage({
+        channel: input.slackChannel as string,
+        text: this.buildSlackPingMessage(input, services)
+      })
+    );
+  }
+
+  private buildSlackPingMessage(
+    input: CheckKeysEndpointInput,
+    services: CheckKeysEndpointResponse['services']
+  ): string {
+    return [
+      'Baroneza /checkKeys pong',
+      `jiraAuthType: ${this.dependencies.keychain.jiraAuthType}`,
+      `jiraProjectKey: ${input.jiraProjectKey ?? 'missing'}`,
+      `slackChannel: ${input.slackChannel ?? 'missing'}`,
+      `github: ${this.serviceStatus(services.github)}`,
+      `jira: ${this.serviceStatus(services.jira)}`,
+      `slackBot: ${this.serviceStatus(services.slackBot)}`,
+      `slackApp: ${this.serviceStatus(services.slackApp)}`,
+      `slackSocketMode: ${this.serviceStatus(services.slackSocketMode)}`
+    ].join('\n');
+  }
+
+  private serviceStatus(service: ServiceCheck): string {
+    if (!service.configured) {
+      return 'missing configuration';
+    }
+
+    return service.responding ? 'responding' : 'not responding';
   }
 
   private missingJiraKeys(): string[] {
