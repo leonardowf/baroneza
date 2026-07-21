@@ -30,6 +30,16 @@
                             "type": "string",
                             "example": "ABC"
                         }
+                    },
+                    {
+                        "name": "slackChannel",
+                        "in": "query",
+                        "required": false,
+                        "description": "Optional Slack channel ID or name that receives a safe ping/pong status summary. Token values are never included.",
+                        "schema": {
+                            "type": "string",
+                            "example": "C1234567890"
+                        }
                     }
                 ],
                 "responses": {
