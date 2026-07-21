@@ -20,6 +20,18 @@
         "/checkKeys": {
             "get": {
                 "description": "Checks whether configured GitHub, Jira, Slack bot, and Slack app tokens can authenticate with their services. Token values are never returned.",
+                "parameters": [
+                    {
+                        "name": "jiraProjectKey",
+                        "in": "query",
+                        "required": true,
+                        "description": "A Jira project key used to validate Jira access through the project versions API.",
+                        "schema": {
+                            "type": "string",
+                            "example": "ABC"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "All configured services responded successfully"
